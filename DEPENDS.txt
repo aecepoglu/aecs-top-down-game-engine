@@ -1,0 +1,4 @@
+Dependencies:
+=============
+* cmake : to compile the project
+* libSDL v2.0 : engine framework
