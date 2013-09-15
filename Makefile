@@ -1,2 +1,2 @@
 all:
-	gcc -o aecengine code.c -lSDL2
+	gcc -o level-editor level-editor.c sdl-helpers.c -lSDL2
