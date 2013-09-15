@@ -5,7 +5,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules/")
 
 find_package(SDL2 REQUIRED)
 
-add_executable(level-editor level-editor.c sdl-helpers.c)
+add_executable(level-editor level-editor.c sdl-helpers.c sdl-helpers.h)
 
 target_link_libraries(level-editor ${SDL2_LIBRARY})
 include_directories(level-editor ${SDL2_INCLUDE_DIR})
