@@ -1,6 +1,7 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_version.h>
+#include <SDL.h>
+#include <SDL_version.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
