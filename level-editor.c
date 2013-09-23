@@ -12,19 +12,23 @@
 /* -----------
  * DEFINITIONS
  */
-#define TILELEN 16
 enum tile { ground, wall, box};
+enum terrain { terrain_none, terrain_wall};
+enum gameObjType { go_none, go_player, go_monster};
 typedef int bool;
 
 struct map {
+	char *path;
 	unsigned int width;
 	unsigned int height;
-	enum tile **tiles;
+	enum terrain** tiles;
+	struct gameObject** objs;
 };
 
-struct player {
+struct gameObject {
 	SDL_Texture *texture;
 	unsigned int x,y;
+	enum gameObjType type;
 };
 	
 
@@ -32,23 +36,36 @@ struct player {
 /* -----------
  *  VARIABLES 
  */
-SDL_Window *win;
 bool running;
+SDL_Window *win;
 SDL_Renderer *ren;
-struct map *myMap;
-const char *mapPath;
-SDL_Texture* textures[2];
-struct player player;
-enum tile brush;
+
+/* textures map:
+ 0-empty
+ 1-terrain_none / padding for terrain = 1
+ 2-terrain_wall
+ 3-go_player  / padding for gameObjType = 2
+ 4-go_monster
+
+ */
+SDL_Texture* textures[2]; 
+#define TEX_PAD_TRN 1
+#define TEX_PAD_OBJ 2
+
+struct map myMap;
+struct gameObject player;
+struct gameObject* monsters;
 
 
 
 /* ------------
  *    MACROS
  */
+#define TILELEN 16
 #define log(...) fprintf(stdout, __VA_ARGS__)
 
 void quit(char *msg) {
+	//TODO handle the termination properly.
 	fprintf(stderr, "Error msg: \"%s\"\n", msg);
 	SDL_DestroyRenderer( ren);
 	SDL_DestroyWindow( win);
@@ -56,6 +73,8 @@ void quit(char *msg) {
 	exit(0);
 }
 
+/* Initializes the window, and creates a renderer object
+ */
 void init() {
 	assert( SDL_Init(SDL_INIT_EVERYTHING) >= 0);
 	win = SDL_CreateWindow("SDL Window", 0, 0, myMap->width *TILELEN, myMap->height *TILELEN, 0);
@@ -64,15 +83,15 @@ void init() {
 	assert( ren);
 }
 
-void drawMap( struct map *m) {
+void drawMap() {
 	unsigned int x,y;
 	for( x=0; x< m->width; x++) {
 		for( y=0; y< m->height; y++) {
-			SDL_Texture *t = textures[ m->tiles[x][y]/*returns 'enum tile*/ ];
+			//draw the game object if there is one; else, draw the terrain
+			SDL_Texture *t = textures[ myMap->objs[x][y] == 0 ? (myMap->tiles[x][y]+TEX_PAD_TRN) : (myMap->objs[x][y]+TEX_PAD_OBJ) ];
 			drawTexture( ren, t, x*TILELEN, y*TILELEN, TILELEN, TILELEN);
 		}
 	}
-	drawTexture( ren, player.texture, player.x*TILELEN, player.y*TILELEN, TILELEN, TILELEN);
 	//log("map drawn\n");
 }
 
@@ -83,14 +102,23 @@ void draw() {
 	SDL_RenderPresent( ren);
 }
 
-void saveMap( const char *path) {
-	FILE *fp = fopen( path, "wb");
+/* Saves the map to disk
+ */
+void saveMap() {
+	FILE *fp = fopen( myMap->filePath, "wb");
 	assert( fp);
-	fwrite( &myMap->width, sizeof(unsigned int), 1, fp);
+	//write dimensions first
+	fwrite( &myMap->width,  sizeof(unsigned int), 1, fp);
 	fwrite( &myMap->height, sizeof(unsigned int), 1, fp);
-	unsigned int x;
-	for(x=0; x<myMap->width; x++)
-		fwrite( myMap->tiles[x], sizeof(enum tile), myMap->height, fp);
+	fwrite( &objListSize,   sizeof(unsigned int), 1, fp);
+	unsigned int i;
+	for(i=0; i<objListSize; i++) {
+		fwrite( &objList[i].x,    sizeof(unsigned int),     1, fp);
+		fwrite( &objList[i].y,    sizeof(unsigned int),     1, fp);
+		fwrite( &objList[i].type, sizeof(enum gameObjType), 1, fp);
+	}
+	for(i=0; i<myMap->width; i++)
+		fwrite( myMap->tiles[i], sizeof(enum tile), myMap->height, fp);
 	fclose(fp);
 
 	log("Map saved to \"%s\"\n", path);
@@ -118,6 +146,9 @@ void handleKey( SDL_KeyboardEvent *e) {
 	};
 }
 
+/* The mouse button-event and motion-events are handled the same
+ * I just need to extract the x,y from the event-data.
+ */
 bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	unsigned int x,y;
 	if( e) {
