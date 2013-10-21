@@ -20,24 +20,22 @@
  * DEFINITIONS
  */
 
-/* The drawing brushes. These are used to draw terrain and objects on map */
-enum brushType { brush_none, brush_terrain, brush_object};
-union brushType2 { enum terrainType terrain; enum objType obj; };
 
 
 /* -----------
  *  VARIABLES 
  */
 bool running;
-SDL_Window *win;
-SDL_Renderer *ren;
+SDL_Window *window;
+SDL_Renderer *renderer;
 SDL_Texture **textures;
 
 
 struct map *myMap;
 
-enum brushType mainBrush;
-union brushType2 secondaryBrush;
+/* The drawing brushes. These are used to draw terrain and objects on map */
+void (*brush)(unsigned int, unsigned int); //draws something on the given location
+union { enum terrainType terrain; enum objType obj; enum aiType ai} secondaryBrush;
 
 /* windowX,windowY : coordinates of current view in the whole map */
 int windowW=40, windowH=30, windowX=0, windowY=0;
@@ -48,11 +46,64 @@ int windowW=40, windowH=30, windowX=0, windowY=0;
  */
 #define TILELEN 16
 
+void drawTerrain( unsigned int x, unsigned int y){
+	if( myMap->tiles[x][y] != secondaryBrush.terrain) {
+		myMap->tiles[x][y] = secondaryBrush.terrain;
+		return 1;
+	}
+}
+
+void drawObject( unsigned int x, unsigned int y){
+	//add objects only if there is no object there
+	if( myMap->objs[x][y] != 0 ) 
+		return;
+	
+	log1( "Creating an object\n");
+	//increase the array size if necessary
+	if( myMap->objListCount == myMap->objListSize) {
+		myMap->objListSize *= 2;
+		myMap->objList = (struct object**)realloc( myMap->objList, sizeof(struct object*) * myMap->objListSize);
+	}
+
+	//create and initialize a monster
+	struct object *obj = createObject( secondaryBrush.obj, x, y);
+
+	log1( "\tcreated\n");
+	
+	//the 2d objs array maps to actual object objects
+	myMap->objs[x][y] = obj;
+	log1( "\tpointer set\n");
+
+	myMap->objList[ myMap->objListCount] = obj;
+	log1( "\tinserted to array\n");
+	myMap->objListCount ++;
+}
+
+void drawAI( unsigned int x, unsigned int y) {
+	struct object *obj = myMap->objs[x][y];
+	
+	//check if there is an intelligent object at the given location
+	if( obj == 0)
+		return;
+
+	//remove the existing AI if necessary
+	if( obj->ai != 0 && (obj->ai->type != secondaryBrush.ai || secondaryBrush.ai == ai_none) ){
+		free(obj->ai);
+		obj->ai = 0;
+	}
+
+	//now obj->ai = 0;
+	if( secondaryBrush.ai != ai_none)
+		
+
+
+}
+
 void quit( const char *msg) {
 	//TODO handle the termination properly.
 	fprintf(stderr, "Error msg: \"%s\"\n", msg);
-	SDL_DestroyRenderer( ren);
-	SDL_DestroyWindow( win);
+	SDL_DestroyRenderer( renderer);
+	SDL_DestroyWindow( window);
 	SDL_Quit();
 	exit(0);
 }
@@ -61,10 +112,10 @@ void quit( const char *msg) {
  */
 void init() {
 	assert( SDL_Init(SDL_INIT_EVERYTHING) >= 0);
-	win = SDL_CreateWindow("SDL Window", 0, 0, windowW*TILELEN, windowH*TILELEN, 0);
-	assert( win);
-	ren = SDL_CreateRenderer( win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	assert( ren);
+	window = SDL_CreateWindow("SDL Window", 0, 0, windowW*TILELEN, windowH*TILELEN, 0);
+	assert( window);
+	ren = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	assert( renderer);
 }
 
 /* Draws the map and objects viewed on screen */
@@ -73,7 +124,7 @@ void drawMap() {
 	for( x=0, rx=windowX; rx< MIN(myMap->width, windowX+windowW); x++, rx++) {
 		for( y=0, ry=windowY; ry< MIN(myMap->height, windowY+windowH); y++, ry++) {
 			//draw the terrain if there is no object here; else, draw the object
-			drawTexture( ren,
+			drawTexture( renderer,
 				textures [
 					myMap->objs[rx][ry] == 0
 						? TEXTURE_MAP_TRN_TYPE( myMap->tiles[rx][ry])
@@ -86,9 +137,9 @@ void drawMap() {
 }
 
 void draw() {
-	SDL_RenderClear( ren);
+	SDL_RenderClear( renderer);
 	drawMap( myMap);
-	SDL_RenderPresent( ren);
+	SDL_RenderPresent( renderer);
 }
 
 /* 	Saves the map to disk
@@ -183,37 +234,11 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	if( x > myMap->width || y > myMap->height)
 		return 0;
 
-	if( mainBrush == brush_terrain) {
-		if( myMap->tiles[x][y] != secondaryBrush.terrain) {
-			myMap->tiles[x][y] = secondaryBrush.terrain;
-			return 1;
-		}
-	}
-	else if ( mainBrush == brush_object) {
-		//add objects only if there is no object there
-		if( myMap->objs[x][y] == 0 ) {
-			log1( "Creating an object\n");
-			//increase the array size if necessary
-			if( myMap->objListCount == myMap->objListSize) {
-				myMap->objListSize *= 2;
-				myMap->objList = (struct object**)realloc( myMap->objList, sizeof(struct object*) * myMap->objListSize);
-			}
 
-			//create and initialize a monster
-			struct object *obj = createObject( secondaryBrush.obj, x, y);
+	brush( x, y);
 
-			log1( "\tcreated\n");
-			
-			//the 2d objs array maps to actual object objects
-			myMap->objs[x][y] = obj;
-			log1( "\tpointer set\n");
 
-			myMap->objList[ myMap->objListCount] = obj;
-			log1( "\tinserted to array\n");
-			myMap->objListCount ++;
-			return 1;
-		}
-	}
+
 	//return 'true' only if there is a change in the map
 	return 0;
 }
@@ -333,7 +358,7 @@ int main( int argc, char *args[]) {
 	init();
 	
 	
-	textures = loadTextures( ren);
+	textures = loadTextures( renderer);
 
 	log0("All set and ready\nStarting...\n");
 
