@@ -1,0 +1,10 @@
+digraph leftTurner {
+	start -> checkFront;
+	checkFront -> moveForward [label="no"];
+	checkFront -> turnLeft [label="yes"];
+	turnLeft -> moveForward;
+	moveForward -> checkFront;
+
+	checkFront [ shape=diamond];
+	checkFront [ style=filled; fillcolor=yellow];
+}

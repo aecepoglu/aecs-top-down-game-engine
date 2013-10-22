@@ -27,33 +27,36 @@ struct map* readMapFile( char *path) {
 	fread( &m->height, 		sizeof(unsigned int), 	1, fp);
 	fread( &m->objListCount, 	sizeof(unsigned int), 	1, fp);
 	fread( &m->objListSize, 	sizeof(unsigned int), 	1, fp);
+	//can try to assert objListCount<objListSize
 	
 	//initialize the 1st dimension of map->tiles and map->objs
 	m->objs = (struct object***)calloc( m->width, sizeof(struct object **));
 	m->tiles = (enum terrainType**)calloc( m->width, sizeof(enum terrainType*));
 
 	//initialize the objList array
-	m->objList = (struct object**)calloc( m->objListCount, sizeof(struct object*));
+	m->objList = (struct object**)calloc( m->objListSize, sizeof(struct object*));
 
+	log1("initializing 2d objs map\n");
 	//initialize the 2nd dimension of map->objs
 	/* map->objs is a 2d map that has pointers to the actual object structs */
 	for( x=0; x< m->width; x++)
 		m->objs[x] = (struct object**)calloc( m->height, sizeof(struct object*));
 		//all points of m->objs[x][y] should be 0 by default
 
+	
+	log1("reading objects-list. count %d size %d\n", m->objListCount, m->objListSize);
+	
 	//read the objList
 	struct object* mon;
 	for( x=0; x< m->objListCount; x++) {
-		unsigned int x,y;
-		enum objType type;
+		struct object *obj = readObject( fp);
 
-		mon = createObject( type, x, y);
-		m->objList[x] = mon;
+		m->objList[x] = obj;
 
 		//setup pointers from the map->objs to objList items
-		m->objs[ x][ y] = mon;
+		m->objs[ obj->x][ obj->y] = obj;
 	}
-	//log1( "width %d\nheight %d\n", m->width, m->height);
+	log1( "width %d\nheight %d\n", m->width, m->height);
 	
 	//read the map tiles
 	for( x=0; x<m->width; x++) {
@@ -83,11 +86,9 @@ void saveMap( struct map *map) {
 	fwrite( &map->objListCount,	sizeof(unsigned int), 1, fp);
 	fwrite( &map->objListSize,	sizeof(unsigned int), 1, fp);
 	unsigned int i;
-	for(i=0;   i<map->objListCount; i++) {
-		fwrite( &map->objList[i]->x,   	sizeof(unsigned int),     1, fp);
-		fwrite( &map->objList[i]->y,    	sizeof(unsigned int),     1, fp);
-		fwrite( &map->objList[i]->type, 	sizeof(enum objType), 1, fp);
-	}
+	for(i=0;   i<map->objListCount; i++)
+		writeObject( fp, map->objList[i]);
+
 	//now print the map terrain, column by column
 	for(i=0; i<map->width; i++)
 		fwrite( map->tiles[i], sizeof(enum terrainType), map->height, fp);

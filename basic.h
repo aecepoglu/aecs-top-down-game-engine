@@ -6,6 +6,7 @@
 #define BASIC_H
 
 #include <SDL.h>
+#include <stdio.h>
 
 typedef int bool;
 enum objType { go_player, go_monster};
@@ -30,5 +31,7 @@ struct object {
 #define MAX( x, y) ((x) > (y) ? (x) : (y))
 
 struct object* createObject( enum objType type, unsigned int x, unsigned int y);
+struct object* readObject( FILE *fp);
+void writeObject( FILE *fp, struct object *obj);
 
 #endif //BASIC_H
