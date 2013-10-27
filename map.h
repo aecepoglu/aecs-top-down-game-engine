@@ -5,14 +5,14 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "basic.h"
+#include "object.h"
 
 /* -----------
  * DEFINITIONS
  */
 enum terrainType { terrain_none, terrain_wall};
 
-struct map {
+struct Map {
 	char *filePath;
 	unsigned int width;
 	unsigned int height;
@@ -51,14 +51,14 @@ struct map {
 /*	Reads the map file at 'path'.
 	Returns the map read
 */
-struct map* readMapFile( char *path);
+struct Map* readMapFile( char *path);
 
 /* 	Saves the map to disk
  */
-void saveMap( struct map* map); 
+void saveMap( struct Map* map); 
 
 /* Create a new map that matches the given parameters
  */
-struct map* createNewMap( unsigned int width, unsigned int height); 
+struct Map* createNewMap( unsigned int width, unsigned int height); 
 
 #endif //MAP_H

@@ -11,7 +11,7 @@
 #include <string.h>
 #include <limits.h>
 
-#include "basic.h"
+#include "object.h"
 #include "texture.h"
 #include "map.h"
 #include "log.h"
@@ -33,7 +33,7 @@ SDL_Renderer *renderer;
 SDL_Texture **textures;
 
 
-struct map *myMap;
+struct Map *myMap;
 
 /* The drawing brushes. These are used to draw terrain and objects on map */
 brushFun *brush; //draws something on the given location

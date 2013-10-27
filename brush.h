@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include "basic.h"
+#include "object.h"
 #include "log.h"
 
 typedef bool (brushFun)(unsigned int, unsigned int, int);
@@ -64,5 +64,5 @@ brushFun* updateBrushState( struct brushState **curState, int *brushVariant, SDL
 	return defaultBrush;
 }
 
-#undef defaultBrush
 #undef no_var
+#undef no_trans

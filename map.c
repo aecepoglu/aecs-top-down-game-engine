@@ -15,9 +15,9 @@
 /*	Reads the map file at 'path'.
 	Returns the map read
 */
-struct map* readMapFile( char *path) {
+struct Map* readMapFile( char *path) {
 	log1( "readMapFile( %s)\n", path);
-	struct map *m = (struct map*)malloc( sizeof(struct map) );
+	struct Map *m = (struct Map*)malloc( sizeof(struct Map) );
 	FILE *fp = fopen( path, "rb");
 	unsigned int x;
 	assert( fp);
@@ -74,7 +74,7 @@ struct map* readMapFile( char *path) {
 		objList {x, y, type}
 		map-tiles, column by column
  */
-void saveMap( struct map *map) {
+void saveMap( struct Map *map) {
 	log1( "saveMap( ... to %s)\n", map->filePath);
 	FILE *fp = fopen( map->filePath, "wb");
 	assert( fp);
@@ -99,9 +99,9 @@ void saveMap( struct map *map) {
 
 /* Create a new map that matches the given parameters
  */
-struct map* createNewMap( unsigned int width, unsigned int height) {
+struct Map* createNewMap( unsigned int width, unsigned int height) {
 	log1( "createNewMap( %d, %d)\n", width, height);
-	struct map *m = (struct map*)malloc(sizeof(struct map));
+	struct Map *m = (struct Map*)malloc(sizeof(struct Map));
 	m->width = width;
 	m->height = height;
 	
