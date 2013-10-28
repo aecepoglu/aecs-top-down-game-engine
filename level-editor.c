@@ -31,6 +31,7 @@ bool running;
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Texture **textures;
+SDL_Texture *bgroundTexture;
 
 
 struct Map *myMap;
@@ -122,29 +123,45 @@ void init() {
 	assert( window);
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	assert( renderer);
+	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, windowW*TILELEN, windowH*TILELEN);
+
 }
 
 /* Draws the map and objects viewed on screen */
-void drawMap() {
-	unsigned int x,y,rx,ry;
-	for( x=0, rx=windowX; rx< MIN(myMap->width, windowX+windowW); x++, rx++) {
-		for( y=0, ry=windowY; ry< MIN(myMap->height, windowY+windowH); y++, ry++) {
-			//draw the terrain if there is no object here; else, draw the object
-			drawTexture( renderer,
-				textures [
-					myMap->objs[rx][ry] == 0
-						? TEXTURE_MAP_TRN_TYPE( myMap->tiles[rx][ry])
-						: TEXTURE_MAP_OBJ_TYPE( myMap->objs[rx][ry]->type)
-					],
-				x*TILELEN, y*TILELEN, TILELEN, TILELEN
-				);
+void drawObjects() {
+	unsigned i,x,y;
+	for( i=0; i<myMap->objListCount; i++) {
+		x = myMap->objList[i]->x - windowX;
+		y = myMap->objList[i]->y - windowY;
+		if( x>=0 && y>=0 && x<windowW && y<windowH ) {
+			drawTexture( renderer, textures[ TEXTURE_MAP_OBJ_TYPE( myMap->objList[i]->type) ], x*TILELEN, y*TILELEN, TILELEN, TILELEN );
 		}
 	}
 }
 
+void drawBackground() {
+	log0("generate background\n");
+	SDL_DestroyTexture( bgroundTexture);
+	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, windowW*TILELEN, windowH*TILELEN) ;
+	SDL_SetRenderTarget( renderer, bgroundTexture); 
+
+	unsigned int x,y,rx,ry;
+	for( x=0, rx=windowX; rx< MIN(myMap->width, windowX+windowW); x++, rx++)
+    	for( y=0, ry=windowY; ry< MIN(myMap->height, windowY+windowH); y++, ry ++)
+    		drawTexture( renderer, textures [ TEXTURE_MAP_TRN_TYPE( myMap->tiles[rx][ry]) ],
+    			x*TILELEN, y*TILELEN, TILELEN, TILELEN
+    			);
+
+	SDL_SetRenderTarget( renderer, 0); //reset
+}
+
 void draw() {
+	log0("draw\n");
 	SDL_RenderClear( renderer);
-	drawMap( myMap);
+	//render background
+	drawTexture( renderer, bgroundTexture, 0, 0, windowW*TILELEN, windowH*TILELEN);
+	//render objects
+	drawObjects( );
 	SDL_RenderPresent( renderer);
 }
 
@@ -155,8 +172,6 @@ void draw() {
  */
 
 void scrollScreen( int dX, int dY) {
-	log1("scroll, gived dx %d, dy %d, x %d, y %d, w %d, h %d\n", dX, dY, windowX, windowY, windowW, windowH);
-	
 	if( windowX + dX >= 0 && windowX + windowW + dX <= myMap->width)
 		windowX += dX;
 	if( windowY + dY >= 0 && windowY + windowH + dY <= myMap->height)
@@ -165,7 +180,7 @@ void scrollScreen( int dX, int dY) {
 	
 
 	log1("scrolled to (%d,%d)\n", windowX, windowY);
-	draw();
+	drawBackground();
 }
 
 void handleKey( SDL_KeyboardEvent *e) {
@@ -245,11 +260,12 @@ int run() {
 					    //log1("Window %d exposed\n", e.window.windowID);
 					    break;
 					case SDL_WINDOWEVENT_RESIZED:
-					    log1("Window %d resized to %dx%d\n",
+					    log0("Window %d resized to %dx%d\n",
 					            e.window.windowID, e.window.data1,
 					            e.window.data2);
 						windowW = (e.window.data1-1) / TILELEN;
 						windowH = (e.window.data2-1) / TILELEN;
+						drawBackground();
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:
 					    log1("Window %d minimized\n", e.window.windowID);
@@ -263,6 +279,9 @@ int run() {
 					case SDL_WINDOWEVENT_CLOSE:
 					    log1("Window %d closed\n", e.window.windowID);
 					    break;
+					default:
+						//unhandled window event
+						continue;
 				};
 				break;
 			case SDL_QUIT:

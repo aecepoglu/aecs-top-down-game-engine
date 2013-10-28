@@ -7,7 +7,6 @@
 
 #include <SDL.h>
 
-
 /* indexes for textures */
 #define TEXTURE_BAD				0
 #define TEXTURE_TRN_NONE 		1
