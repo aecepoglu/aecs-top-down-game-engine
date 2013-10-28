@@ -49,6 +49,15 @@ int windowW=40, windowH=30, windowX=0, windowY=0;
  */
 #define TILELEN 16
 
+
+bool moveForward( struct Map *map, struct object* obj) {
+	return 1;
+}
+bool turnLeft( struct Map *map, struct object *obj) {
+	return 1;
+}
+
+
 bool defaultBrush( unsigned int x, unsigned int y, int type) {
 	log0("brush unset\n");
 	return 0;
@@ -131,10 +140,6 @@ void drawMap() {
 				);
 		}
 	}
-	log0("1 %s\n", myMap->objs[0][0] == 0 ? "empty" : "full");
-	log0("2 %s\n", myMap->objs[0][1] == 0 ? "empty" : "full");
-	log0("3 %s\n", myMap->objs[0][2] == 0 ? "empty" : "full");
-	log0("4 %s\n", myMap->objs[0][3] == 0 ? "empty" : "full");
 }
 
 void draw() {
@@ -188,7 +193,6 @@ void handleKey( SDL_KeyboardEvent *e) {
 			break;
 		default:
 			brush = updateBrushState( &myBrushState, &brushVariant, e->keysym.sym);
-			log0("brush updated\n");
 			break;
 	};
 }
