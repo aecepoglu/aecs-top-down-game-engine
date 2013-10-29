@@ -23,22 +23,27 @@ brushFun drawAI;
 
 #define no_var 0 
 #define no_trans 0
-
 struct brushState initialBrushState = 
 {"null", 1, defaultBrush, no_var, (struct stateTransition[]) {
 	//0
-	{SDLK_1, { "create", 2, defaultBrush, no_var, (struct stateTransition[]) {
+	{SDLK_1, { "create", 3, defaultBrush, no_var, (struct stateTransition[]) {
 		//0
 		{SDLK_1, { "object", 0, drawObject, go_monster, no_trans} },
 		//1
 		{SDLK_2, { "terrain", 2, defaultBrush, no_var, (struct stateTransition[]) {
 			//0
-			{ SDLK_1, { "ground", 0, drawTerrain, terrain_none, no_trans} },
+			{SDLK_1, { "ground", 0, drawTerrain, terrain_none, no_trans} },
 			//1
-			{ SDLK_2, { "wall", 0, drawTerrain, terrain_wall, no_trans} }
-		}}}
+			{SDLK_2, { "wall", 0, drawTerrain, terrain_wall, no_trans} }
+		}}},
+		//2
+		{SDLK_3, { "AI", 1, defaultBrush, no_var, (struct stateTransition[]) {
+			{SDLK_1, { "left-turner", 0, drawAI, ai_leftTurner, no_trans} },
+		}}},
 	}}}
 }};
+#undef no_var
+#undef no_trans
 
 //void (*updateBrushState( struct brushState *(*curState), SDL_Keycode key))( unsigned int, unsigned int, int) {
 brushFun* updateBrushState( struct brushState **curState, int *brushVariant, SDL_Keycode key) {
@@ -64,5 +69,3 @@ brushFun* updateBrushState( struct brushState **curState, int *brushVariant, SDL
 	return defaultBrush;
 }
 
-#undef no_var
-#undef no_trans

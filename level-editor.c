@@ -1,62 +1,16 @@
-/*
-	level-editor main code
-*/
-
-#include <SDL.h>
-#include <SDL_version.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-#include <limits.h>
-
-#include "object.h"
-#include "texture.h"
-#include "map.h"
-#include "log.h"
-
+#include "engine.h"
 #include "brush.h"
+#include "aiTable.h"
 
-/* -----------
- * DEFINITIONS
- */
-
-
-
-/* -----------
- *  VARIABLES 
- */
-bool running;
-SDL_Window *window;
-SDL_Renderer *renderer;
-SDL_Texture **textures;
-SDL_Texture *bgroundTexture;
-
-
-struct Map *myMap;
 
 /* The drawing brushes. These are used to draw terrain and objects on map */
 brushFun *brush; //draws something on the given location
 int brushVariant;
 struct brushState* myBrushState;
 
-/* windowX,windowY : coordinates of current view in the whole map */
-int windowW=40, windowH=30, windowX=0, windowY=0;
 
-
-/* ------------
- *    MACROS
- */
-#define TILELEN 16
-
-
-bool moveForward( struct Map *map, struct object* obj) {
-	return 1;
-}
-bool turnLeft( struct Map *map, struct object *obj) {
-	return 1;
-}
+bool moveForward( struct Map *map, struct object* obj) { }
+bool turnLeft( struct Map *map, struct object *obj) { }
 
 
 bool defaultBrush( unsigned int x, unsigned int y, int type) {
@@ -103,84 +57,15 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 }
 
 bool drawAI( unsigned int x, unsigned int y, int type) {
-	//TODO
-}
-
-void quit( const char *msg) {
-	//TODO handle the termination properly.
-	fprintf(stderr, "Error msg: \"%s\"\n", msg);
-	SDL_DestroyRenderer( renderer);
-	SDL_DestroyWindow( window);
-	SDL_Quit();
-	exit(0);
-}
-
-/* Initializes the window, and creates a renderer object
- */
-void init() {
-	assert( SDL_Init(SDL_INIT_EVERYTHING) >= 0);
-	window = SDL_CreateWindow("SDL Window", 0, 0, windowW*TILELEN, windowH*TILELEN, 0);
-	assert( window);
-	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	assert( renderer);
-	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, windowW*TILELEN, windowH*TILELEN);
-
-}
-
-/* Draws the map and objects viewed on screen */
-void drawObjects() {
-	unsigned i,x,y;
-	for( i=0; i<myMap->objListCount; i++) {
-		x = myMap->objList[i]->x - windowX;
-		y = myMap->objList[i]->y - windowY;
-		if( x>=0 && y>=0 && x<windowW && y<windowH ) {
-			drawTexture( renderer, textures[ TEXTURE_MAP_OBJ_TYPE( myMap->objList[i]->type) ], x*TILELEN, y*TILELEN, TILELEN, TILELEN );
-		}
+	//if there is an object at the given location, and it dsoen't have an AI
+	if( myMap->objs[x][y] != 0 && myMap->objs[x][y]->ai==0) {
+		log0("Create an ai of type %d\n", type);
+		struct AI *ai = AI_CREATE( type);
+		myMap->objs[x][y]->ai = ai;
+		return 1;
 	}
-}
-
-void drawBackground() {
-	log0("generate background\n");
-	SDL_DestroyTexture( bgroundTexture);
-	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, windowW*TILELEN, windowH*TILELEN) ;
-	SDL_SetRenderTarget( renderer, bgroundTexture); 
-
-	unsigned int x,y,rx,ry;
-	for( x=0, rx=windowX; rx< MIN(myMap->width, windowX+windowW); x++, rx++)
-    	for( y=0, ry=windowY; ry< MIN(myMap->height, windowY+windowH); y++, ry ++)
-    		drawTexture( renderer, textures [ TEXTURE_MAP_TRN_TYPE( myMap->tiles[rx][ry]) ],
-    			x*TILELEN, y*TILELEN, TILELEN, TILELEN
-    			);
-
-	SDL_SetRenderTarget( renderer, 0); //reset
-}
-
-void draw() {
-	log0("draw\n");
-	SDL_RenderClear( renderer);
-	//render background
-	drawTexture( renderer, bgroundTexture, 0, 0, windowW*TILELEN, windowH*TILELEN);
-	//render objects
-	drawObjects( );
-	SDL_RenderPresent( renderer);
-}
-
-/* 	Saves the map to disk
-	Map format : map-width map-height objListCount objListSize
-		objList {x, y, type}
-		map-tiles, column by column
- */
-
-void scrollScreen( int dX, int dY) {
-	if( windowX + dX >= 0 && windowX + windowW + dX <= myMap->width)
-		windowX += dX;
-	if( windowY + dY >= 0 && windowY + windowH + dY <= myMap->height)
-		windowY += dY;
 	
-	
-
-	log1("scrolled to (%d,%d)\n", windowX, windowY);
-	drawBackground();
+	return 0;
 }
 
 void handleKey( SDL_KeyboardEvent *e) {
@@ -231,12 +116,7 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	x += windowX;
 	y += windowY;
 
-	//if the mouse is outside the map, don't do anything
-	if( x > myMap->width || y > myMap->height)
-		return 0;
-
-
-	return brush( x, y, brushVariant);
+	return ( x < myMap->width && y < myMap->height && brush( x, y, brushVariant) );
 }
 
 
@@ -293,11 +173,20 @@ int run() {
 				handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				handleMouse( (SDL_MouseButtonEvent*)&e, 0);
+				if (handleMouse( (SDL_MouseButtonEvent*)&e, 0) ) {
+					drawBackground();
+					break;
+				}
+				else
+					continue;
 				break;
 			case SDL_MOUSEMOTION:
-				if( handleMouse( 0, (SDL_MouseMotionEvent*)&e) )
+				if( handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
+					drawBackground();
 					break;
+				}
+				else
+					continue;
 			case SDL_KEYUP:
 			case SDL_MOUSEBUTTONUP:
 				/*don't do anything for those events*/

@@ -54,7 +54,7 @@ struct Map* readMapFile( char *path) {
 		m->objList[x] = obj;
 
 		//setup pointers from the map->objs to objList items
-		m->objs[ obj->x][ obj->y] = obj;
+		m->objs[ obj->pos.i][ obj->pos.j] = obj;
 	}
 	log1( "width %d\nheight %d\n", m->width, m->height);
 	

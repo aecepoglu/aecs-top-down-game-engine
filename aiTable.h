@@ -1,3 +1,6 @@
+#ifndef AITABLE_H
+#define AITABLE_H
+
 #include "ai/leftTurner.h"
 #include "ai.h"
 #include "aiFun.h"
@@ -8,12 +11,14 @@ struct aiTableItem {
 };
 
 
-struct aiTableItem aiTable[] = {
+static struct aiTableItem aiTable[] = {
 	{ 0, 0 }, //ai_none
 	{ leftTurner_create, leftTurner_update }, //ai_leftTurner
 };
-#define AICOUNT 1
 
 /* table interface */
 #define AI_CREATE( type) aiTable[type].constructor()
-#define AI_UPDATE( type, map, object) aiTable[type].updateFun( map, object)
+#define AI_UPDATE( map, obj) aiTable[ obj->ai->type].updateFun( map, obj, obj->ai->data)
+
+
+#endif

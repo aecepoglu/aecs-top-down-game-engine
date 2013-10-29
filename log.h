@@ -1,8 +1,8 @@
 #ifndef LOG_H
 #define LOG_H
 
-//#define VERBOSE_0 //default verbose level
-#define VERBOSE_1
+#define VERBOSE_0 //default verbose level
+//#define VERBOSE_1
 
 #ifdef VERBOSE_0
 	#define log0(...) fprintf(stdout, __VA_ARGS__)

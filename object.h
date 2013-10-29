@@ -9,13 +9,14 @@
 #include <stdio.h>
 #include "ai.h"
 #include "basic.h"
+#include "vector.h"
 
 enum objType { go_player, go_monster, };
 enum direction { dir_right, dir_up, dir_left, dir_down, };
 
 /*struct AI defined in ai.h*/
 struct object {
-	unsigned int x,y;
+	struct Vector pos;
 	enum objType type;
 	enum direction dir;
 	struct AI *ai;
@@ -24,6 +25,11 @@ struct object {
 
 #define MIN( x, y) ((x) < (y) ? (x) : (y))
 #define MAX( x, y) ((x) > (y) ? (x) : (y))
+
+
+static struct Vector dirVectors[] = {
+	{1, 0}, {0, -1}, {-1, 0}, {0, 1}
+};
 
 /* Creates and returns an Object of given type */
 struct object* createObject( enum objType type, unsigned int x, unsigned int y);
