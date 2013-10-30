@@ -11,7 +11,7 @@
 #include "basic.h"
 #include "vector.h"
 
-enum objType { go_player, go_monster, };
+enum objType { go_player, go_monster, go_misc};
 enum direction { dir_right, dir_up, dir_left, dir_down, };
 
 /*struct AI defined in ai.h*/

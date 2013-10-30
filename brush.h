@@ -19,6 +19,7 @@ struct stateTransition {
 brushFun defaultBrush;
 brushFun drawObject;
 brushFun drawTerrain;
+brushFun drawPlayer;
 brushFun drawAI;
 
 #define no_var 0 
@@ -28,7 +29,14 @@ struct brushState initialBrushState =
 	//0
 	{SDLK_1, { "create", 3, defaultBrush, no_var, (struct stateTransition[]) {
 		//0
-		{SDLK_1, { "object", 0, drawObject, go_monster, no_trans} },
+		{SDLK_1, { "object", 3, defaultBrush, no_var, (struct stateTransition[]) {
+			//0
+			{SDLK_4, { "player", 0, drawPlayer, no_var, no_trans} },
+			//1
+			{SDLK_1, { "monster", 0, drawObject, go_monster, no_trans} },
+			//2
+			{SDLK_2, { "apple", 0, drawObject, go_misc, no_trans} },
+		}}}
 		//1
 		{SDLK_2, { "terrain", 2, defaultBrush, no_var, (struct stateTransition[]) {
 			//0

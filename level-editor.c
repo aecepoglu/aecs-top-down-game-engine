@@ -12,9 +12,11 @@ struct brushState* myBrushState;
 bool moveForward( struct Map *map, struct object* obj) { }
 bool turnLeft( struct Map *map, struct object *obj) { }
 
+struct object *player;
+
 
 bool defaultBrush( unsigned int x, unsigned int y, int type) {
-	log0("brush unset\n");
+	//log1("brush unset\n");
 	return 0;
 }
 
@@ -32,34 +34,37 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 	if( myMap->objs[x][y] != 0 ) 
 		return 0;
 	
-	log1( "Creating an object\n");
-	log0("obj %d/%d\n", myMap->objListCount, myMap->objListSize);
 	//increase the array size if necessary
 	if( myMap->objListCount == myMap->objListSize) {
 		myMap->objListSize *= 2;
-		log0("new size : %d\n", myMap->objListSize);
 		myMap->objList = (struct object**)realloc( myMap->objList, sizeof(struct object*) * myMap->objListSize);
 	}
 
 	//create and initialize a monster
 	struct object *obj = createObject( type, x, y);
-	log0( "\tcreated %d, %d, %d\n", type, x, y);
 	
 	//the 2d objs array maps to actual object objects
 	myMap->objs[x][y] = obj;
-	log1( "\tpointer set\n");
 
 	myMap->objList[ myMap->objListCount] = obj;
 	myMap->objListCount ++;
-	log1( "\tinserted to array\n");
 
 	return 1;
+}
+
+bool drawPlayer( unsigned int x, unsigned int y, int type) {
+	//don't do anything if a player exists already
+	if( player==0 && myMap->objs[x][y]==0 && myMap->tiles[x][y]==trn_none ) {
+		player = createObject( type, x, y);
+		objs[x][y] = player;
+	}
+	else 
+		return 0;
 }
 
 bool drawAI( unsigned int x, unsigned int y, int type) {
 	//if there is an object at the given location, and it dsoen't have an AI
 	if( myMap->objs[x][y] != 0 && myMap->objs[x][y]->ai==0) {
-		log0("Create an ai of type %d\n", type);
 		struct AI *ai = AI_CREATE( type);
 		myMap->objs[x][y]->ai = ai;
 		return 1;
