@@ -1,6 +1,7 @@
 #include "texture.h"
 #include <SDL_image.h>
 #include <assert.h>
+#include <stdlib.h>
 
 SDL_Texture *loadTexture( SDL_Renderer *ren, const char *path){
 	SDL_Surface *img = IMG_Load( path);
@@ -24,6 +25,6 @@ SDL_Texture** loadTextures( SDL_Renderer *ren) {
 	textures[ TEXTURE_TRN_WALL 		] = loadTexture( ren, "res/brick.png");
 	textures[ TEXTURE_OBJ_PLAYER 	] = loadTexture( ren, "res/player.bmp");
 	textures[ TEXTURE_OBJ_MONSTER 	] = loadTexture( ren, "res/monster.png");
-	
+
 	return textures;
 }

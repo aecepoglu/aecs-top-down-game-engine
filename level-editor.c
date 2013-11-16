@@ -31,9 +31,9 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 
 bool drawObject( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
-	if( myMap->objs[x][y] != 0 ) 
+	if( myMap->objs[x][y] != 0 )
 		return 0;
-	
+
 	//increase the array size if necessary
 	if( myMap->objListCount == myMap->objListSize) {
 		myMap->objListSize *= 2;
@@ -42,7 +42,7 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 
 	//create and initialize a monster
 	struct object *obj = createObject( type, x, y);
-	
+
 	//the 2d objs array maps to actual object objects
 	myMap->objs[x][y] = obj;
 
@@ -58,7 +58,7 @@ bool drawPlayer( unsigned int x, unsigned int y, int type) {
 		player = createObject( type, x, y);
 		objs[x][y] = player;
 	}
-	else 
+	else
 		return 0;
 }
 
@@ -69,7 +69,7 @@ bool drawAI( unsigned int x, unsigned int y, int type) {
 		myMap->objs[x][y]->ai = ai;
 		return 1;
 	}
-	
+
 	return 0;
 }
 
@@ -252,8 +252,8 @@ int main( int argc, char *args[]) {
 
 
 	init();
-	
-	
+
+
 	textures = loadTextures( renderer);
 	myBrushState = &initialBrushState;
 	brush = defaultBrush;

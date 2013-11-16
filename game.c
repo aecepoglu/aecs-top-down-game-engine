@@ -7,7 +7,7 @@ Uint32 timerDelay;
 bool moveForward( struct Map *map, struct object* obj) {
 	struct Vector newPos = { obj->pos.i, obj->pos.j};
 	vectorAdd( &newPos, &dirVectors[ obj->dir]);
-	if( IS_VECTOR_IN_REGION( newPos, 0, 0, myMap->width, myMap->height ) 
+	if( IS_VECTOR_IN_REGION( newPos, 0, 0, myMap->width, myMap->height )
 		&& myMap->tiles[newPos.i][newPos.j] == terrain_none
 		&& myMap->objs [newPos.i][newPos.j] == 0 ) {
 		obj->pos.i = newPos.i;
@@ -138,7 +138,7 @@ void setDefaults() {
 	log0("setting defaults\n");
 
 	timerDelay = 500;
-	
+
 	SDL_UserEvent userEvent;
 	userEvent.type = SDL_USEREVENT;
 	timerPushEvent.type = SDL_USEREVENT;

@@ -1,4 +1,5 @@
 #include "leftTurner.h"
+#include <stdlib.h>
 
 struct AI* leftTurner_create() {
 	struct AI* ai = (struct AI*)malloc(sizeof(struct AI));

@@ -1,6 +1,7 @@
 #include "object.h"
 #include "log.h"
 #include "aiTable.h"
+#include <stdlib.h>
 
 struct object* createObject( enum objType type, unsigned int x, unsigned int y) {
 	struct object *o = (struct object*)malloc(sizeof(struct object));
@@ -29,6 +30,6 @@ struct object* readObject( FILE *fp) {
 	enum aiType type;
 	fread( &type,      sizeof(enum aiType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
-		
+
 	return obj;
 }
