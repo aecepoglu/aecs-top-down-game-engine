@@ -8,12 +8,12 @@ find_package(SDL2_image REQUIRED)
 set(MY_SOURCE_FILES engine.c engine.h texture.c texture.h map.c map.h object.c object.h brush.h vector.c vector.h basic.h ai.h aiFun.h aiTable.h ai/leftTurner.h ai/leftTurner.c)
 
 add_executable(levelEditor level-editor.c ${MY_SOURCE_FILES})
-target_link_libraries(levelEditor ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
-include_directories(levelEditor ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS})
+target_link_libraries(levelEditor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
+include_directories(levelEditor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 add_executable(aec-game game.c ${MY_SOURCE_FILES})
-target_link_libraries(aec-game ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
-include_directories(aec-game ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS})
+target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
+include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 
 #copy resources from source-dir to binary-dir

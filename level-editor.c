@@ -54,9 +54,9 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 
 bool drawPlayer( unsigned int x, unsigned int y, int type) {
 	//don't do anything if a player exists already
-	if( player==0 && myMap->objs[x][y]==0 && myMap->tiles[x][y]==trn_none ) {
+	if( player==0 && myMap->objs[x][y]==0 && myMap->tiles[x][y]==terrain_none) {
 		player = createObject( type, x, y);
-		objs[x][y] = player;
+		myMap->objs[x][y] = player;
 	}
 	else
 		return 0;

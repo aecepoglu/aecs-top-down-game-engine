@@ -36,7 +36,7 @@ struct brushState initialBrushState =
 			{SDLK_1, { "monster", 0, drawObject, go_monster, no_trans} },
 			//2
 			{SDLK_2, { "apple", 0, drawObject, go_misc, no_trans} },
-		}}}
+		}}},
 		//1
 		{SDLK_2, { "terrain", 2, defaultBrush, no_var, (struct stateTransition[]) {
 			//0
