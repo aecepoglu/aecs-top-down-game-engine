@@ -64,6 +64,7 @@ void update() {
 }
 
 int run() {
+    drawBackground();
 	draw(); //the initial draw //TODO check if necessary
 
 	SDL_AddTimer( timerDelay, timerCallback, 0);

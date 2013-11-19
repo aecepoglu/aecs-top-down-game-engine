@@ -126,6 +126,7 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 
 
 int run() {
+    drawBackground();
 	draw();
 	SDL_Event e;
 	while( running) {
