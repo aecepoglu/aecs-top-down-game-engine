@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project( levelEditor)
+project( aecEngine)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules/")
 find_package(SDL2 REQUIRED)
