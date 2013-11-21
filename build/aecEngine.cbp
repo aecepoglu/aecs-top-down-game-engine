@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="aecEngine" />
+		<Option makefile_is_custom="1" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="CMake Files\;CMake Files\cmake-modules\;" />
+		<Build>
+			<Target title="all">
+				<Option type="4" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 all' />
+					<CompileFile command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;' />
+					<Clean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<DistClean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="aec-game">
+				<Option output="E:/aecs-top-down-game-engine/build/aec-game.exe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="E:/aecs-top-down-game-engine/build" />
+				<Option object_output="./" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="-m newmap" />
+				<Compiler>
+					<Add directory="E:/aecs-top-down-game-engine/aec-game" />
+					<Add directory="E:/aecs-top-down-game-engine/levelEditor" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL/include/SDL2" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL_image/include/SDL2" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include-fixed" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/backward" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/mingw32" />
+				</Compiler>
+				<MakeCommands>
+					<Build command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 aec-game' />
+					<CompileFile command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;' />
+					<Clean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<DistClean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="aec-game/fast">
+				<Option output="E:/aecs-top-down-game-engine/build/aec-game.exe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="E:/aecs-top-down-game-engine/build" />
+				<Option object_output="./" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add directory="E:/aecs-top-down-game-engine/aec-game" />
+					<Add directory="E:/aecs-top-down-game-engine/levelEditor" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL/include/SDL2" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL_image/include/SDL2" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include-fixed" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/backward" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/mingw32" />
+				</Compiler>
+				<MakeCommands>
+					<Build command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 aec-game/fast' />
+					<CompileFile command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;' />
+					<Clean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<DistClean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option type="4" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 edit_cache' />
+					<CompileFile command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;' />
+					<Clean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<DistClean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="levelEditor">
+				<Option output="E:/aecs-top-down-game-engine/build/levelEditor.exe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="E:/aecs-top-down-game-engine/build" />
+				<Option object_output="./" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="-m newmap" />
+				<Compiler>
+					<Add directory="E:/aecs-top-down-game-engine/aec-game" />
+					<Add directory="E:/aecs-top-down-game-engine/levelEditor" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL/include/SDL2" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL_image/include/SDL2" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include-fixed" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/backward" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/mingw32" />
+				</Compiler>
+				<MakeCommands>
+					<Build command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 levelEditor' />
+					<CompileFile command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;' />
+					<Clean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<DistClean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="levelEditor/fast">
+				<Option output="E:/aecs-top-down-game-engine/build/levelEditor.exe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="E:/aecs-top-down-game-engine/build" />
+				<Option object_output="./" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add directory="E:/aecs-top-down-game-engine/aec-game" />
+					<Add directory="E:/aecs-top-down-game-engine/levelEditor" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL/include/SDL2" />
+					<Add directory="E:/aecs-top-down-game-engine/libs/SDL_image/include/SDL2" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include-fixed" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/backward" />
+					<Add directory="c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/include/c++/mingw32" />
+				</Compiler>
+				<MakeCommands>
+					<Build command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 levelEditor/fast' />
+					<CompileFile command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;' />
+					<Clean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<DistClean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option type="4" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 rebuild_cache' />
+					<CompileFile command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;' />
+					<Clean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<DistClean command='C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f &quot;E:/aecs-top-down-game-engine/build/Makefile&quot;  VERBOSE=1 clean' />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="../CMakeLists.txt">
+			<Option virtualFolder="CMake Files/" />
+		</Unit>
+		<Unit filename="../ai.h" />
+		<Unit filename="../aiFun.h" />
+		<Unit filename="../aiTable.h" />
+		<Unit filename="../ai/leftTurner.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ai/leftTurner.h" />
+		<Unit filename="../basic.h" />
+		<Unit filename="../brush.h" />
+		<Unit filename="../cmake-modules/FindSDL2.cmake">
+			<Option virtualFolder="CMake Files/cmake-modules/" />
+		</Unit>
+		<Unit filename="../cmake-modules/FindSDL2_image.cmake">
+			<Option virtualFolder="CMake Files/cmake-modules/" />
+		</Unit>
+		<Unit filename="../engine.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../engine.h" />
+		<Unit filename="../game.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../level-editor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../map.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../map.h" />
+		<Unit filename="../object.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../object.h" />
+		<Unit filename="../texture.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../texture.h" />
+		<Unit filename="../vector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../vector.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

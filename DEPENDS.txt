@@ -1,3 +1,4 @@
 Dependencies:
 =============
 * libSDL v2.0 : engine framework
+* libSDL-image : for interfacing with images ( pngs in particular)

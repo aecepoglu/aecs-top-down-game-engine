@@ -1,0 +1,272 @@
+The system is: Windows - 6.1 - x86
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: C:/Users/Furkan/CodeBlocks/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.exe"
+
+The C compiler identification is GNU, found in "E:/aecs-top-down-game-engine/build/CMakeFiles/2.8.12.1/CompilerIdC/a.exe"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: C:/Users/Furkan/CodeBlocks/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.exe"
+
+The CXX compiler identification is GNU, found in "E:/aecs-top-down-game-engine/build/CMakeFiles/2.8.12.1/CompilerIdCXX/a.exe"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp
+
+Run Build Command:C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe "cmTryCompileExec60958228/fast"
+C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTryCompileExec60958228.dir\build.make CMakeFiles/cmTryCompileExec60958228.dir/build
+mingw32-make.exe[1]: Entering directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_progress_report E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec60958228.dir/testCCompiler.c.obj
+C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe    -o CMakeFiles\cmTryCompileExec60958228.dir\testCCompiler.c.obj   -c E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\testCCompiler.c
+Linking C executable cmTryCompileExec60958228.exe
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTryCompileExec60958228.dir\link.txt --verbose=1
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E remove -f CMakeFiles\cmTryCompileExec60958228.dir/objects.a
+C:\Users\Furkan\CodeBlocks\MinGW\bin\ar.exe cr CMakeFiles\cmTryCompileExec60958228.dir/objects.a @CMakeFiles\cmTryCompileExec60958228.dir\objects1.rsp
+C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe       -Wl,--whole-archive CMakeFiles\cmTryCompileExec60958228.dir/objects.a -Wl,--no-whole-archive  -o cmTryCompileExec60958228.exe -Wl,--out-implib,libcmTryCompileExec60958228.dll.a -Wl,--major-image-version,0,--minor-image-version,0  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 
+mingw32-make.exe[1]: Leaving directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp
+
+Run Build Command:C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe "cmTryCompileExec2860281691/fast"
+C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTryCompileExec2860281691.dir\build.make CMakeFiles/cmTryCompileExec2860281691.dir/build
+mingw32-make.exe[1]: Entering directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_progress_report E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2860281691.dir/CMakeCCompilerABI.c.obj
+C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe    -o CMakeFiles\cmTryCompileExec2860281691.dir\CMakeCCompilerABI.c.obj   -c "C:\Program Files\CMake 2.8\share\cmake-2.8\Modules\CMakeCCompilerABI.c"
+Linking C executable cmTryCompileExec2860281691.exe
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTryCompileExec2860281691.dir\link.txt --verbose=1
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E remove -f CMakeFiles\cmTryCompileExec2860281691.dir/objects.a
+C:\Users\Furkan\CodeBlocks\MinGW\bin\ar.exe cr CMakeFiles\cmTryCompileExec2860281691.dir/objects.a @CMakeFiles\cmTryCompileExec2860281691.dir\objects1.rsp
+C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe     -v -Wl,--whole-archive CMakeFiles\cmTryCompileExec2860281691.dir/objects.a -Wl,--no-whole-archive  -o cmTryCompileExec2860281691.exe -Wl,--out-implib,libcmTryCompileExec2860281691.dll.a -Wl,--major-image-version,0,--minor-image-version,0   
+Using built-in specs.
+COLLECT_GCC=C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe
+COLLECT_LTO_WRAPPER=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/lto-wrapper.exe
+Target: mingw32
+Configured with: ../../src/gcc-4.7.1/configure --build=mingw32 --enable-languages=c,c++,ada,fortran,objc,obj-c++ --enable-threads=win32 --enable-libgomp --enable-lto --enable-fully-dynamic-string --enable-libstdcxx-debug --enable-version-specific-runtime-libs --with-gnu-ld --disable-nls --disable-win32-registry --disable-symvers --disable-build-poststage1-with-cxx --disable-werror --prefix=/mingw32tdm --with-local-prefix=/mingw32tdm --enable-cxx-flags='-fno-function-sections -fno-data-sections' --with-pkgversion=tdm-1 --enable-sjlj-exceptions --with-bugurl=http://tdm-gcc.tdragon.net/bugs
+Thread model: win32
+gcc version 4.7.1 (tdm-1) 
+COMPILER_PATH=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/;c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/bin/
+LIBRARY_PATH=c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec2860281691.exe' '-mtune=i386' '-march=i386'
+ c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/collect2.exe -Bdynamic -o cmTryCompileExec2860281691.exe c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../crt2.o c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtbegin.o -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1 -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../.. --whole-archive CMakeFiles\cmTryCompileExec2860281691.dir/objects.a --no-whole-archive --out-implib libcmTryCompileExec2860281691.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtend.o
+mingw32-make.exe[1]: Leaving directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld\.exe|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe "cmTryCompileExec2860281691/fast"]
+  ignore line: [C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTryCompileExec2860281691.dir\build.make CMakeFiles/cmTryCompileExec2860281691.dir/build]
+  ignore line: [mingw32-make.exe[1]: Entering directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp']
+  ignore line: ["C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_progress_report E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec2860281691.dir/CMakeCCompilerABI.c.obj]
+  ignore line: [C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe    -o CMakeFiles\cmTryCompileExec2860281691.dir\CMakeCCompilerABI.c.obj   -c "C:\Program Files\CMake 2.8\share\cmake-2.8\Modules\CMakeCCompilerABI.c"]
+  ignore line: [Linking C executable cmTryCompileExec2860281691.exe]
+  ignore line: ["C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTryCompileExec2860281691.dir\link.txt --verbose=1]
+  ignore line: ["C:\Program Files\CMake 2.8\bin\cmake.exe" -E remove -f CMakeFiles\cmTryCompileExec2860281691.dir/objects.a]
+  ignore line: [C:\Users\Furkan\CodeBlocks\MinGW\bin\ar.exe cr CMakeFiles\cmTryCompileExec2860281691.dir/objects.a @CMakeFiles\cmTryCompileExec2860281691.dir\objects1.rsp]
+  ignore line: [C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe     -v -Wl,--whole-archive CMakeFiles\cmTryCompileExec2860281691.dir/objects.a -Wl,--no-whole-archive  -o cmTryCompileExec2860281691.exe -Wl,--out-implib,libcmTryCompileExec2860281691.dll.a -Wl,--major-image-version,0,--minor-image-version,0   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe]
+  ignore line: [COLLECT_LTO_WRAPPER=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/lto-wrapper.exe]
+  ignore line: [Target: mingw32]
+  ignore line: [Configured with: ../../src/gcc-4.7.1/configure --build=mingw32 --enable-languages=c,c++,ada,fortran,objc,obj-c++ --enable-threads=win32 --enable-libgomp --enable-lto --enable-fully-dynamic-string --enable-libstdcxx-debug --enable-version-specific-runtime-libs --with-gnu-ld --disable-nls --disable-win32-registry --disable-symvers --disable-build-poststage1-with-cxx --disable-werror --prefix=/mingw32tdm --with-local-prefix=/mingw32tdm --enable-cxx-flags='-fno-function-sections -fno-data-sections' --with-pkgversion=tdm-1 --enable-sjlj-exceptions --with-bugurl=http://tdm-gcc.tdragon.net/bugs]
+  ignore line: [Thread model: win32]
+  ignore line: [gcc version 4.7.1 (tdm-1) ]
+  ignore line: [COMPILER_PATH=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/bin/]
+  ignore line: [LIBRARY_PATH=c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec2860281691.exe' '-mtune=i386' '-march=i386']
+  link line: [ c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/collect2.exe -Bdynamic -o cmTryCompileExec2860281691.exe c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../crt2.o c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtbegin.o -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1 -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../.. --whole-archive CMakeFiles\cmTryCompileExec2860281691.dir/objects.a --no-whole-archive --out-implib libcmTryCompileExec2860281691.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtend.o]
+    arg [c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/collect2.exe] ==> ignore
+    arg [-Bdynamic] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec2860281691.exe] ==> ignore
+    arg [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../crt2.o] ==> ignore
+    arg [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtbegin.o] ==> ignore
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1]
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc]
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib]
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../..] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../..]
+    arg [--whole-archive] ==> ignore
+    arg [CMakeFiles\cmTryCompileExec2860281691.dir/objects.a] ==> ignore
+    arg [--no-whole-archive] ==> ignore
+    arg [--out-implib] ==> ignore
+    arg [libcmTryCompileExec2860281691.dll.a] ==> ignore
+    arg [--major-image-version] ==> ignore
+    arg [0] ==> ignore
+    arg [--minor-image-version] ==> ignore
+    arg [0] ==> ignore
+    arg [-lmingw32] ==> lib [mingw32]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lmoldname] ==> lib [moldname]
+    arg [-lmingwex] ==> lib [mingwex]
+    arg [-lmsvcrt] ==> lib [msvcrt]
+    arg [-ladvapi32] ==> lib [advapi32]
+    arg [-lshell32] ==> lib [shell32]
+    arg [-luser32] ==> lib [user32]
+    arg [-lkernel32] ==> lib [kernel32]
+    arg [-lmingw32] ==> lib [mingw32]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lmoldname] ==> lib [moldname]
+    arg [-lmingwex] ==> lib [mingwex]
+    arg [-lmsvcrt] ==> lib [msvcrt]
+    arg [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtend.o] ==> ignore
+  remove lib [gcc]
+  remove lib [gcc]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1] ==> [c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc/mingw32/4.7.1]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc] ==> [c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib] ==> [c:/Users/Furkan/CodeBlocks/MinGW/mingw32/lib]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../..] ==> [c:/Users/Furkan/CodeBlocks/MinGW/lib]
+  implicit libs: [mingw32;moldname;mingwex;msvcrt;advapi32;shell32;user32;kernel32;mingw32;moldname;mingwex;msvcrt]
+  implicit dirs: [c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc/mingw32/4.7.1;c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc;c:/Users/Furkan/CodeBlocks/MinGW/mingw32/lib;c:/Users/Furkan/CodeBlocks/MinGW/lib]
+  implicit fwks: []
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp
+
+Run Build Command:C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe "cmTryCompileExec1893333350/fast"
+C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTryCompileExec1893333350.dir\build.make CMakeFiles/cmTryCompileExec1893333350.dir/build
+mingw32-make.exe[1]: Entering directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_progress_report E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec1893333350.dir/testCXXCompiler.cxx.obj
+C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe     -o CMakeFiles\cmTryCompileExec1893333350.dir\testCXXCompiler.cxx.obj -c E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec1893333350.exe
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTryCompileExec1893333350.dir\link.txt --verbose=1
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E remove -f CMakeFiles\cmTryCompileExec1893333350.dir/objects.a
+C:\Users\Furkan\CodeBlocks\MinGW\bin\ar.exe cr CMakeFiles\cmTryCompileExec1893333350.dir/objects.a @CMakeFiles\cmTryCompileExec1893333350.dir\objects1.rsp
+C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe       -Wl,--whole-archive CMakeFiles\cmTryCompileExec1893333350.dir/objects.a -Wl,--no-whole-archive  -o cmTryCompileExec1893333350.exe -Wl,--out-implib,libcmTryCompileExec1893333350.dll.a -Wl,--major-image-version,0,--minor-image-version,0  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 
+mingw32-make.exe[1]: Leaving directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp
+
+Run Build Command:C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe "cmTryCompileExec2061812598/fast"
+C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTryCompileExec2061812598.dir\build.make CMakeFiles/cmTryCompileExec2061812598.dir/build
+mingw32-make.exe[1]: Entering directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_progress_report E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec2061812598.dir/CMakeCXXCompilerABI.cpp.obj
+C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe     -o CMakeFiles\cmTryCompileExec2061812598.dir\CMakeCXXCompilerABI.cpp.obj -c "C:\Program Files\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXCompilerABI.cpp"
+Linking CXX executable cmTryCompileExec2061812598.exe
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTryCompileExec2061812598.dir\link.txt --verbose=1
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E remove -f CMakeFiles\cmTryCompileExec2061812598.dir/objects.a
+C:\Users\Furkan\CodeBlocks\MinGW\bin\ar.exe cr CMakeFiles\cmTryCompileExec2061812598.dir/objects.a @CMakeFiles\cmTryCompileExec2061812598.dir\objects1.rsp
+C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe     -v -Wl,--whole-archive CMakeFiles\cmTryCompileExec2061812598.dir/objects.a -Wl,--no-whole-archive  -o cmTryCompileExec2061812598.exe -Wl,--out-implib,libcmTryCompileExec2061812598.dll.a -Wl,--major-image-version,0,--minor-image-version,0   
+Using built-in specs.
+COLLECT_GCC=C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe
+COLLECT_LTO_WRAPPER=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/lto-wrapper.exe
+Target: mingw32
+Configured with: ../../src/gcc-4.7.1/configure --build=mingw32 --enable-languages=c,c++,ada,fortran,objc,obj-c++ --enable-threads=win32 --enable-libgomp --enable-lto --enable-fully-dynamic-string --enable-libstdcxx-debug --enable-version-specific-runtime-libs --with-gnu-ld --disable-nls --disable-win32-registry --disable-symvers --disable-build-poststage1-with-cxx --disable-werror --prefix=/mingw32tdm --with-local-prefix=/mingw32tdm --enable-cxx-flags='-fno-function-sections -fno-data-sections' --with-pkgversion=tdm-1 --enable-sjlj-exceptions --with-bugurl=http://tdm-gcc.tdragon.net/bugs
+Thread model: win32
+gcc version 4.7.1 (tdm-1) 
+COMPILER_PATH=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/;c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/bin/
+LIBRARY_PATH=c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib/;c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec2061812598.exe' '-mtune=i386' '-march=i386'
+ c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/collect2.exe -Bdynamic -o cmTryCompileExec2061812598.exe c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../crt2.o c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtbegin.o -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1 -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../.. --whole-archive CMakeFiles\cmTryCompileExec2061812598.dir/objects.a --no-whole-archive --out-implib libcmTryCompileExec2061812598.dll.a --major-image-version 0 --minor-image-version 0 -Bstatic -lstdc++ -Bdynamic -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtend.o
+mingw32-make.exe[1]: Leaving directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld\.exe|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe "cmTryCompileExec2061812598/fast"]
+  ignore line: [C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTryCompileExec2061812598.dir\build.make CMakeFiles/cmTryCompileExec2061812598.dir/build]
+  ignore line: [mingw32-make.exe[1]: Entering directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp']
+  ignore line: ["C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_progress_report E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec2061812598.dir/CMakeCXXCompilerABI.cpp.obj]
+  ignore line: [C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe     -o CMakeFiles\cmTryCompileExec2061812598.dir\CMakeCXXCompilerABI.cpp.obj -c "C:\Program Files\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXCompilerABI.cpp"]
+  ignore line: [Linking CXX executable cmTryCompileExec2061812598.exe]
+  ignore line: ["C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTryCompileExec2061812598.dir\link.txt --verbose=1]
+  ignore line: ["C:\Program Files\CMake 2.8\bin\cmake.exe" -E remove -f CMakeFiles\cmTryCompileExec2061812598.dir/objects.a]
+  ignore line: [C:\Users\Furkan\CodeBlocks\MinGW\bin\ar.exe cr CMakeFiles\cmTryCompileExec2061812598.dir/objects.a @CMakeFiles\cmTryCompileExec2061812598.dir\objects1.rsp]
+  ignore line: [C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe     -v -Wl,--whole-archive CMakeFiles\cmTryCompileExec2061812598.dir/objects.a -Wl,--no-whole-archive  -o cmTryCompileExec2061812598.exe -Wl,--out-implib,libcmTryCompileExec2061812598.dll.a -Wl,--major-image-version,0,--minor-image-version,0   ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=C:\Users\Furkan\CodeBlocks\MinGW\bin\g++.exe]
+  ignore line: [COLLECT_LTO_WRAPPER=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/lto-wrapper.exe]
+  ignore line: [Target: mingw32]
+  ignore line: [Configured with: ../../src/gcc-4.7.1/configure --build=mingw32 --enable-languages=c,c++,ada,fortran,objc,obj-c++ --enable-threads=win32 --enable-libgomp --enable-lto --enable-fully-dynamic-string --enable-libstdcxx-debug --enable-version-specific-runtime-libs --with-gnu-ld --disable-nls --disable-win32-registry --disable-symvers --disable-build-poststage1-with-cxx --disable-werror --prefix=/mingw32tdm --with-local-prefix=/mingw32tdm --enable-cxx-flags='-fno-function-sections -fno-data-sections' --with-pkgversion=tdm-1 --enable-sjlj-exceptions --with-bugurl=http://tdm-gcc.tdragon.net/bugs]
+  ignore line: [Thread model: win32]
+  ignore line: [gcc version 4.7.1 (tdm-1) ]
+  ignore line: [COMPILER_PATH=c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/bin/]
+  ignore line: [LIBRARY_PATH=c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib/]
+  ignore line: [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec2061812598.exe' '-mtune=i386' '-march=i386']
+  link line: [ c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/collect2.exe -Bdynamic -o cmTryCompileExec2061812598.exe c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../crt2.o c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtbegin.o -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1 -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib -Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../.. --whole-archive CMakeFiles\cmTryCompileExec2061812598.dir/objects.a --no-whole-archive --out-implib libcmTryCompileExec2061812598.dll.a --major-image-version 0 --minor-image-version 0 -Bstatic -lstdc++ -Bdynamic -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtend.o]
+    arg [c:/users/furkan/codeblocks/mingw/bin/../libexec/gcc/mingw32/4.7.1/collect2.exe] ==> ignore
+    arg [-Bdynamic] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec2061812598.exe] ==> ignore
+    arg [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../crt2.o] ==> ignore
+    arg [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtbegin.o] ==> ignore
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1]
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc]
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib]
+    arg [-Lc:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../..] ==> dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../..]
+    arg [--whole-archive] ==> ignore
+    arg [CMakeFiles\cmTryCompileExec2061812598.dir/objects.a] ==> ignore
+    arg [--no-whole-archive] ==> ignore
+    arg [--out-implib] ==> ignore
+    arg [libcmTryCompileExec2061812598.dll.a] ==> ignore
+    arg [--major-image-version] ==> ignore
+    arg [0] ==> ignore
+    arg [--minor-image-version] ==> ignore
+    arg [0] ==> ignore
+    arg [-Bstatic] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-Bdynamic] ==> ignore
+    arg [-lmingw32] ==> lib [mingw32]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lmoldname] ==> lib [moldname]
+    arg [-lmingwex] ==> lib [mingwex]
+    arg [-lmsvcrt] ==> lib [msvcrt]
+    arg [-ladvapi32] ==> lib [advapi32]
+    arg [-lshell32] ==> lib [shell32]
+    arg [-luser32] ==> lib [user32]
+    arg [-lkernel32] ==> lib [kernel32]
+    arg [-lmingw32] ==> lib [mingw32]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lmoldname] ==> lib [moldname]
+    arg [-lmingwex] ==> lib [mingwex]
+    arg [-lmsvcrt] ==> lib [msvcrt]
+    arg [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/crtend.o] ==> ignore
+  remove lib [gcc]
+  remove lib [gcc]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1] ==> [c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc/mingw32/4.7.1]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc] ==> [c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../../../mingw32/lib] ==> [c:/Users/Furkan/CodeBlocks/MinGW/mingw32/lib]
+  collapse library dir [c:/users/furkan/codeblocks/mingw/bin/../lib/gcc/mingw32/4.7.1/../../..] ==> [c:/Users/Furkan/CodeBlocks/MinGW/lib]
+  implicit libs: [stdc++;mingw32;moldname;mingwex;msvcrt;advapi32;shell32;user32;kernel32;mingw32;moldname;mingwex;msvcrt]
+  implicit dirs: [c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc/mingw32/4.7.1;c:/Users/Furkan/CodeBlocks/MinGW/lib/gcc;c:/Users/Furkan/CodeBlocks/MinGW/mingw32/lib;c:/Users/Furkan/CodeBlocks/MinGW/lib]
+  implicit fwks: []
+
+

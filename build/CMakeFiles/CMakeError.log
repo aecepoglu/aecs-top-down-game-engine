@@ -1,0 +1,22 @@
+Determining if files pthread.h exist failed with the following output:
+Change Dir: E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp
+
+Run Build Command:C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe "cmTryCompileExec2542650386/fast"
+C:/Users/Furkan/CodeBlocks/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTryCompileExec2542650386.dir\build.make CMakeFiles/cmTryCompileExec2542650386.dir/build
+mingw32-make.exe[1]: Entering directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+"C:\Program Files\CMake 2.8\bin\cmake.exe" -E cmake_progress_report E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2542650386.dir/CheckIncludeFiles.c.obj
+C:\Users\Furkan\CodeBlocks\MinGW\bin\gcc.exe    -o CMakeFiles\cmTryCompileExec2542650386.dir\CheckIncludeFiles.c.obj   -c E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CheckIncludeFiles.c
+E:\aecs-top-down-game-engine\build\CMakeFiles\CMakeTmp\CheckIncludeFiles.c:2:21: fatal error: pthread.h: No such file or directory
+compilation terminated.
+mingw32-make.exe[1]: *** [CMakeFiles/cmTryCompileExec2542650386.dir/CheckIncludeFiles.c.obj] Error 1
+mingw32-make.exe[1]: Leaving directory `E:/aecs-top-down-game-engine/build/CMakeFiles/CMakeTmp'
+mingw32-make.exe: *** [cmTryCompileExec2542650386/fast] Error 2
+
+Source:
+/* */
+#include <pthread.h>
+
+
+int main(){return 0;}
+
