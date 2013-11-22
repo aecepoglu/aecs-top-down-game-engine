@@ -22,7 +22,7 @@
 #include "log.h"
 
 /* ----------------------------------
- *  		VARIABLES 
+ *  		VARIABLES
  */
 bool running;
 SDL_Window *window;
@@ -38,7 +38,7 @@ int windowW, windowH, windowX, windowY;
 /* ---------------------------------
  *			DEFINITIONS
  */
-#define TILELEN 16
+#define TILELEN 32
 
 
 
