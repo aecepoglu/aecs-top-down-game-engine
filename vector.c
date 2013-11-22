@@ -8,6 +8,21 @@ void vectorSub( struct Vector *v1, struct Vector *v2) {
 	v1->i -= v2->i;
 	v1->j -= v2->j;
 }
+void vectorReverse( struct Vector *v) {
+	v->x = - v->x;
+	v->y = - v->y;
+}
+void vectorRotate( struct Vector *v, bool clockwise) {
+	int tmp = v->x;
+	if( clockwise) {
+		v->x = - v->y;
+		v->y = tmp;
+	}
+	else {
+		v->x = v->y;
+		v->y = -tmp;
+	}
+}
 
 void readVector( FILE *fp, struct Vector *v) {
 	//assume target is not null

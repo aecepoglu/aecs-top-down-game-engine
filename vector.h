@@ -7,8 +7,17 @@ struct Vector {
 	int i, j ;
 };
 
+/* Sums two vectors. First vector has the result
+*/
 void vectorAdd( struct Vector*, struct Vector* );
+/* Subtracts two vectors. First vector has the result
+*/
 void vectorSub( struct Vector*, struct Vector* );
+
+void vectorReverse( struct Vector*);
+/* bool clockwise: true if clockwise, false if counter-clockwise
+*/
+void vectorRotate( struct Vector*, bool);
 
 void readVector( FILE *fp, struct Vector*);
 void writeVector( FILE *fp, struct Vector*);

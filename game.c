@@ -19,7 +19,10 @@ bool moveForward( struct Map *map, struct object* obj) {
 
 }
 bool turnLeft( struct Map *map, struct object *obj) {
-	obj->dir = (obj->dir + 1) %4;
+	vectorRotate( obj->dir, true);
+}
+bool turnRight( struct Map *map, struct object *obj) {
+	vectorRotate( obj->dir, false);
 }
 
 
@@ -31,7 +34,8 @@ void handleKey( SDL_KeyboardEvent *e) {
 		default:
 			log0("Unhandled key\n");
 			break;
-/*		case SDLK_UP:
+/* TODO Disabling the scroll controls for now. These keys should move the player around the map, and scroll the map as necessary.
+		case SDLK_UP:
 			scrollScreen( 0, -1);
 			break;
 		case SDLK_DOWN:
@@ -124,7 +128,7 @@ int run() {
 			case SDL_MOUSEMOTION:
 			case SDL_KEYUP:
 			case SDL_MOUSEBUTTONUP:
-				/*don't do anything for those events*/
+				/*don't do anything for these events*/
 				continue;
 			default:
 				log1("unhandled event type: %d\n", e.type);
