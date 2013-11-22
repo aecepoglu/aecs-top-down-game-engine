@@ -1,2 +1,0 @@
-E:/aecs-top-down-game-engine/build/CMakeFiles/aec-game.dir
-E:/aecs-top-down-game-engine/build/CMakeFiles/levelEditor.dir
