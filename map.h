@@ -33,14 +33,6 @@ struct Map {
 	/-----/-----/
 */
 
-	
-
-
-/* ------------
- *    MACROS
- */
-#define TILELEN 16
-
 
 
 /* -----------
@@ -55,10 +47,10 @@ struct Map* readMapFile( char *path);
 
 /* 	Saves the map to disk
  */
-void saveMap( struct Map* map); 
+void saveMap( struct Map* map);
 
 /* Create a new map that matches the given parameters
  */
-struct Map* createNewMap( unsigned int width, unsigned int height); 
+struct Map* createNewMap( unsigned int width, unsigned int height);
 
 #endif //MAP_H
