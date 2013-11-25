@@ -18,7 +18,7 @@ enum direction { dir_right, dir_up, dir_left, dir_down, };
 struct object {
 	struct Vector pos;
 	enum objType type;
-	enum direction dir;
+	struct Vector *dir;
 	struct AI *ai;
 };
 
@@ -26,9 +26,15 @@ struct object {
 #define MIN( x, y) ((x) < (y) ? (x) : (y))
 #define MAX( x, y) ((x) > (y) ? (x) : (y))
 
-
+static struct Vector vectorLeft = { -1, 0};
+static struct Vector vectorRight = { 1, 0};
+static struct Vector vectorDown = { 0, 1};
+static struct Vector vectorUp = { 0, -1};
 static struct Vector dirVectors[] = {
-	{1, 0}, {0, -1}, {-1, 0}, {0, 1}
+	[dir_right] = vectorRight,
+	[dir_left] = vectorLeft,
+	[dir_up] = vectorUp,
+	[dir_down] = vectorDown,
 };
 
 /* Creates and returns an Object of given type */

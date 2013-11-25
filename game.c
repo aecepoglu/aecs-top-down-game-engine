@@ -3,10 +3,11 @@
 
 SDL_Event timerPushEvent;
 Uint32 timerDelay;
+struct object *player;
 
 bool moveForward( struct Map *map, struct object* obj) {
 	struct Vector newPos = { obj->pos.i, obj->pos.j};
-	vectorAdd( &newPos, &dirVectors[ obj->dir]);
+	vectorAdd( &newPos, obj->dir);
 	if( IS_VECTOR_IN_REGION( newPos, 0, 0, myMap->width, myMap->height )
 		&& myMap->tiles[newPos.i][newPos.j] == terrain_none
 		&& myMap->objs [newPos.i][newPos.j] == 0 ) {
@@ -20,9 +21,11 @@ bool moveForward( struct Map *map, struct object* obj) {
 }
 bool turnLeft( struct Map *map, struct object *obj) {
 	vectorRotate( obj->dir, true);
+	return true;
 }
 bool turnRight( struct Map *map, struct object *obj) {
 	vectorRotate( obj->dir, false);
+	return true;
 }
 
 
@@ -31,21 +34,21 @@ void handleKey( SDL_KeyboardEvent *e) {
 		case SDLK_q:
 			quit("Quit-key pressed.\n");
 			break;
+		case SDLK_RIGHT:
+			turnRight( myMap, player);
+			break;
+		case SDLK_LEFT:
+			turnLeft( myMap, player);
+			break;
 		default:
 			log0("Unhandled key\n");
 			break;
-/* TODO Disabling the scroll controls for now. These keys should move the player around the map, and scroll the map as necessary.
+/* TODO Disabling these scroll controls for now. These keys should move the player around the map, and scroll the map as necessary.
 		case SDLK_UP:
 			scrollScreen( 0, -1);
 			break;
 		case SDLK_DOWN:
 			scrollScreen( 0, +1);
-			break;
-		case SDLK_RIGHT:
-			scrollScreen( +1, 0);
-			break;
-		case SDLK_LEFT:
-			scrollScreen( -1, 0);
 			break;
 			*/
 	};
