@@ -189,6 +189,9 @@ int main( int argc, char *args[]) {
 		else
 			myMap = readMapFile( mapPath);
 	}
+	struct *object player = createObject( go_player, myMap->startPos->x, myMap->startPos->y);
+	myMap->objs[ myMap->startPos->x][ myMap->startPos->y] = player;
+	arrayAdd( myMap->objList, player, myMap->objListcount, myMap->bojListSize);
 
 	setDefaults();
 	init();

@@ -19,7 +19,7 @@ void vectorReverse( struct Vector*);
 */
 void vectorRotate( struct Vector*, bool);
 
-void readVector( FILE *fp, struct Vector*);
+struct Vector* readVector( FILE *fp);
 void writeVector( FILE *fp, struct Vector*);
 
 #define IS_VECTOR_IN_REGION( vec, x0, y0, x1, y1) ((vec.i > x0) && (vec.j > y0) && (vec.i < x1) && (vec.j < y1))

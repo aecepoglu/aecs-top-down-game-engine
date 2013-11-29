@@ -24,10 +24,12 @@ void vectorRotate( struct Vector *v, bool clockwise) {
 	}
 }
 
-void readVector( FILE *fp, struct Vector *v) {
+struct Vector *readVector( FILE *fp) {
+	struct Vector *v = (struct Vector*)malloc( sizeof( struct Vector));
 	//assume target is not null
 	fread( &v->i, sizeof( int), 1, fp);
 	fread( &v->j, sizeof( int), 1, fp);
+	return v;
 }
 void writeVector( FILE *fp, struct Vector *v) {
 	fwrite( &v->i, sizeof( int), 1, fp);

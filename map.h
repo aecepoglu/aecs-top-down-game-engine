@@ -18,6 +18,8 @@ struct Map {
 	unsigned int height;
 	enum terrainType** tiles;
 
+	struct Vector *startPos;
+
 	struct object*** objs;
 	struct object** objList;
 	unsigned int objListCount;

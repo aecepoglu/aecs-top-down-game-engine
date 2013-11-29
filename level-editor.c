@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "brush.h"
 #include "aiTable.h"
+#include "array.h"
 
 
 /* The drawing brushes. These are used to draw terrain and objects on map */
@@ -34,20 +35,13 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 	if( myMap->objs[x][y] != 0 )
 		return 0;
 
-	//increase the array size if necessary
-	if( myMap->objListCount == myMap->objListSize) {
-		myMap->objListSize *= 2;
-		myMap->objList = (struct object**)realloc( myMap->objList, sizeof(struct object*) * myMap->objListSize);
-	}
-
 	//create and initialize a monster
 	struct object *obj = createObject( type, x, y);
 
+	arrayAdd( myMay->objList, obj, myMap->objListCount, myMap->objListSize);
+
 	//the 2d objs array maps to actual object objects
 	myMap->objs[x][y] = obj;
-
-	myMap->objList[ myMap->objListCount] = obj;
-	myMap->objListCount ++;
 
 	return 1;
 }
