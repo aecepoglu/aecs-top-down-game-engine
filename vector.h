@@ -2,6 +2,8 @@
 #define VECTOR_H
 
 #include <stdio.h>
+#include "basic.h"
+
 
 struct Vector {
 	int i, j ;
@@ -17,10 +19,16 @@ void vectorSub( struct Vector*, struct Vector* );
 void vectorReverse( struct Vector*);
 /* bool clockwise: true if clockwise, false if counter-clockwise
 */
+
+struct Vector* vectorClone( struct Vector *v);
+
+
 void vectorRotate( struct Vector*, bool);
 
 struct Vector* readVector( FILE *fp);
+void readToVector( FILE *fp, struct Vector*);
 void writeVector( FILE *fp, struct Vector*);
+
 
 #define IS_VECTOR_IN_REGION( vec, x0, y0, x1, y1) ((vec.i > x0) && (vec.j > y0) && (vec.i < x1) && (vec.j < y1))
 

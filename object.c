@@ -8,7 +8,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y) 
 	o->pos.i = x;
 	o->pos.j = y;
 	o->type = type;
-	o->dir = dir_up;
+	o->dir = vectorClone( & dirVectors[ dir_up]);
 	o->ai = 0;
 
 	return o;
@@ -24,7 +24,7 @@ void writeObject( FILE *fp, struct object *obj) {
 
 struct object* readObject( FILE *fp) {
 	struct object *obj = (struct object*)malloc(sizeof(struct object));
-	readVector( fp, &obj->pos);
+	readToVector( fp, &obj->pos);
 	fread( &obj->type, sizeof(enum objType),   1, fp);
 	fread( &obj->dir,  sizeof(enum direction), 1, fp);
 	enum aiType type;

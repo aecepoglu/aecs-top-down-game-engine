@@ -25,7 +25,6 @@ struct Map* readMapFile( char *path) {
 	//read dimensions first
 	fread( &m->width, 		sizeof(unsigned int), 	1, fp);
 	fread( &m->height, 		sizeof(unsigned int), 	1, fp);
-	m->startPos = readVector( fp);
 	fread( &m->objListCount, 	sizeof(unsigned int), 	1, fp);
 	fread( &m->objListSize, 	sizeof(unsigned int), 	1, fp);
 	//can try to assert objListCount<objListSize
@@ -83,9 +82,6 @@ void saveMap( struct Map *map) {
 	fwrite( &map->width,  sizeof(unsigned int), 1, fp);
 	fwrite( &map->height, sizeof(unsigned int), 1, fp);
 
-	//write the player start position
-	writeVector( fp, map->startPos);
-
 	//write the objects list, size first
 	fwrite( &map->objListCount,	sizeof(unsigned int), 1, fp);
 	fwrite( &map->objListSize,	sizeof(unsigned int), 1, fp);
@@ -123,10 +119,6 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 		for(y=0; y<height; y++)
 			m->tiles[x][y] = terrain_none;
 	}
-
-	m->startPos = (struct Vector*)malloc( sizeof( struct Vector));
-	m->startPos->x = 0;
-	m->startPos->y = 0;
 
 	log1( "createMap() over\n");
 	return m;

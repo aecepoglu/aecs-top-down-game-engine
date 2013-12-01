@@ -26,15 +26,15 @@ struct object {
 #define MIN( x, y) ((x) < (y) ? (x) : (y))
 #define MAX( x, y) ((x) > (y) ? (x) : (y))
 
-static struct Vector vectorLeft = { -1, 0};
-static struct Vector vectorRight = { 1, 0};
-static struct Vector vectorDown = { 0, 1};
-static struct Vector vectorUp = { 0, -1};
+//static struct Vector vectorLeft = { -1, 0};
+//static struct Vector vectorRight = { 1, 0};
+//static struct Vector vectorDown = { 0, 1};
+//static struct Vector vectorUp = { 0, -1};
 static struct Vector dirVectors[] = {
-	[dir_right] = vectorRight,
-	[dir_left] = vectorLeft,
-	[dir_up] = vectorUp,
-	[dir_down] = vectorDown,
+	[dir_right] = { 1, 0},
+	[dir_left] = { -1, 0},
+	[dir_up] = { 0, -1},
+	[dir_down] = {0, 1},
 };
 
 /* Creates and returns an Object of given type */

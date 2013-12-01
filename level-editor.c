@@ -32,13 +32,13 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 
 bool drawObject( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
-	if( myMap->objs[x][y] != 0 )
+	if( myMap->objs[x][y]!=0 || myMap->tiles[x][y]!=terrain_none)
 		return 0;
 
 	//create and initialize a monster
 	struct object *obj = createObject( type, x, y);
 
-	arrayAdd( myMay->objList, obj, myMap->objListCount, myMap->objListSize);
+	ARRAY_ADD( myMap->objList, obj, myMap->objListCount, myMap->objListSize, sizeof( struct object));
 
 	//the 2d objs array maps to actual object objects
 	myMap->objs[x][y] = obj;
@@ -48,9 +48,9 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 
 bool drawPlayer( unsigned int x, unsigned int y, int type) {
 	//don't do anything if a player exists already
-	if( player==0 && myMap->objs[x][y]==0 && myMap->tiles[x][y]==terrain_none) {
-		player = createObject( type, x, y);
-		myMap->objs[x][y] = player;
+	if( player==0 && drawObject( x, y, go_player)) {
+		player = myMap->objs[x][y];
+		return 1;
 	}
 	else
 		return 0;

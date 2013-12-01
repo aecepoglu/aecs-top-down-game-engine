@@ -13,10 +13,10 @@ bool moveForward( struct Map *map, struct object* obj) {
 		&& myMap->objs [newPos.i][newPos.j] == 0 ) {
 		obj->pos.i = newPos.i;
 		obj->pos.j = newPos.j;
-		return 1;
+		return true;
 	}
 	else
-		return 0;
+		return false;
 
 }
 bool turnLeft( struct Map *map, struct object *obj) {
@@ -40,15 +40,14 @@ void handleKey( SDL_KeyboardEvent *e) {
 		case SDLK_LEFT:
 			turnLeft( myMap, player);
 			break;
+		case SDLK_UP:
+			moveForward( myMap, player);
+			break;
 		default:
 			log0("Unhandled key\n");
 			break;
 /* TODO Disabling these scroll controls for now. These keys should move the player around the map, and scroll the map as necessary.
-		case SDLK_UP:
-			scrollScreen( 0, -1);
-			break;
 		case SDLK_DOWN:
-			scrollScreen( 0, +1);
 			break;
 			*/
 	};
@@ -151,6 +150,15 @@ void setDefaults() {
 	userEvent.type = SDL_USEREVENT;
 	timerPushEvent.type = SDL_USEREVENT;
 	timerPushEvent.user = userEvent;
+	
+	//find the player from the obj list
+	int i;
+	for( i=0; i<myMap->objListCount; i++) {
+		if( myMap->objList[i]->type == go_player ) {
+			player = myMap->objList[i];
+			break;
+		}
+	}
 }
 
 
@@ -189,9 +197,6 @@ int main( int argc, char *args[]) {
 		else
 			myMap = readMapFile( mapPath);
 	}
-	struct *object player = createObject( go_player, myMap->startPos->x, myMap->startPos->y);
-	myMap->objs[ myMap->startPos->x][ myMap->startPos->y] = player;
-	arrayAdd( myMap->objList, player, myMap->objListcount, myMap->bojListSize);
 
 	setDefaults();
 	init();
