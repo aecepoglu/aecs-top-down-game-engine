@@ -42,4 +42,8 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y);
 struct object* readObject( FILE *fp);
 void writeObject( FILE *fp, struct object *obj);
 
+void use( struct object *obj1, struct object *obj2);
+void swallow( struct object *obj1, struct object *obj2);
+void hit( struct object *obj1, struct object *obj2);
+
 #endif //OBJECT_H

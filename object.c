@@ -33,3 +33,23 @@ struct object* readObject( FILE *fp) {
 
 	return obj;
 }
+
+/*
+	Some functions objects use to interract with each other 
+*/
+
+void use( struct object *obj, struct object *obj2) {
+	/* Not used yet. Might even need to be implemented inside the object */
+}
+
+void hit( struct object *obj1, struct object *obj2) {
+	obj2->health -= 1;
+}
+
+void swallow( struct object *obj1, struct object *obj2) {
+	/* People can eat each other while alive.
+		Change this to obj1->health += obj2->maxHealth/2
+		Also check for life before eating.
+	*/
+	obj1->health += obj2->health;
+}

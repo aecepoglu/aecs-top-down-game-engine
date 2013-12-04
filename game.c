@@ -3,14 +3,38 @@
 
 SDL_Event timerPushEvent;
 Uint32 timerDelay;
+
 struct object *player;
+
+/* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
+bool playerMoved = false;
+int playerViewLimXMin = 10;
+int playerViewLimYMin = 10;
+int playerViewLimXMax; //Max - 10
+int playerViewLimYMax; //Max - 10
+//TODO Use FOV distance instead of '10'
+//FIXME The program will crash if the window is too small.
+
+bool moveBackward( struct Map *map, struct object* obj) {
+	struct Vector newPos = { obj->pos.i, obj->pos.j};
+	vectorSub( &newPos, obj->dir);
+	if( myMap->tiles[newPos.i][newPos.j] == terrain_none
+		&& myMap->objs [newPos.i][newPos.j] == 0 )
+	{
+		obj->pos.i = newPos.i;
+		obj->pos.j = newPos.j;
+		return true;
+	}
+	else
+		return false;
+}
 
 bool moveForward( struct Map *map, struct object* obj) {
 	struct Vector newPos = { obj->pos.i, obj->pos.j};
 	vectorAdd( &newPos, obj->dir);
-	if( IS_VECTOR_IN_REGION( newPos, 0, 0, myMap->width, myMap->height )
-		&& myMap->tiles[newPos.i][newPos.j] == terrain_none
-		&& myMap->objs [newPos.i][newPos.j] == 0 ) {
+	if( myMap->tiles[newPos.i][newPos.j] == terrain_none
+		&& myMap->objs [newPos.i][newPos.j] == 0 )
+	{
 		obj->pos.i = newPos.i;
 		obj->pos.j = newPos.j;
 		return true;
@@ -19,37 +43,54 @@ bool moveForward( struct Map *map, struct object* obj) {
 		return false;
 
 }
+
 bool turnLeft( struct Map *map, struct object *obj) {
 	vectorRotate( obj->dir, true);
 	return true;
 }
+
 bool turnRight( struct Map *map, struct object *obj) {
 	vectorRotate( obj->dir, false);
 	return true;
 }
 
+void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
+	if( ! playerMoved) {
+		playerMoved = true;
+		if ( moveFunction( myMap, player) ) {
+			//scroll if necessary
+			if( player->pos.i > playerViewLimXMax) 
+				scrollScreen( 1, 0);
+			else if ( player->pos.i < playerViewLimXMin) 
+				scrollScreen( -1, 0);
+			else if ( player->pos.j > playerViewLimYMax) 
+				scrollScreen( 0, 1);
+			else if ( player->pos.j < playerViewLimYMin) 
+				scrollScreen( 0, -1);
+		}
+	}
+}
 
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
 		case SDLK_q:
 			quit("Quit-key pressed.\n");
 			break;
-		case SDLK_RIGHT:
-			turnRight( myMap, player);
+		case SDLK_UP:
+			movePlayer( moveForward);
+			break;
+		case SDLK_DOWN:
+			movePlayer( moveBackward);
 			break;
 		case SDLK_LEFT:
-			turnLeft( myMap, player);
+			movePlayer( turnLeft);
 			break;
-		case SDLK_UP:
-			moveForward( myMap, player);
+		case SDLK_RIGHT:
+			movePlayer( turnRight);
 			break;
 		default:
 			log0("Unhandled key\n");
 			break;
-/* TODO Disabling these scroll controls for now. These keys should move the player around the map, and scroll the map as necessary.
-		case SDLK_DOWN:
-			break;
-			*/
 	};
 }
 
@@ -67,6 +108,7 @@ void update() {
 		if( myMap->objList[i]->ai )
 			AI_UPDATE( myMap, myMap->objList[i] );
 	}
+	playerMoved = false;
 }
 
 int run() {
@@ -144,7 +186,7 @@ int run() {
 void setDefaults() {
 	log0("setting defaults\n");
 
-	timerDelay = 500;
+	timerDelay = 250;
 
 	SDL_UserEvent userEvent;
 	userEvent.type = SDL_USEREVENT;
