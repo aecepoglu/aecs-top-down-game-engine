@@ -8,12 +8,13 @@ struct object *player;
 
 /* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
 bool playerMoved = false;
-int playerViewLimXMin = 10;
-int playerViewLimYMin = 10;
-int playerViewLimXMax; //Max - 10
-int playerViewLimYMax; //Max - 10
-//TODO Use FOV distance instead of '10'
-//FIXME The program will crash if the window is too small.
+
+#define VIEW_RANGE 10  //TODO Use FOV distance instead of '10'
+int playerViewLimXMin = VIEW_RANGE;
+int playerViewLimYMin = VIEW_RANGE;
+int playerViewLimXMax;
+int playerViewLimYMax;
+//FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
 
 bool moveBackward( struct Map *map, struct object* obj) {
 	struct Vector newPos = { obj->pos.i, obj->pos.j};
@@ -138,6 +139,9 @@ int run() {
 					    log0("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
 						windowW = (e.window.data1-1) / TILELEN;
 						windowH = (e.window.data2-1) / TILELEN;
+						playerViewLimXMax = windowW - VIEW_RANGE;
+						playerViewLimYMax = windowH - VIEW_RANGE;
+
 						drawBackground();
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:
