@@ -248,8 +248,9 @@ int main( int argc, char *args[]) {
 
 	init();
 
-
+    log0("loading textures\n");
 	textures = loadTextures( renderer);
+	log0("loaded\n");
 	myBrushState = &initialBrushState;
 	brush = defaultBrush;
 

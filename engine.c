@@ -31,6 +31,7 @@ void drawObjects() {
 		y = myMap->objList[i]->pos.j - windowY;
 		if( x>=0 && y>=0 && x<windowW && y<windowH ) {
 			drawTexture( renderer, textures[ TEXTURE_MAP_OBJ_TYPE( myMap->objList[i]->type) ], x*TILELEN, y*TILELEN, TILELEN, TILELEN );
+			drawTexture( renderer, textures[ TEXTURE_MAP_DIR( myMap->objList[i]->dir) ], x*TILELEN, y*TILELEN, TILELEN, TILELEN );
 		}
 	}
 }
@@ -39,7 +40,7 @@ void drawBackground() {
 	log0("generate background\n");
 	SDL_DestroyTexture( bgroundTexture);
 	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, windowW*TILELEN, windowH*TILELEN) ;
-	SDL_SetRenderTarget( renderer, bgroundTexture); 
+	SDL_SetRenderTarget( renderer, bgroundTexture);
 
 	unsigned int x,y,rx,ry;
 	for( x=0, rx=windowX; rx< MIN(myMap->width, windowX+windowW); x++, rx++)
@@ -72,8 +73,8 @@ void scrollScreen( int dX, int dY) {
 		windowX += dX;
 	if( windowY + dY >= 0 && windowY + windowH + dY <= myMap->height)
 		windowY += dY;
-	
-	
+
+
 
 	log1("scrolled to (%d,%d)\n", windowX, windowY);
 	drawBackground();

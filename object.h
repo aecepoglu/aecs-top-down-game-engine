@@ -12,14 +12,15 @@
 #include "vector.h"
 
 enum objType { go_player, go_monster, go_misc};
-enum direction { dir_right, dir_up, dir_left, dir_down, };
+enum direction { dir_up, dir_right, dir_down, dir_left};
 
 /*struct AI defined in ai.h*/
 struct object {
 	struct Vector pos;
 	enum objType type;
-	struct Vector *dir;
+	enum direction dir;
 	struct AI *ai;
+	uint8_t health;
 };
 
 
@@ -31,10 +32,10 @@ struct object {
 //static struct Vector vectorDown = { 0, 1};
 //static struct Vector vectorUp = { 0, -1};
 static struct Vector dirVectors[] = {
-	[dir_right] = { 1, 0},
-	[dir_left] = { -1, 0},
 	[dir_up] = { 0, -1},
+	[dir_right] = { 1, 0},
 	[dir_down] = {0, 1},
+	[dir_left] = { -1, 0},
 };
 
 /* Creates and returns an Object of given type */

@@ -7,9 +7,9 @@ digraph levelEditorUsage {
 	create -> createTerrain [ label="2"];
 	create -> createAI [ label="3"];
 
-	createObject -> createPlayer [ label="1"];
-	createObject -> createMonster [ label="2"];
-	createObject -> createApple [ label="3"];
+	createObject -> createMonster [ label="1"];
+	createObject -> createApple [ label="2"];
+	createObject -> createPlayer [ label="3"];
 
 	createTerrain -> createGround [ label="1"];
 	createTerrain -> createWall [ label="2"];

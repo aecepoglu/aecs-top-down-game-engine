@@ -18,7 +18,7 @@ int playerViewLimYMax;
 
 bool moveBackward( struct Map *map, struct object* obj) {
 	struct Vector newPos = { obj->pos.i, obj->pos.j};
-	vectorSub( &newPos, obj->dir);
+	vectorSub( &newPos, &dirVectors[ obj->dir ] );
 	if( myMap->tiles[newPos.i][newPos.j] == terrain_none
 		&& myMap->objs [newPos.i][newPos.j] == 0 )
 	{
@@ -32,7 +32,7 @@ bool moveBackward( struct Map *map, struct object* obj) {
 
 bool moveForward( struct Map *map, struct object* obj) {
 	struct Vector newPos = { obj->pos.i, obj->pos.j};
-	vectorAdd( &newPos, obj->dir);
+	vectorAdd( &newPos, &dirVectors[ obj->dir ]);
 	if( myMap->tiles[newPos.i][newPos.j] == terrain_none
 		&& myMap->objs [newPos.i][newPos.j] == 0 )
 	{
@@ -46,12 +46,12 @@ bool moveForward( struct Map *map, struct object* obj) {
 }
 
 bool turnLeft( struct Map *map, struct object *obj) {
-	vectorRotate( obj->dir, true);
+	obj->dir = (obj->dir - 1) % 4;
 	return true;
 }
 
 bool turnRight( struct Map *map, struct object *obj) {
-	vectorRotate( obj->dir, false);
+	obj->dir = (obj->dir + 1) % 4;
 	return true;
 }
 
@@ -60,13 +60,13 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 		playerMoved = true;
 		if ( moveFunction( myMap, player) ) {
 			//scroll if necessary
-			if( player->pos.i > playerViewLimXMax) 
+			if( player->pos.i > playerViewLimXMax)
 				scrollScreen( 1, 0);
-			else if ( player->pos.i < playerViewLimXMin) 
+			else if ( player->pos.i < playerViewLimXMin)
 				scrollScreen( -1, 0);
-			else if ( player->pos.j > playerViewLimYMax) 
+			else if ( player->pos.j > playerViewLimYMax)
 				scrollScreen( 0, 1);
-			else if ( player->pos.j < playerViewLimYMin) 
+			else if ( player->pos.j < playerViewLimYMin)
 				scrollScreen( 0, -1);
 		}
 	}
@@ -190,13 +190,13 @@ int run() {
 void setDefaults() {
 	log0("setting defaults\n");
 
-	timerDelay = 250;
+	timerDelay = 1000;
 
 	SDL_UserEvent userEvent;
 	userEvent.type = SDL_USEREVENT;
 	timerPushEvent.type = SDL_USEREVENT;
 	timerPushEvent.user = userEvent;
-	
+
 	//find the player from the obj list
 	int i;
 	for( i=0; i<myMap->objListCount; i++) {

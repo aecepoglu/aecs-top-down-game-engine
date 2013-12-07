@@ -8,7 +8,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y) 
 	o->pos.i = x;
 	o->pos.j = y;
 	o->type = type;
-	o->dir = vectorClone( & dirVectors[ dir_up]);
+	o->dir = dir_right;
 	o->ai = 0;
 
 	return o;
@@ -35,7 +35,7 @@ struct object* readObject( FILE *fp) {
 }
 
 /*
-	Some functions objects use to interract with each other 
+	Some functions objects use to interract with each other
 */
 
 void use( struct object *obj, struct object *obj2) {
@@ -49,7 +49,7 @@ void hit( struct object *obj1, struct object *obj2) {
 void swallow( struct object *obj1, struct object *obj2) {
 	/* People can eat each other while alive.
 		Change this to obj1->health += obj2->maxHealth/2
-		Also check for life before eating.
+		Also only eat dead objects
 	*/
 	obj1->health += obj2->health;
 }
