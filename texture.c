@@ -26,13 +26,16 @@ SDL_Texture** loadTextures( SDL_Renderer *ren) {
 	textures[ TEXTURE_BAD 			] = loadTexture( ren, "res/qmark.png");
 	textures[ TEXTURE_TRN_NONE 		] = loadTexture( ren, "res/ground.bmp");
 	textures[ TEXTURE_TRN_WALL 		] = loadTexture( ren, "res/brick.png");
-	textures[ TEXTURE_OBJ_MONSTER 	] = loadTexture( ren, "res/player.png");
-	textures[ TEXTURE_OBJ_PLAYER 	] = textures[ TEXTURE_OBJ_MONSTER];
+	textures[ TEXTURE_OBJ_MONSTER 	] = loadTexture( ren, "res/monster.png");
+	textures[ TEXTURE_OBJ_PLAYER 	] = loadTexture( ren, "res/player.png");
 	textures[ TEXTURE_OBJ_APPLE     ] = textures[ TEXTURE_BAD];
 	textures[ TEXTURE_EYE_RIGHT 	] = loadTexture( ren, "res/monster_eye_right.png");
 	textures[ TEXTURE_EYE_UP        ] = loadTexture( ren, "res/monster_eye_up.png");
 	textures[ TEXTURE_EYE_LEFT      ] = loadTexture( ren, "res/monster_eye_left.png");
 	textures[ TEXTURE_EYE_DOWN   	] = loadTexture( ren, "res/monster_eye_down.png");
+
+
+	SDL_SetTextureColorMod( textures[ TEXTURE_OBJ_MONSTER], 255, 150, 255);
 
 
 	return textures;
