@@ -28,7 +28,7 @@ SDL_Texture** loadTextures( SDL_Renderer *ren) {
 	textures[ TEXTURE_TRN_WALL 		] = loadTexture( ren, "res/brick.png");
 	textures[ TEXTURE_OBJ_MONSTER 	] = loadTexture( ren, "res/monster.png");
 	textures[ TEXTURE_OBJ_PLAYER 	] = loadTexture( ren, "res/player.png");
-	textures[ TEXTURE_OBJ_APPLE     ] = textures[ TEXTURE_BAD];
+	textures[ TEXTURE_OBJ_APPLE     ] = loadTexture( ren, "res/apple.png");
 	textures[ TEXTURE_EYE_RIGHT 	] = loadTexture( ren, "res/monster_eye_right.png");
 	textures[ TEXTURE_EYE_UP        ] = loadTexture( ren, "res/monster_eye_up.png");
 	textures[ TEXTURE_EYE_LEFT      ] = loadTexture( ren, "res/monster_eye_left.png");
