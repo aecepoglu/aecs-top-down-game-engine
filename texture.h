@@ -18,6 +18,7 @@
 #define TEXTURE_EYE_RIGHT       7
 #define TEXTURE_EYE_DOWN        8
 #define TEXTURE_EYE_LEFT        9
+#define TEXTURES_COUNT			10
 
 
 #define TEXTURE_MAP_TRN_TYPE( t)  (TEXTURE_TRN_NONE + t)

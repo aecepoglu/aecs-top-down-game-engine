@@ -37,7 +37,7 @@ void drawObjects() {
 }
 
 void drawBackground() {
-	log0("generate background\n");
+	log2("generate background\n");
 	SDL_DestroyTexture( bgroundTexture);
 	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, windowW*TILELEN, windowH*TILELEN) ;
 	SDL_SetRenderTarget( renderer, bgroundTexture);
@@ -53,7 +53,7 @@ void drawBackground() {
 }
 
 void draw() {
-	log0("draw\n");
+	log2("draw\n");
 	SDL_RenderClear( renderer);
 	//render background
 	drawTexture( renderer, bgroundTexture, 0, 0, windowW*TILELEN, windowH*TILELEN);

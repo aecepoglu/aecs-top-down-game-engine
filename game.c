@@ -75,7 +75,7 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
 		case SDLK_q:
-			quit("Quit-key pressed.\n");
+			running = 0;
 			break;
 		case SDLK_UP:
 			movePlayer( moveForward);
@@ -190,7 +190,7 @@ int run() {
 void setDefaults() {
 	log0("setting defaults\n");
 
-	timerDelay = 1000;
+	timerDelay = 250;
 
 	SDL_UserEvent userEvent;
 	userEvent.type = SDL_USEREVENT;
@@ -198,13 +198,7 @@ void setDefaults() {
 	timerPushEvent.user = userEvent;
 
 	//find the player from the obj list
-	int i;
-	for( i=0; i<myMap->objListCount; i++) {
-		if( myMap->objList[i]->type == go_player ) {
-			player = myMap->objList[i];
-			break;
-		}
-	}
+	player = findPlayer( myMap);
 }
 
 

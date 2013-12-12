@@ -31,6 +31,9 @@ struct object* readObject( FILE *fp) {
 	fread( &type,      sizeof(enum aiType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
 
+	//TODO save and load health
+	obj->health = 2;
+
 	return obj;
 }
 

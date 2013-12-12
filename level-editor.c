@@ -201,10 +201,12 @@ int run() {
 
 
 
+
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
 	char *mapPath = 0;
+	player = 0;
 
 	//Handle cmd-line arguments
 	int argi = 1;
@@ -244,13 +246,12 @@ int main( int argc, char *args[]) {
 			myMap = readMapFile( mapPath);
 	}
 
-
+	player = findPlayer( myMap);
 
 	init();
 
     log0("loading textures\n");
 	textures = loadTextures( renderer);
-	log0("loaded\n");
 	myBrushState = &initialBrushState;
 	brush = defaultBrush;
 
@@ -260,5 +261,8 @@ int main( int argc, char *args[]) {
 	run();
 
 	log0("Program over\nPeace\n");
+	SDL_DestroyRenderer( renderer);
+	SDL_DestroyWindow( window);
+	SDL_Quit();
 	return 0;
 }

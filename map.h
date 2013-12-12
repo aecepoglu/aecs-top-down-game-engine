@@ -44,6 +44,10 @@ struct Map {
 */
 struct Map* readMapFile( char *path);
 
+/*	Finds the player object in the given map and returns it
+*/
+struct object* findPlayer( struct Map* m);
+
 /* 	Saves the map to disk
  */
 void saveMap( struct Map* map);

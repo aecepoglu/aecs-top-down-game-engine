@@ -69,6 +69,20 @@ struct Map* readMapFile( char *path) {
 	return m;
 }
 
+struct object* findPlayer( struct Map *m) {
+	log0( "Looking for player.\n");
+	unsigned int i;
+	for( i=0; i<m->objListCount; i++) {
+		if( m->objList[i]->type == go_player) {
+			log0 ( "Found player\n");
+			return m->objList[i];
+		}
+	}
+	log0 ( "Could not find player\n");
+	return 0;
+}
+
+
 /* 	Saves the map to disk
 	Map format : map-width map-height objListCount objListSize
 		objList {x, y, type}
