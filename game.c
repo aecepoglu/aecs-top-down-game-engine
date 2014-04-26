@@ -22,7 +22,7 @@ void gameOver() {
 /* Moves forward only if that spot is empty */
 bool moveBackward( struct Map *map, struct object* obj) {
 	struct Vector newPos;
-	vectorSub( &dirVectors[ obj->dir ], &newPos, &obj->pos);
+	vectorSub( &obj->pos, &dirVectors[ obj->dir ], &newPos );
 	if( map->tiles[newPos.i][newPos.j] == 0 && map->objs[newPos.i][newPos.j] == 0) {
 		map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
 		map->objs[ newPos.i ][ newPos.j ] = obj;

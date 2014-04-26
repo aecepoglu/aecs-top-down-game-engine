@@ -1,3 +1,4 @@
+#include <stdlib.h> //for malloc
 #include "hungryLeftTurner.h"
 
 struct hungryLeftTurnerData {
@@ -50,7 +51,7 @@ void hungryLeftTurner_update( struct Map *map, struct object *obj, void *data) {
 
 	int leftDistance = hungryLeftTurner_look( map, &obj->pos, (obj->dir -1)%4);
 	if( leftDistance > 0) {
-		log0("found target %d away\n", leftDistance);
+		log2("hungryLeftTurner: found target %d away\n", leftDistance);
 		aiData->goalDistance = leftDistance;
 		aiData->state = STATE_EXCITED;
 		turnLeft( map, obj);
@@ -65,7 +66,7 @@ void hungryLeftTurner_update( struct Map *map, struct object *obj, void *data) {
 				goto calm_turnLeft;
 			break;
 		case STATE_EXCITED:
-			log0("state excited\ngoalDistance > 0 : %s\n", aiData->goalDistance > 0 ? "true" : "false");
+			log2("hungryLeftTurner: state excited\ngoalDistance > 0 : %s\n", aiData->goalDistance > 0 ? "true" : "false");
 			if( aiData->goalDistance > 0 && moveForward(map, obj) )
 				goto excited_end;
 			else {
