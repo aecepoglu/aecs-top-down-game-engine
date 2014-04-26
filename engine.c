@@ -19,7 +19,7 @@ void init() {
 	vectorAdd( &viewPos, &viewSize, &viewEnd);
 
 	assert( SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER) >= 0);
-	window = SDL_CreateWindow("SDL Window", 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN, 0);
+	window = SDL_CreateWindow("aec-game", 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN, 0);
 	assert( window);
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	assert( renderer);

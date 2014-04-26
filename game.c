@@ -114,6 +114,7 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 				needsScroll = false;
 
 			if(needsScroll) {
+				log1("Screen needs scroll. Player:(%d,%d) and viewPos:(%d,%d) viewEnd:(%d,%d)\n", player->pos.i, player->pos.j, viewPos.i, viewPos.j, viewEnd.i, viewEnd.j);
 				struct Vector *scrollVector = &dirVectors[scrollDirection];
 				vectorAdd( scrollVector, &playerMoveAreaStart, &playerMoveAreaStart);
 				vectorAdd( scrollVector, &playerMoveAreaEnd, &playerMoveAreaEnd);
@@ -189,15 +190,15 @@ int run() {
 		switch (e.type) {
 			case SDL_WINDOWEVENT:
 				switch( e.window.event) {
-					case SDL_WINDOWEVENT_SHOWN:
-					    log1("Window %d shown\n", e.window.windowID);
+					case SDL_WINDOWEVENT_EXPOSED:
+					    //log1("Window %d exposed\n", e.window.windowID);
 					    break;
 					case SDL_WINDOWEVENT_HIDDEN:
 					    log1("Window %d hidden\n", e.window.windowID);
 					    break;
-					case SDL_WINDOWEVENT_EXPOSED:
-					    //log1("Window %d exposed\n", e.window.windowID);
-					    break;
+					case SDL_WINDOWEVENT_SHOWN:
+					    log1("Window %d shown\n", e.window.windowID);
+						break;
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
 						resizeView(e.window.data1, e.window.data2);
@@ -251,8 +252,9 @@ int run() {
 
 void setDefaults() {
 	log0("setting defaults\n");
-
+	
 	timerDelay = 100;
+	
 
 	SDL_UserEvent userEvent;
 	userEvent.type = SDL_USEREVENT;
@@ -304,6 +306,11 @@ int main( int argc, char *args[]) {
 
 	setDefaults();
 	init();
+
+	//FIXME temporary placement here. need their default values set somewhere better, maybe
+	vectorAdd( &viewPos, &PLAYER_PADDING_VECTOR, &playerMoveAreaStart);
+	vectorSub( &viewEnd, &PLAYER_PADDING_VECTOR, &playerMoveAreaEnd);
+
 	textures = loadTextures( renderer);
 
 	log0("All set and ready\nStarting...\n");
