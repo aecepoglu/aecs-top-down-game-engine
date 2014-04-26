@@ -4,6 +4,7 @@
 #include "ai.h"
 #include "object.h"
 #include "map.h"
+#include "log.h"
 
 /*AI-utility functions*/
 typedef void (aiUpdateFun)(struct Map*, struct object*, void*);

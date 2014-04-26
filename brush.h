@@ -46,8 +46,9 @@ struct brushState initialBrushState =
 			{SDLK_2, { "wall", 0, drawTerrain, terrain_wall, no_trans} }
 		}}},
 		//2
-		{SDLK_3, { "AI", 1, defaultBrush, no_var, (struct stateTransition[]) {
+		{SDLK_3, { "AI", 2, defaultBrush, no_var, (struct stateTransition[]) {
 			{SDLK_1, { "left-turner", 0, drawAI, ai_leftTurner, no_trans} },
+			{SDLK_2, { "hungry-left-turner", 0, drawAI, ai_hungryLeftTurner, no_trans} },
 		}}},
 		//3
 		{SDLK_4, { "direction", 4, defaultBrush, no_var, (struct stateTransition[]) {

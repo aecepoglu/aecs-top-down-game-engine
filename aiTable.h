@@ -2,6 +2,7 @@
 #define AITABLE_H
 
 #include "ai/leftTurner.h"
+#include "ai/hungryLeftTurner.h"
 #include "ai.h"
 #include "aiFun.h"
 
@@ -12,8 +13,9 @@ struct aiTableItem {
 
 
 static struct aiTableItem aiTable[] = {
-	{ 0, 0 }, //ai_none
-	{ leftTurner_create, leftTurner_update }, //ai_leftTurner
+	[ai_none] = 			{ 0, 						0 						},
+	[ai_leftTurner] = 		{ leftTurner_create, 		leftTurner_update 		},
+	[ai_hungryLeftTurner] = { hungryLeftTurner_create, 	hungryLeftTurner_update },
 };
 
 /* table interface */
