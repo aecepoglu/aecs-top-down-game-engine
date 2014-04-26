@@ -1,17 +1,17 @@
 #include "vector.h"
 #include <stdlib.h>
 
-void vectorAdd( struct Vector *v1, struct Vector *v2) {
-	v1->i += v2->i;
-	v1->j += v2->j;
+void vectorAdd( struct Vector *v1, struct Vector *v2, struct Vector *v3) {
+	v3->i = v1->i + v2->i;
+	v3->j = v1->j + v2->j;
 }
-void vectorSub( struct Vector *v1, struct Vector *v2) {
-	v1->i -= v2->i;
-	v1->j -= v2->j;
+void vectorSub( struct Vector *v1, struct Vector *v2, struct Vector *v3) {
+	v3->i = v1->i - v2->i;
+	v3->j = v1->j - v2->j;
 }
-void vectorReverse( struct Vector *v) {
-	v->i = - v->i;
-	v->j = - v->j;
+void vectorReverse( struct Vector *v1, struct Vector *v2) {
+	v2->i = - v1->i;
+	v2->j = - v1->j;
 }
 void vectorRotate( struct Vector *v, bool clockwise) {
 	int tmp = v->i;
@@ -41,9 +41,7 @@ void writeVector( FILE *fp, struct Vector *v) {
 	fwrite( &v->j, sizeof( int), 1, fp);
 }
 
-struct Vector *vectorClone( struct Vector *v) {
-	struct Vector *v2 = (struct Vector*)malloc( sizeof( struct Vector));
-	v2->i = v->i;
-	v2->j = v->j;
-	return v2;
+void vectorClone( struct Vector *v1, struct Vector *v2) {
+	v2->i = v1->i;
+	v2->j = v1->j;
 }

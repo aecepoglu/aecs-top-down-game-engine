@@ -32,8 +32,8 @@ SDL_Texture *bgroundTexture;
 
 struct Map *myMap;
 
-/* windowX,windowY : coordinates of current view in the whole map */
-int windowW, windowH, windowX, windowY;
+struct Vector viewPos, viewSize, viewEnd;
+int windowW, windowH;
 
 /* ---------------------------------
  *			DEFINITIONS
@@ -69,6 +69,10 @@ void draw();
 
 /* Moves the view around
 */
-void scrollScreen( int, int);
+bool scrollScreen( enum direction);
+
+/* Resizez current viewPort to match the newly resized window
+*/
+void resizeView( int, int);
 
 #endif //ENGINE_H

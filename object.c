@@ -4,14 +4,18 @@
 #include <stdlib.h>
 
 struct object* createObject( enum objType type, unsigned int x, unsigned int y) {
-	struct object *o = (struct object*)malloc(sizeof(struct object));
-	o->pos.i = x;
-	o->pos.j = y;
-	o->type = type;
-	o->dir = dir_right;
-	o->ai = 0;
+	struct object *obj = (struct object*)malloc(sizeof(struct object));
+	obj->pos.i = x;
+	obj->pos.j = y;
+	obj->type = type;
+	obj->dir = dir_right;
+	obj->ai = 0;
+	obj->health = 3;
+	obj->maxHealth = 3;
+	obj->timerCounter= 0;
+	obj->isDeleted=false;
 
-	return o;
+	return obj;
 }
 
 void writeObject( FILE *fp, struct object *obj) {
@@ -31,8 +35,10 @@ struct object* readObject( FILE *fp) {
 	fread( &type,      sizeof(enum aiType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
 
-	//TODO save and load health
-	obj->health = 2;
+	//TODO save and load health, timerCounter
+	obj->health = 3;
+	obj->maxHealth = 3;
+	obj->timerCounter= 0;
 
 	return obj;
 }
@@ -41,18 +47,24 @@ struct object* readObject( FILE *fp) {
 	Some functions objects use to interract with each other
 */
 
-void use( struct object *obj, struct object *obj2) {
+void objectUse( struct object *obj, struct object *obj2) {
 	/* Not used yet. Might even need to be implemented inside the object */
 }
 
-void hit( struct object *obj1, struct object *obj2) {
-	obj2->health -= 1;
+bool objectHit( struct object *obj1, struct object *obj2) {
+	log1("Obj at (%d,%d) is hit\n", obj2->pos.i, obj2->pos.j);
+	if( obj2->health > 0) {
+		obj2->health -= 1;
+
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
-void swallow( struct object *obj1, struct object *obj2) {
-	/* People can eat each other while alive.
-		Change this to obj1->health += obj2->maxHealth/2
-		Also only eat dead objects
-	*/
-	obj1->health += obj2->health;
+void objectSwallow( struct object *obj1, struct object *obj2) {
+	if( obj2->health == 0) {
+		obj1->health += obj2->maxHealth;
+	}
 }

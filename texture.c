@@ -6,7 +6,7 @@
 #include "log.h"
 
 SDL_Texture *loadTexture( SDL_Renderer *ren, const char *path){
-    log0( "Loading %s\n", path);
+    log1( "\tLoading %s\n", path);
 	SDL_Surface *img = IMG_Load( path);
 	assert( img);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface( ren, img);
@@ -22,6 +22,7 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 }
 
 SDL_Texture** loadTextures( SDL_Renderer *ren) {
+	log0("Loading textures\n");
 	SDL_Texture **textures = calloc( TEXTURES_COUNT, sizeof(SDL_Texture*) );
 	textures[ TEXTURE_BAD 			] = loadTexture( ren, "res/qmark.png");
 	textures[ TEXTURE_TRN_NONE 		] = loadTexture( ren, "res/ground.bmp");

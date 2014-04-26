@@ -9,20 +9,20 @@ struct Vector {
 	int i, j ;
 };
 
-/* Sums two vectors. First vector has the result
+/* Sums two vectors. 3rd vector has the result
 */
-void vectorAdd( struct Vector*, struct Vector* );
-/* Subtracts two vectors. First vector has the result
-*/
-void vectorSub( struct Vector*, struct Vector* );
+void vectorAdd( struct Vector*, struct Vector* , struct Vector*);
 
-void vectorReverse( struct Vector*);
+/* Subtracts two vectors. 3rd vector has the result
+*/
+void vectorSub( struct Vector*, struct Vector*, struct Vector* );
+
+void vectorReverse( struct Vector*, struct Vector*);
+
+void vectorClone( struct Vector *v, struct Vector*);
+
 /* bool clockwise: true if clockwise, false if counter-clockwise
 */
-
-struct Vector* vectorClone( struct Vector *v);
-
-
 void vectorRotate( struct Vector*, bool);
 
 struct Vector* readVector( FILE *fp);

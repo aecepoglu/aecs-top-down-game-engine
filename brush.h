@@ -21,21 +21,22 @@ brushFun drawObject;
 brushFun drawTerrain;
 brushFun drawPlayer;
 brushFun drawAI;
+brushFun setDirection;
 
 #define no_var 0
 #define no_trans 0
 struct brushState initialBrushState =
 {"null", 1, defaultBrush, no_var, (struct stateTransition[]) {
 	//0
-	{SDLK_1, { "create", 3, defaultBrush, no_var, (struct stateTransition[]) {
+	{SDLK_1, { "create/set", 4, defaultBrush, no_var, (struct stateTransition[]) {
 		//0
 		{SDLK_1, { "object", 3, defaultBrush, no_var, (struct stateTransition[]) {
 			//0
-			{SDLK_3, { "player", 0, drawPlayer, no_var, no_trans} },
+			{SDLK_1, { "player", 0, drawPlayer, no_var, no_trans} },
 			//1
-			{SDLK_1, { "monster", 0, drawObject, go_monster, no_trans} },
+			{SDLK_2, { "monster", 0, drawObject, go_monster, no_trans} },
 			//2
-			{SDLK_2, { "apple", 0, drawObject, go_misc, no_trans} },
+			{SDLK_3, { "apple", 0, drawObject, go_misc, no_trans} },
 		}}},
 		//1
 		{SDLK_2, { "terrain", 2, defaultBrush, no_var, (struct stateTransition[]) {
@@ -48,6 +49,13 @@ struct brushState initialBrushState =
 		{SDLK_3, { "AI", 1, defaultBrush, no_var, (struct stateTransition[]) {
 			{SDLK_1, { "left-turner", 0, drawAI, ai_leftTurner, no_trans} },
 		}}},
+		//3
+		{SDLK_4, { "direction", 4, defaultBrush, no_var, (struct stateTransition[]) {
+			{SDLK_1, { "up", 0, setDirection, dir_up, no_trans} },
+			{SDLK_2, { "right", 0, setDirection, dir_right, no_trans} },
+			{SDLK_3, { "down", 0, setDirection, dir_down, no_trans} },
+			{SDLK_4, { "left", 0, setDirection, dir_left, no_trans} },
+		}}}
 	}}}
 }};
 #undef no_var
@@ -55,6 +63,7 @@ struct brushState initialBrushState =
 
 //void (*updateBrushState( struct brushState *(*curState), SDL_Keycode key))( unsigned int, unsigned int, int) {
 brushFun* updateBrushState( struct brushState **curState, int *brushVariant, SDL_Keycode key) {
+	brushFun *result = defaultBrush;
 	int i;
 	for( i=0; i< (*curState)->len; i++)
 		if( (*curState)->stateTransitions[i].key == key) {
@@ -63,17 +72,19 @@ brushFun* updateBrushState( struct brushState **curState, int *brushVariant, SDL
 			log0("state changed to %s\n", (*curState)->name);
 			//if the new state is a final state
 			if( (*curState)->stateTransitions == 0) {
-				brushFun* result = (*curState)->brush;
+				result = (*curState)->brush;
 				*brushVariant = (*curState)->variant;
 				log0("reseting brush state\n");
 				//reset the state
 				(*curState) = &initialBrushState;
-
-				return result;
 			}
-			else
-				return defaultBrush;
+			break;
 		}
-	return defaultBrush;
+	
+	for( i=0; i< (*curState)->len; i++)
+		log0("%d. %s\n", i+1, (*curState)->stateTransitions[i].target.name);
+	log0("\n");
+
+	return result;
 }
 

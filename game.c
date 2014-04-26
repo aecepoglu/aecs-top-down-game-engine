@@ -9,40 +9,62 @@ struct object *player;
 /* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
 bool playerMoved = false;
 
-#define VIEW_RANGE 10  //TODO Use FOV distance instead of '10'
-int playerViewLimXMin = VIEW_RANGE;
-int playerViewLimYMin = VIEW_RANGE;
-int playerViewLimXMax;
-int playerViewLimYMax;
+#define VIEW_RANGE 3  //TODO Use FOV distance instead of '10'
+struct Vector playerMoveAreaStart, playerMoveAreaEnd;
+struct Vector PLAYER_PADDING_VECTOR = {VIEW_RANGE, VIEW_RANGE};
 //FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
 
-bool moveBackward( struct Map *map, struct object* obj) {
-	struct Vector newPos = { obj->pos.i, obj->pos.j};
-	vectorSub( &newPos, &dirVectors[ obj->dir ] );
-	if( myMap->tiles[newPos.i][newPos.j] == terrain_none
-		&& myMap->objs [newPos.i][newPos.j] == 0 )
-	{
-		obj->pos.i = newPos.i;
-		obj->pos.j = newPos.j;
-		return true;
-	}
-	else
-		return false;
+void gameOver() {
+	log0("game over...\n");
+	running=false;
 }
 
-bool moveForward( struct Map *map, struct object* obj) {
-	struct Vector newPos = { obj->pos.i, obj->pos.j};
-	vectorAdd( &newPos, &dirVectors[ obj->dir ]);
-	if( myMap->tiles[newPos.i][newPos.j] == terrain_none
-		&& myMap->objs [newPos.i][newPos.j] == 0 )
-	{
-		obj->pos.i = newPos.i;
-		obj->pos.j = newPos.j;
+/* Moves forward only if that spot is empty */
+bool moveBackward( struct Map *map, struct object* obj) {
+	struct Vector newPos;
+	vectorSub( &dirVectors[ obj->dir ], &newPos, &obj->pos);
+	if( map->tiles[newPos.i][newPos.j] == 0 && map->objs[newPos.i][newPos.j] == 0) {
+		map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
+		map->objs[ newPos.i ][ newPos.j ] = obj;
+		vectorClone( &newPos, &obj->pos);
 		return true;
 	}
-	else
+	else {
 		return false;
+	}
+}
 
+/* Move forward. Hit the object if can't move forward */
+bool moveForward( struct Map *map, struct object* obj) {
+	struct Vector newPos;
+	vectorAdd( &dirVectors[ obj->dir ], &obj->pos, &newPos );
+	if( map->tiles[newPos.i][newPos.j] == 0 ) {
+		struct object *objAtPos = map->objs[newPos.i][newPos.j];
+		if( ! objAtPos ) {
+			map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
+			map->objs[ newPos.i ][ newPos.j ] = obj;
+			vectorClone( &newPos, &obj->pos);
+			return true;
+		}
+		else {
+			if (objectHit( obj, objAtPos) ) {
+				//if objAtPos died
+				if( objAtPos->health == 0 ) {
+					log0("object died\n");
+					if( objAtPos == player ) {
+						gameOver();
+					}
+					else {
+						
+					}
+				}
+			}
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
 }
 
 bool turnLeft( struct Map *map, struct object *obj) {
@@ -55,19 +77,48 @@ bool turnRight( struct Map *map, struct object *obj) {
 	return true;
 }
 
+bool eat( struct Map *map, struct object *obj) {
+	struct Vector newPos;
+	vectorAdd( &dirVectors[ obj->dir ], &obj->pos, &newPos);
+	struct object *otherObj = map->objs[newPos.i][newPos.j];
+	if( otherObj != 0 && otherObj->health == 0) {
+		objectSwallow( obj, otherObj);
+		map->objs[ newPos.i ][ newPos.j ] = 0;
+		/* mark it for 'awaiting deletion'
+		It will be deleted in the next update cycle */
+		otherObj->isDeleted=true;
+		if( otherObj == player) {
+			gameOver();
+		}
+	}
+}
+
 void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 	if( ! playerMoved) {
 		playerMoved = true;
 		if ( moveFunction( myMap, player) ) {
 			//scroll if necessary
-			if( player->pos.i > playerViewLimXMax)
-				scrollScreen( 1, 0);
-			else if ( player->pos.i < playerViewLimXMin)
-				scrollScreen( -1, 0);
-			else if ( player->pos.j > playerViewLimYMax)
-				scrollScreen( 0, 1);
-			else if ( player->pos.j < playerViewLimYMin)
-				scrollScreen( 0, -1);
+
+			bool needsScroll = true;
+			enum direction scrollDirection;
+
+			if( player->pos.i >= playerMoveAreaEnd.i && scrollScreen(dir_right))
+				scrollDirection = dir_right;
+			else if( player->pos.i < playerMoveAreaStart.i && scrollScreen(dir_left))
+				scrollDirection = dir_left;
+			else if( player->pos.j >= playerMoveAreaEnd.j && scrollScreen(dir_down))
+				scrollDirection = dir_down;
+			else if( player->pos.j < playerMoveAreaStart.j && scrollScreen(dir_up))
+				scrollDirection = dir_up;
+			else
+				needsScroll = false;
+
+			if(needsScroll) {
+				struct Vector *scrollVector = &dirVectors[scrollDirection];
+				vectorAdd( scrollVector, &playerMoveAreaStart, &playerMoveAreaStart);
+				vectorAdd( scrollVector, &playerMoveAreaEnd, &playerMoveAreaEnd);
+			}
+				
 		}
 	}
 }
@@ -89,6 +140,9 @@ void handleKey( SDL_KeyboardEvent *e) {
 		case SDLK_RIGHT:
 			movePlayer( turnRight);
 			break;
+		case SDLK_e:
+			eat( myMap, player);
+			break;
 		default:
 			log0("Unhandled key\n");
 			break;
@@ -96,18 +150,29 @@ void handleKey( SDL_KeyboardEvent *e) {
 }
 
 Uint32 timerCallback( Uint32 interval, void *param) {
-	log0("tick\n");
+	log2("tick\n");
 	SDL_PushEvent( &timerPushEvent);
 	return interval;
 }
 
 void update() {
-	log0("update\n");
+	log2("update\n");
 	unsigned int i;
 	for( i=0; i<myMap->objListCount; i++) {
 		//update object at [i]
-		if( myMap->objList[i]->ai )
-			AI_UPDATE( myMap, myMap->objList[i] );
+		/* Some objects are marked for deletion
+		Copy all non-deleted objects into a new-list
+		and that list is the new object-list */
+		if( myMap->objList[i]->isDeleted ) {
+			//TODO implement obj deletion. Just not showing the deleted objects now
+			//TODO don't forget to remove the matching code from draw()
+		}
+		else if( myMap->objList[i]->ai ) {
+			if( myMap->objList[i]->timerCounter == 0) {
+				AI_UPDATE( myMap, myMap->objList[i] );
+			}
+			myMap->objList[i]->timerCounter --;
+		}
 	}
 	playerMoved = false;
 }
@@ -120,8 +185,6 @@ int run() {
 
 	SDL_Event e;
 	while( running) {
-		//while( SDL_PollEvent( &e)) {
-		//}
 		SDL_WaitEvent( &e);
 		switch (e.type) {
 			case SDL_WINDOWEVENT:
@@ -136,11 +199,10 @@ int run() {
 					    //log1("Window %d exposed\n", e.window.windowID);
 					    break;
 					case SDL_WINDOWEVENT_RESIZED:
-					    log0("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
-						windowW = (e.window.data1-1) / TILELEN;
-						windowH = (e.window.data2-1) / TILELEN;
-						playerViewLimXMax = windowW - VIEW_RANGE;
-						playerViewLimYMax = windowH - VIEW_RANGE;
+					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
+						resizeView(e.window.data1, e.window.data2);
+						vectorAdd( &viewPos, &PLAYER_PADDING_VECTOR, &playerMoveAreaStart);
+						vectorSub( &viewEnd, &PLAYER_PADDING_VECTOR, &playerMoveAreaEnd);
 
 						drawBackground();
 					    break;
@@ -190,7 +252,7 @@ int run() {
 void setDefaults() {
 	log0("setting defaults\n");
 
-	timerDelay = 250;
+	timerDelay = 100;
 
 	SDL_UserEvent userEvent;
 	userEvent.type = SDL_USEREVENT;
@@ -199,6 +261,8 @@ void setDefaults() {
 
 	//find the player from the obj list
 	player = findPlayer( myMap);
+	if( ! player)
+		quit( "No player was detected. You need a player object in the map.");
 }
 
 

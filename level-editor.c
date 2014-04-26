@@ -17,7 +17,6 @@ struct object *player;
 
 
 bool defaultBrush( unsigned int x, unsigned int y, int type) {
-	//log1("brush unset\n");
 	return 0;
 }
 
@@ -67,11 +66,22 @@ bool drawAI( unsigned int x, unsigned int y, int type) {
 	return 0;
 }
 
+bool setDirection( unsigned int x, unsigned int y, int type) {
+	//if there is an object at the given location, and it dsoen't have an AI
+	if( myMap->objs[x][y] != 0) {
+		myMap->objs[x][y]->dir = (enum direction)type;
+		return 1;
+	}
+
+	return 0;
+}
+
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
 		case SDLK_s:
 			/* saves the map, and continues */
 			saveMap( myMap);
+			log0("saved\n");
 			break;
 		case SDLK_q:
 			/* terminates program without saving anything */
@@ -79,19 +89,20 @@ void handleKey( SDL_KeyboardEvent *e) {
 			break;
 
 		case SDLK_UP:
-			scrollScreen( 0, -1);
+			scrollScreen( dir_up);
 			break;
 		case SDLK_DOWN:
-			scrollScreen( 0, +1);
+			scrollScreen( dir_down);
 			break;
 		case SDLK_RIGHT:
-			scrollScreen( +1, 0);
+			scrollScreen( dir_right);
 			break;
 		case SDLK_LEFT:
-			scrollScreen( -1, 0);
+			scrollScreen( dir_left);
 			break;
 		default:
-			brush = updateBrushState( &myBrushState, &brushVariant, e->keysym.sym);
+			if( e->keysym.sym >= SDLK_0 && e->keysym.sym <= SDLK_9)
+				brush = updateBrushState( &myBrushState, &brushVariant, e->keysym.sym);
 			break;
 	};
 }
@@ -112,8 +123,8 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 		y = e2->y / TILELEN;
 	}
 
-	x += windowX;
-	y += windowY;
+	x += viewPos.i;
+	y += viewPos.j;
 
 	return ( x < myMap->width && y < myMap->height && brush( x, y, brushVariant) );
 }
@@ -140,11 +151,10 @@ int run() {
 					    //log1("Window %d exposed\n", e.window.windowID);
 					    break;
 					case SDL_WINDOWEVENT_RESIZED:
-					    log0("Window %d resized to %dx%d\n",
+					    log1("Window %d resized to %dx%d\n",
 					            e.window.windowID, e.window.data1,
 					            e.window.data2);
-						windowW = (e.window.data1-1) / TILELEN;
-						windowH = (e.window.data2-1) / TILELEN;
+						resizeView(e.window.data1, e.window.data2);
 						drawBackground();
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:

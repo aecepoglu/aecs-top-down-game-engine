@@ -13,5 +13,6 @@ bool moveForward	( struct Map*, struct object*);
 bool moveBackward	( struct Map*, struct object*);
 bool turnLeft		( struct Map*, struct object*);
 bool turnRight		( struct Map*, struct object*);
+bool eat			( struct Map*, struct object*);
 
 #endif
