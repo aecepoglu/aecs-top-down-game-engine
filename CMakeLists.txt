@@ -15,6 +15,7 @@ add_executable(aec-game game.c ${MY_SOURCE_FILES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
+add_definitions(-Wall)
 
 #copy resources from source-dir to binary-dir
 file(COPY "res" DESTINATION ${CMAKE_BINARY_DIR}/)

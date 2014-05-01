@@ -91,6 +91,7 @@ bool eat( struct Map *map, struct object *obj) {
 			gameOver();
 		}
 	}
+	return true;
 }
 
 void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
@@ -178,7 +179,7 @@ void update() {
 	playerMoved = false;
 }
 
-int run() {
+void run() {
     drawBackground();
 	draw(); //the initial draw //TODO check if necessary
 
@@ -311,7 +312,7 @@ int main( int argc, char *args[]) {
 	vectorAdd( &viewPos, &PLAYER_PADDING_VECTOR, &playerMoveAreaStart);
 	vectorSub( &viewEnd, &PLAYER_PADDING_VECTOR, &playerMoveAreaEnd);
 
-	textures = loadTextures( renderer);
+	textures = loadAllTextures( renderer);
 
 	log0("All set and ready\nStarting...\n");
 

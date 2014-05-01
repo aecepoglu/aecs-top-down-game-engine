@@ -27,7 +27,7 @@
 bool running;
 SDL_Window *window;
 SDL_Renderer *renderer;
-SDL_Texture **textures;
+struct GameTextures *textures;
 SDL_Texture *bgroundTexture;
 
 struct Map *myMap;

@@ -1,6 +1,15 @@
 #include "vector.h"
 #include <stdlib.h>
 
+
+struct Vector dirVectors[] = {
+	[dir_up] = { 0, -1},
+	[dir_right] = { 1, 0},
+	[dir_down] = {0, 1},
+	[dir_left] = { -1, 0},
+};
+
+
 void vectorAdd( struct Vector *v1, struct Vector *v2, struct Vector *v3) {
 	v3->i = v1->i + v2->i;
 	v3->j = v1->j + v2->j;

@@ -14,6 +14,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y) 
 	obj->maxHealth = 3;
 	obj->timerCounter= 0;
 	obj->isDeleted=false;
+	obj->visualState = 1;
 
 	return obj;
 }
@@ -35,10 +36,12 @@ struct object* readObject( FILE *fp) {
 	fread( &type,      sizeof(enum aiType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
 
-	//TODO save and load health, timerCounter
+	//TODO save and load health, timerCounter, visualState
 	obj->health = 3;
 	obj->maxHealth = 3;
 	obj->timerCounter= 0;
+	obj->visualState = 1;
+	obj->isDeleted=false;
 
 	return obj;
 }
@@ -48,7 +51,8 @@ struct object* readObject( FILE *fp) {
 */
 
 void objectUse( struct object *obj, struct object *obj2) {
-	/* Not used yet. Might even need to be implemented inside the object */
+	/* Not used yet. Might even need to be implemented inside the object AI or sth. ]
+	*/
 }
 
 bool objectHit( struct object *obj1, struct object *obj2) {

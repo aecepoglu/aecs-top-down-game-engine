@@ -29,6 +29,8 @@ struct Vector* readVector( FILE *fp);
 void readToVector( FILE *fp, struct Vector*);
 void writeVector( FILE *fp, struct Vector*);
 
+enum direction { dir_up, dir_right, dir_down, dir_left};
+extern struct Vector dirVectors[4];
 
 #define IS_VECTOR_IN_REGION( vec, x0, y0, x1, y1) ((vec.i > x0) && (vec.j > y0) && (vec.i < x1) && (vec.j < y1))
 

@@ -5,7 +5,7 @@
 #include "map.h"
 #include "log.h"
 
-	
+#define MAP_VERSION 0
 
 /* -----------
  *	FUNCTIONS
@@ -21,6 +21,12 @@ struct Map* readMapFile( char *path) {
 	FILE *fp = fopen( path, "rb");
 	unsigned int x;
 	assert( fp);
+
+	//make sure map versions match
+	int mapVersion;
+	fread( &mapVersion, sizeof(unsigned int), 1, fp);
+
+	assert(mapVersion == MAP_VERSION);
 
 	//read dimensions first
 	fread( &m->width, 		sizeof(unsigned int), 	1, fp);
@@ -47,7 +53,6 @@ struct Map* readMapFile( char *path) {
 	log1("reading objects-list. count %d size %d\n", m->objListCount, m->objListSize);
 	
 	//read the objList
-	struct object* mon;
 	for( x=0; x< m->objListCount; x++) {
 		struct object *obj = readObject( fp);
 
@@ -92,6 +97,11 @@ void saveMap( struct Map *map) {
 	log1( "saveMap( ... to %s)\n", map->filePath);
 	FILE *fp = fopen( map->filePath, "wb");
 	assert( fp);
+
+	//write map version first
+	unsigned int mapVersion = MAP_VERSION;
+	fwrite( &mapVersion, sizeof(unsigned int), 1, fp);
+
 	//write dimensions first
 	fwrite( &map->width,  sizeof(unsigned int), 1, fp);
 	fwrite( &map->height, sizeof(unsigned int), 1, fp);

@@ -34,6 +34,7 @@ void init() {
 void drawObjects() {
 	unsigned i;
 	struct Vector screenPos;
+	struct object *obj;
 	for( i=0; i<myMap->objListCount; i++) {
 		vectorSub( &myMap->objList[i]->pos, &viewPos, &screenPos);
 		if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
@@ -41,8 +42,11 @@ void drawObjects() {
 			if( myMap->objList[i]->isDeleted ) //TODO remove these two lines after implementing object deletion
 				continue;
 			log2("drawing object %d for real\n", i);
-			drawTexture( renderer, textures[ TEXTURE_MAP_OBJ_TYPE( myMap->objList[i]->type) ], screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
-			drawTexture( renderer, textures[ TEXTURE_MAP_DIR( myMap->objList[i]->dir) ], screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
+			obj = myMap->objList[i];
+			//TODO replace [0] with a state variable
+			drawTexture( renderer, 
+				textures->obj[obj->type][ obj->health > 0 ? obj->visualState : 0 ][obj->dir], 
+				screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
 		}
 	}
 }
@@ -53,12 +57,12 @@ void drawBackground() {
 	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, viewSize.i*TILELEN, viewSize.j*TILELEN) ;
 	SDL_SetRenderTarget( renderer, bgroundTexture);
 
-	drawTexture( renderer, textures[TEXTURE_TRN_NONE], 0, 0, windowW, windowH);
+	drawTexture( renderer, textures->trn[TEXTURE_TRN_NONE], 0, 0, windowW, windowH);
 
 	unsigned int x,y,rx,ry;
 	for( x=0, rx=viewPos.i; rx< MIN(myMap->width, viewEnd.i); x++, rx++)
     	for( y=0, ry=viewPos.j; ry< MIN(myMap->height, viewEnd.j); y++, ry ++)
-    		drawTexture( renderer, textures [ TEXTURE_MAP_TRN_TYPE( myMap->tiles[rx][ry]) ],
+    		drawTexture( renderer, textures->trn[ myMap->tiles[rx][ry] ],
     			x*TILELEN, y*TILELEN, TILELEN, TILELEN
     			);
 

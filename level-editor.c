@@ -4,14 +4,15 @@
 #include "array.h"
 
 
+
 /* The drawing brushes. These are used to draw terrain and objects on map */
 brushFun *brush; //draws something on the given location
 int brushVariant;
 struct brushState* myBrushState;
 
 
-bool moveForward( struct Map *map, struct object* obj) { }
-bool turnLeft( struct Map *map, struct object *obj) { }
+bool moveForward( struct Map *map, struct object* obj) { return false; }
+bool turnLeft( struct Map *map, struct object *obj) { return false; }
 
 struct object *player;
 
@@ -130,7 +131,7 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 }
 
 
-int run() {
+void run() {
     drawBackground();
 	draw();
 	SDL_Event e;
@@ -261,7 +262,7 @@ int main( int argc, char *args[]) {
 	init();
 
     log0("loading textures\n");
-	textures = loadTextures( renderer);
+	textures = loadAllTextures( renderer);
 	myBrushState = &initialBrushState;
 	brush = defaultBrush;
 
