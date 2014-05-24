@@ -1,9 +1,12 @@
-#include "texture.h"
 #include <SDL_image.h>
 #include <assert.h>
 #include <stdlib.h>
 
+#include "texture.h"
+#include "object.h"
 #include "log.h"
+
+#define SPRITE_TILE_LEN 16
 
 SDL_Texture *loadTexture( SDL_Renderer *ren, const char *path){
     log1( "\tLoading %s\n", path);
@@ -19,31 +22,33 @@ SDL_Texture *loadTexture( SDL_Renderer *ren, const char *path){
 SDL_Texture ***loadTextureSheet( SDL_Renderer *ren, const char *path) {
     log1( "\tLoading sheet %s\n", path);
 	SDL_Surface *img = IMG_Load( path);
-	int edgeLen = img->w / 4;
 
-	int numStates = img->h / edgeLen;
-	log2( "\t\tWidth: %d, Height: %d. Num-states: %d, Edge-len:%d\n", img->w, img->h, numStates, edgeLen);
+	int numRotations = img->w / SPRITE_TILE_LEN;
+
+	int numStates = img->h / SPRITE_TILE_LEN;
+	log0( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 	assert(numStates >= 2);
 
 	SDL_Texture ***result = calloc( numStates, sizeof(SDL_Texture **));
 
 
 
-	SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, edgeLen, edgeLen, img->format->BitsPerPixel, img->format->Rmask, img->format->Gmask, img->format->Bmask, img->format->Amask);
+	SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, SPRITE_TILE_LEN, SPRITE_TILE_LEN, img->format->BitsPerPixel, img->format->Rmask, img->format->Gmask, img->format->Bmask, img->format->Amask);
 	SDL_Rect surfRect;
-	surfRect.w = edgeLen;
-	surfRect.h = edgeLen;
+	surfRect.w = SPRITE_TILE_LEN;
+	surfRect.h = SPRITE_TILE_LEN;
 
 	//SDL_UnlockSurface(img);
 	//SDL_UnlockSurface(&surf);
 
 	int state, rot;
 	for( state=0; state<numStates; state++) {
-		surfRect.y = state * edgeLen;
+		surfRect.y = state * SPRITE_TILE_LEN;
 		result[state] = calloc( 4, sizeof(SDL_Texture*));
 		for( rot=0; rot<4; rot++) {
-			surfRect.x = rot*edgeLen;
-			
+			surfRect.x = (rot % numRotations)*SPRITE_TILE_LEN;
+	
+			SDL_FillRect( blitSurf, NULL, 0);
 			if (SDL_BlitSurface( img, &surfRect, blitSurf, NULL) != 0)
 				printf("SDL_BlitSurface failed: %s\n", SDL_GetError());
 
@@ -67,18 +72,22 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	struct GameTextures *result = malloc( sizeof(struct GameTextures));
 	
 	result->trn = calloc( TEXTURES_COUNT_TERRAIN, sizeof(SDL_Texture*));
-	result->obj = calloc( TEXTURES_COUNT_OBJECT, sizeof(SDL_Texture***));
 
-	result->trn[ TEXTURE_TRN_NONE 		] = loadTexture( ren, "res/ground.bmp");
+	result->trn[ TEXTURE_TRN_NONE 		] = loadTexture( ren, "res/ground.png");
 	result->trn[ TEXTURE_TRN_WALL 		] = loadTexture( ren, "res/brick.png");
 
+	result->obj = calloc( go_NUM_ITEMS, sizeof(SDL_Texture***));
 
-	result->obj[ TEXTURE_OBJ_PLAYER 	] = loadTextureSheet( ren, "res/player.png");
-	result->obj[ TEXTURE_OBJ_MONSTER 	] = loadTextureSheet( ren, "res/monster.png");
-	result->obj[ TEXTURE_OBJ_APPLE		] = loadTextureSheet( ren, "res/apple.png");
+	result->obj[ go_player] = loadTextureSheet( ren, "res/player.png");
+	result->obj[ go_monster] = loadTextureSheet( ren, "res/monster.png");
+	result->obj[ go_apple] = loadTextureSheet( ren, "res/apple.png");
+	result->obj[ go_flower] = loadTextureSheet( ren, "res/flower.png");
+	//MAKE SURE THE 
 
 	//TODO duplicate sprite sheet and color it
 	//SDL_SetTextureColorMod( result->objectTextures[ TEXTURE_OBJ_MONSTER], 255, 150, 255);
 
 	return result;
 }
+
+#undef SPRITE_TILE_LEN

@@ -1,7 +1,6 @@
 #include "engine.h"
 #include "brush.h"
 #include "aiTable.h"
-#include "array.h"
 
 
 
@@ -38,10 +37,7 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 	//create and initialize a monster
 	struct object *obj = createObject( type, x, y);
 
-	ARRAY_ADD( myMap->objList, obj, myMap->objListCount, myMap->objListSize, sizeof( struct object));
-
-	//the 2d objs array maps to actual object objects
-	myMap->objs[x][y] = obj;
+	addObject( obj, myMap, x, y);
 
 	return 1;
 }
@@ -58,13 +54,17 @@ bool drawPlayer( unsigned int x, unsigned int y, int type) {
 
 bool drawAI( unsigned int x, unsigned int y, int type) {
 	//if there is an object at the given location, and it dsoen't have an AI
-	if( myMap->objs[x][y] != 0 && myMap->objs[x][y]->ai==0) {
+	if( myMap->objs[x][y] != 0) {
+		if ( myMap->objs[x][y]->ai != NULL && myMap->objs[x][y]->ai->type != type) 
+			AI_DESTROY( myMap->objs[x][y]->ai);
+
 		struct AI *ai = AI_CREATE( type);
 		myMap->objs[x][y]->ai = ai;
-		return 1;
+
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
 bool setDirection( unsigned int x, unsigned int y, int type) {

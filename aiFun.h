@@ -8,6 +8,7 @@
 
 /*AI-utility functions*/
 typedef void (aiUpdateFun)(struct Map*, struct object*, void*);
+typedef void (aiDestroyFun)(struct AI*);
 typedef struct AI* (aiCreateFun)();
 
 bool moveForward	( struct Map*, struct object*);

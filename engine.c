@@ -43,7 +43,7 @@ void drawObjects() {
 				continue;
 			log2("drawing object %d for real\n", i);
 			obj = myMap->objList[i];
-			//TODO replace [0] with a state variable
+			//TODO use visual state only: don't do health check. if object died after attacking, set visual state in the hit() function
 			drawTexture( renderer, 
 				textures->obj[obj->type][ obj->health > 0 ? obj->visualState : 0 ][obj->dir], 
 				screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
@@ -119,3 +119,4 @@ void resizeView( int winW, int winH) {
 	viewSize.j = (winH-1) / TILELEN;
 	vectorAdd( &viewPos, &viewSize, &viewEnd);
 }
+

@@ -12,10 +12,6 @@
 #define TEXTURE_TRN_WALL 		1
 #define TEXTURES_COUNT_TERRAIN	2
 
-#define TEXTURE_OBJ_PLAYER 		0
-#define TEXTURE_OBJ_MONSTER 	1
-#define TEXTURE_OBJ_APPLE    	2
-#define TEXTURES_COUNT_OBJECT	3
 
 struct GameTextures {
 	SDL_Texture **trn;

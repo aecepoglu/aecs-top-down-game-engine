@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "array.h"
 
 #include "map.h"
 #include "log.h"
@@ -88,13 +89,24 @@ struct object* findPlayer( struct Map *m) {
 }
 
 
-/* 	Saves the map to disk
-	Map format : map-width map-height objListCount objListSize
-		objList {x, y, type}
-		map-tiles, column by column
- */
+
+void addObject( struct object* obj, struct Map *map, int x, int y) {
+	ARRAY_ADD( map->objList, obj, map->objListCount, map->objListSize, sizeof( struct object));
+	map->objs[x][y] = obj;
+}
+
+
+
 void saveMap( struct Map *map) {
 	log1( "saveMap( ... to %s)\n", map->filePath);
+
+	//confirm the ground tiles are connected
+	if( ! checkMapValidity(map) ) {
+		log0("\tMap is not valid. Not gonna save\n");
+		return;
+	}
+
+
 	FILE *fp = fopen( map->filePath, "wb");
 	assert( fp);
 
@@ -118,7 +130,7 @@ void saveMap( struct Map *map) {
 		fwrite( map->tiles[i], sizeof(enum terrainType), map->height, fp);
 	fclose(fp);
 
-	log1("Map saved to \"%s\"\n", map->filePath);
+	log0("Map saved to \"%s\"\n", map->filePath);
 }
 
 /* Create a new map that matches the given parameters
@@ -146,4 +158,106 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 
 	log1( "createMap() over\n");
 	return m;
+}
+
+//TODO check if tiles are against the edges
+bool checkMapValidity( struct Map *map) {
+	bool result;
+
+	unsigned int x,y;
+
+	int playerCount = 0;
+	int groundCount = 0;
+
+	int **connectedTiles = (int**)calloc( map->width, sizeof(int*));
+	for(x=0; x<map->width; x++) {
+		connectedTiles[x] = (int*)calloc( map->height, sizeof(int));
+		for(y=0; y<map->height; y++) {
+			if( map->tiles[x][y] == terrain_none) {
+
+				if( x == map->width -1 || x == 0 || y == map->height - 1 || y == 0) {
+					log0("\tGround tile at position %d,%d is at the edge. There cannot be ground tiles at map edges.\n", x, y);
+					goto freeConnectedTiles;
+				}
+					
+
+				groundCount ++;
+				connectedTiles[x][y] = 0;
+			}
+			else
+				connectedTiles[x][y] = -1;
+
+			if( map->objs[x][y] != 0 && map->objs[x][y]->type == go_player)
+				playerCount ++;
+		}
+	}
+
+	if( playerCount != 1) {
+		log0("\tplayer count is %d. must be 1.\n", playerCount);
+		result = false;
+		goto freeConnectedTiles;
+	}
+	
+	if( groundCount == 0) {
+		log0("\tgroundCount is %d. must be > 0.\n", groundCount);
+		result = false;
+		goto freeConnectedTiles;
+	}
+
+
+	int groupLookupSize = 64;
+	int *groupLookup = (int*)calloc( groupLookupSize, sizeof(int));
+	int connectedGroupsCount = 0;
+	int currentGroupIndex = 0;
+	for(x=0; x<map->width; x++) {
+		for(y=0; y<map->height; y++) {
+			if(connectedTiles[x][y] >= 0) {
+				if(connectedTiles[x][y] == 0) {
+					connectedGroupsCount ++;
+					currentGroupIndex ++;
+					if(currentGroupIndex >= groupLookupSize) {
+						groupLookupSize *= 2;
+						groupLookup = realloc( groupLookup, sizeof(int) * groupLookupSize);
+					}
+					connectedTiles[x][y] = currentGroupIndex;
+				}
+
+				if(connectedTiles[x+1][y] == 0)
+					connectedTiles[x+1][y] = connectedTiles[x][y];
+				
+				if(connectedTiles[x][y+1] == 0)
+					connectedTiles[x][y+1] = connectedTiles[x][y];
+				else if(connectedTiles[x][y+1] != -1){
+					int k = connectedTiles[x][y+1];
+					while(k != connectedTiles[x][y]) {
+						if(groupLookup[k] == 0){
+							connectedGroupsCount --;
+							groupLookup[ connectedTiles[x][y+1] ] = connectedTiles[x][y];
+							log2("\t\tsetting lookup %d to %d\n", connectedTiles[x][y+1], connectedTiles[x][y]);
+							break;
+						}
+						else
+							k = groupLookup[k];
+					}
+				}
+			}
+		}
+	}
+
+	if( connectedGroupsCount > 1) {
+		log0("\tThere must be only 1 connected group of ground tiles. Map has %d\n", connectedGroupsCount);
+		result = false;
+		goto end;
+	}
+	result = true;
+
+	end:
+	free(groupLookup);
+
+	freeConnectedTiles:
+	for(x=0; x<map->width; x++)
+		free(connectedTiles[x]);
+	free(connectedTiles);
+
+	return result;
 }

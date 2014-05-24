@@ -11,6 +11,11 @@ struct hungryLeftTurnerData {
 #define TURNS_PER_MOVE_CALM 4
 #define TURNS_PER_MOVE_EXCITED 1
 
+void hungryLeftTurner_destroy(struct AI *ai) {
+	free((struct hungryLeftTurnerData*)(ai->data));
+	free(ai);
+}
+
 struct AI* hungryLeftTurner_create() {
 	struct AI* ai = (struct AI*)malloc(sizeof(struct AI));
 	ai->type = ai_hungryLeftTurner;

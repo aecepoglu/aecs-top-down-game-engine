@@ -3,9 +3,6 @@
 
 #define TURNSPERMOVE 4
 
-void common_ai_destroy(struct AI* ai) {
-	free(ai);
-}
 
 struct AI* leftTurner_create() {
 	struct AI* ai = (struct AI*)malloc(sizeof(struct AI));

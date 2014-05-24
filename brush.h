@@ -30,13 +30,11 @@ struct brushState initialBrushState =
 	//0
 	{SDLK_1, { "create/set", 4, defaultBrush, no_var, (struct stateTransition[]) {
 		//0
-		{SDLK_1, { "object", 3, defaultBrush, no_var, (struct stateTransition[]) {
-			//0
+		{SDLK_1, { "object", 4, defaultBrush, no_var, (struct stateTransition[]) {
 			{SDLK_1, { "player", 0, drawPlayer, no_var, no_trans} },
-			//1
 			{SDLK_2, { "monster", 0, drawObject, go_monster, no_trans} },
-			//2
-			{SDLK_3, { "apple", 0, drawObject, go_misc, no_trans} },
+			{SDLK_3, { "apple", 0, drawObject, go_apple, no_trans} },
+			{SDLK_4, { "flower", 0, drawObject, go_flower, no_trans} },
 		}}},
 		//1
 		{SDLK_2, { "terrain", 2, defaultBrush, no_var, (struct stateTransition[]) {
@@ -46,9 +44,10 @@ struct brushState initialBrushState =
 			{SDLK_2, { "wall", 0, drawTerrain, terrain_wall, no_trans} }
 		}}},
 		//2
-		{SDLK_3, { "AI", 2, defaultBrush, no_var, (struct stateTransition[]) {
+		{SDLK_3, { "AI", 3, defaultBrush, no_var, (struct stateTransition[]) {
 			{SDLK_1, { "left-turner", 0, drawAI, ai_leftTurner, no_trans} },
 			{SDLK_2, { "hungry-left-turner", 0, drawAI, ai_hungryLeftTurner, no_trans} },
+			{SDLK_3, { "simple-flower", 0, drawAI, ai_simpleFlower, no_trans} },
 		}}},
 		//3
 		{SDLK_4, { "direction", 4, defaultBrush, no_var, (struct stateTransition[]) {
