@@ -82,6 +82,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_monster] = loadTextureSheet( ren, "res/monster.png");
 	result->obj[ go_apple] = loadTextureSheet( ren, "res/apple.png");
 	result->obj[ go_flower] = loadTextureSheet( ren, "res/flower.png");
+	result->obj[ go_creeperPlant] = loadTextureSheet( ren, "res/apple.png");
 	//MAKE SURE THE 
 
 	//TODO duplicate sprite sheet and color it

@@ -8,7 +8,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y) 
 	obj->pos.i = x;
 	obj->pos.j = y;
 	obj->type = type;
-	obj->dir = dir_right;
+	obj->dir = dir_up;
 	obj->ai = 0;
 	obj->health = 3;
 	obj->maxHealth = 3;

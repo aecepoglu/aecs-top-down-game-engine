@@ -8,30 +8,32 @@ struct Vector dirVectors[] = {
 	[dir_down] = {0, 1},
 	[dir_left] = { -1, 0},
 };
+uint8_t dirFlags[] = {
+	[dir_up] = 		0x00,
+	[dir_right] = 	0x02,
+	[dir_down] = 	0x04,
+	[dir_left] = 	0x08,
+};
 
 
-void vectorAdd( struct Vector *v1, struct Vector *v2, struct Vector *v3) {
+void vectorAdd( struct Vector *v3, struct Vector *v1, struct Vector *v2) {
 	v3->i = v1->i + v2->i;
 	v3->j = v1->j + v2->j;
 }
-void vectorSub( struct Vector *v1, struct Vector *v2, struct Vector *v3) {
+void vectorSub( struct Vector *v3, struct Vector *v1, struct Vector *v2) {
 	v3->i = v1->i - v2->i;
 	v3->j = v1->j - v2->j;
 }
-void vectorReverse( struct Vector *v1, struct Vector *v2) {
-	v2->i = - v1->i;
-	v2->j = - v1->j;
+void vectorClone( struct Vector *v2, struct Vector *v1) {
+	v2->i = v1->i;
+	v2->j = v1->j;
 }
-void vectorRotate( struct Vector *v, bool clockwise) {
+void vectorRotate( struct Vector *v2, struct Vector *v, bool clockwise) {
 	int tmp = v->i;
-	if( clockwise) {
-		v->i = - v->j;
-		v->j = tmp;
-	}
-	else {
-		v->i = v->j;
-		v->j = -tmp;
-	}
+
+	int x = clockwise ? -1 : +1;
+	v2->i = x * v->j;
+	v2->j = -x * tmp;
 }
 
 struct Vector *readVector( FILE *fp) {
@@ -50,7 +52,3 @@ void writeVector( FILE *fp, struct Vector *v) {
 	fwrite( &v->j, sizeof( int), 1, fp);
 }
 
-void vectorClone( struct Vector *v1, struct Vector *v2) {
-	v2->i = v1->i;
-	v2->j = v1->j;
-}

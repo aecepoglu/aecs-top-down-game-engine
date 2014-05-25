@@ -19,7 +19,7 @@ void init() {
 	windowW = viewSize.i * TILELEN;
 	windowH = viewSize.j * TILELEN;
 
-	vectorAdd( &viewPos, &viewSize, &viewEnd);
+	vectorAdd( &viewEnd, &viewPos, &viewSize  );
 
 	assert( SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER) >= 0);
 	window = SDL_CreateWindow("sdl-window", 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN, 0);
@@ -36,7 +36,7 @@ void drawObjects() {
 	struct Vector screenPos;
 	struct object *obj;
 	for( i=0; i<myMap->objListCount; i++) {
-		vectorSub( &myMap->objList[i]->pos, &viewPos, &screenPos);
+		vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
 		if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
 			log2("drawing object %d\n", i);
 			if( myMap->objList[i]->isDeleted ) //TODO remove these two lines after implementing object deletion
@@ -102,8 +102,8 @@ bool scrollScreen( enum direction dir) {
 
 	if(canScroll) {
 		struct Vector *dirVector = &dirVectors[dir];
-		vectorAdd( dirVector, &viewPos, &viewPos);
-		vectorAdd( dirVector, &viewEnd, &viewEnd);
+		vectorAdd( &viewPos, &viewPos, dirVector );
+		vectorAdd( &viewEnd, &viewEnd, dirVector );
 
 		log1("scrolled to [(%d,%d), (%d,%d)]\n", viewPos.i, viewPos.j, viewEnd.i, viewEnd.j);
 		drawBackground();
@@ -117,6 +117,6 @@ void resizeView( int winW, int winH) {
 	windowH = winH;
 	viewSize.i = (winW-1) / TILELEN;
 	viewSize.j = (winH-1) / TILELEN;
-	vectorAdd( &viewPos, &viewSize, &viewEnd);
+	vectorAdd( &viewEnd, &viewPos, &viewSize );
 }
 

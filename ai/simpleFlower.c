@@ -37,13 +37,13 @@ void simpleFlower_update( struct Map *map, struct object *obj, void *data) {
 		obj->timerCounter = TURNS_PER_MOVE_YOUNG;
 	}
 	else {
-		if(random() % 4 == 0) {
+		if(rand() % 4 == 0) {
 			log0("\tflower lucky\n");
-			int xDiff = (random() % 5) - 2;
+			int xDiff = (rand() % 5) - 2;
 			int xPos = obj->pos.i + xDiff;
 
 			int yMod = 5 - 2*abs(xDiff);
-			int yPos = obj->pos.j + random()%yMod - yMod/2;
+			int yPos = obj->pos.j + rand()%yMod - yMod/2;
 
 			if( TILE_CLEAR(map, xPos, yPos) ) {
 				struct object *newFlower = createObject(go_flower, xPos, yPos);

@@ -6,11 +6,12 @@
 #include "map.h"
 
 
-enum aiType { ai_none, ai_leftTurner, ai_hungryLeftTurner, ai_simpleFlower};
+enum aiType { ai_none, ai_leftTurner, ai_hungryLeftTurner, ai_simpleFlower, ai_creeperPlant};
 
 struct AI {
 	enum aiType type;
 	void *data;
+	bool enabled;
 };
 
 

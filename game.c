@@ -22,11 +22,11 @@ void gameOver() {
 /* Moves forward only if that spot is empty */
 bool moveBackward( struct Map *map, struct object* obj) {
 	struct Vector newPos;
-	vectorSub( &obj->pos, &dirVectors[ obj->dir ], &newPos );
+	vectorSub( &newPos, &obj->pos, &dirVectors[ obj->dir ] );
 	if( map->tiles[newPos.i][newPos.j] == 0 && map->objs[newPos.i][newPos.j] == 0) {
 		map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
 		map->objs[ newPos.i ][ newPos.j ] = obj;
-		vectorClone( &newPos, &obj->pos);
+		vectorClone( &obj->pos, &newPos );
 		return true;
 	}
 	else {
@@ -37,13 +37,13 @@ bool moveBackward( struct Map *map, struct object* obj) {
 /* Move forward. Hit the object if can't move forward */
 bool moveForward( struct Map *map, struct object* obj) {
 	struct Vector newPos;
-	vectorAdd( &dirVectors[ obj->dir ], &obj->pos, &newPos );
+	vectorAdd(  &newPos, &obj->pos, &dirVectors[ obj->dir ]);
 	if( map->tiles[newPos.i][newPos.j] == 0 ) {
 		struct object *objAtPos = map->objs[newPos.i][newPos.j];
 		if( ! objAtPos ) {
 			map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
 			map->objs[ newPos.i ][ newPos.j ] = obj;
-			vectorClone( &newPos, &obj->pos);
+			vectorClone( &obj->pos, &newPos );
 			return true;
 		}
 		else {
@@ -68,18 +68,18 @@ bool moveForward( struct Map *map, struct object* obj) {
 }
 
 bool turnLeft( struct Map *map, struct object *obj) {
-	obj->dir = (obj->dir - 1) % 4;
+	obj->dir = DIR_ROTATE_LEFT(obj->dir);
 	return true;
 }
 
 bool turnRight( struct Map *map, struct object *obj) {
-	obj->dir = (obj->dir + 1) % 4;
+	obj->dir = DIR_ROTATE_RIGHT(obj->dir);
 	return true;
 }
 
 bool eat( struct Map *map, struct object *obj) {
 	struct Vector newPos;
-	vectorAdd( &dirVectors[ obj->dir ], &obj->pos, &newPos);
+	vectorAdd(  &newPos, &obj->pos, &dirVectors[ obj->dir ]);
 	struct object *otherObj = map->objs[newPos.i][newPos.j];
 	if( otherObj != 0 && otherObj->health == 0) {
 		objectSwallow( obj, otherObj);
@@ -117,8 +117,8 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 			if(needsScroll) {
 				log1("Screen needs scroll. Player:(%d,%d) and viewPos:(%d,%d) viewEnd:(%d,%d)\n", player->pos.i, player->pos.j, viewPos.i, viewPos.j, viewEnd.i, viewEnd.j);
 				struct Vector *scrollVector = &dirVectors[scrollDirection];
-				vectorAdd( scrollVector, &playerMoveAreaStart, &playerMoveAreaStart);
-				vectorAdd( scrollVector, &playerMoveAreaEnd, &playerMoveAreaEnd);
+				vectorAdd( &playerMoveAreaStart, &playerMoveAreaStart, scrollVector );
+				vectorAdd( &playerMoveAreaEnd, &playerMoveAreaEnd, scrollVector );
 			}
 				
 		}
@@ -169,7 +169,7 @@ void update() {
 			//TODO implement obj deletion. Just not showing the deleted objects now
 			//TODO don't forget to remove the matching code from draw()
 		}
-		else if( myMap->objList[i]->ai ) {
+		else if( myMap->objList[i]->ai && myMap->objList[i]->ai->enabled ) {
 			if( myMap->objList[i]->timerCounter == 0) {
 				AI_UPDATE( myMap, myMap->objList[i] );
 			}
@@ -181,7 +181,7 @@ void update() {
 
 void run() {
     drawBackground();
-	draw(); //the initial draw //TODO check if necessary
+	draw(); //the initial draw. TODO check if this draw() call is necessary
 
 	SDL_AddTimer( timerDelay, timerCallback, 0);
 
@@ -203,8 +203,8 @@ void run() {
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
 						resizeView(e.window.data1, e.window.data2);
-						vectorAdd( &viewPos, &PLAYER_PADDING_VECTOR, &playerMoveAreaStart);
-						vectorSub( &viewEnd, &PLAYER_PADDING_VECTOR, &playerMoveAreaEnd);
+						vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR);
+						vectorSub( &playerMoveAreaEnd, &viewEnd , &PLAYER_PADDING_VECTOR);
 
 						drawBackground();
 					    break;
@@ -309,8 +309,8 @@ int main( int argc, char *args[]) {
 	init();
 
 	//FIXME temporary placement here. need their default values set somewhere better, maybe
-	vectorAdd( &viewPos, &PLAYER_PADDING_VECTOR, &playerMoveAreaStart);
-	vectorSub( &viewEnd, &PLAYER_PADDING_VECTOR, &playerMoveAreaEnd);
+	vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR );
+	vectorSub( &playerMoveAreaEnd, &viewEnd, &PLAYER_PADDING_VECTOR );
 
 	textures = loadAllTextures( renderer);
 
