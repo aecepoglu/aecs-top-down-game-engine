@@ -30,3 +30,4 @@ add_definitions(-Wall)
 
 #copy resources from source-dir to binary-dir
 file(COPY "res" DESTINATION ${CMAKE_BINARY_DIR}/)
+file(COPY "test-maps" DESTINATION ${CMAKE_BINARY_DIR}/)
