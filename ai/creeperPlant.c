@@ -16,18 +16,20 @@ struct creeperPlantData {
 
 #define TURNS_PER_MOVE 10
 
-void creeperPlant_disableChildren(struct creeperPlantData* data) {
+void creeperPlant_disableChildren(struct AI* ai) {
+	struct creeperPlantData *data = (struct creeperPlantData*)ai->data;
 	data->type = TYPE_DYING;
+
 	int dir;
+	int numChildren = 0;
 	for(dir=0; dir<4; dir++) {
 		if(dir != dir_down && data->children[dir] != NULL) {
-			struct creeperPlantData* childData = (struct creeperPlantData*)data->children[dir]->data;
-			if(childData->type == TYPE_SPROUT) {
-				data->children[dir]->enabled = true;
-			}
-			creeperPlant_disableChildren(childData);
+			numChildren ++;
+			creeperPlant_disableChildren(data->children[dir]);
 		}
 	}
+
+	ai->enabled = numChildren == 0;
 }
 
 void creeperPlant_destroy(struct AI *ai) {
@@ -48,12 +50,10 @@ void creeperPlant_destroy(struct AI *ai) {
 	}
 
 	log0("destroying children\n");
-	struct creeperPlantData *childData;
 	for( dir=0; dir<4; dir++) {
 		if ( data->children[dir] != NULL) {
-			childData = (struct creeperPlantData*)data->children[dir]->data;
-			childData->children[dir_down] = NULL;
-			creeperPlant_disableChildren(childData);
+			((struct creeperPlantData*)data->children[dir]->data)->children[dir_down] = NULL;
+			creeperPlant_disableChildren(data->children[dir]);
 		}
 	}
 	free(data);

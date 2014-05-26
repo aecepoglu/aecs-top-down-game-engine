@@ -3,7 +3,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#define VERBOSE_2
+#define VERBOSE_0
 
 #ifdef VERBOSE_0
 	#define log0(...) fprintf(stdout, __VA_ARGS__)
