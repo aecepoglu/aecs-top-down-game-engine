@@ -4,7 +4,7 @@
 
 struct creeperPlantData {
 	uint8_t type;
-	struct object* children[4];
+	struct AI* children[4];
 
 	uint8_t clingeFlag;
 };
@@ -12,16 +12,56 @@ struct creeperPlantData {
 #define TYPE_ROOT 0
 #define TYPE_NODE 1
 #define TYPE_SPROUT 2
+#define TYPE_DYING 3
 
 #define TURNS_PER_MOVE 10
 
-void creeperPlant_destroy(struct AI *ai) {
-	//TODO needs proper deallocation
-	free((struct creeperPlantData*)(ai->data));
-	free(ai);
+void creeperPlant_disableChildren(struct creeperPlantData* data) {
+	data->type = TYPE_DYING;
+	int dir;
+	for(dir=0; dir<4; dir++) {
+		if(dir != dir_down && data->children[dir] != NULL) {
+			struct creeperPlantData* childData = (struct creeperPlantData*)data->children[dir]->data;
+			if(childData->type == TYPE_SPROUT) {
+				data->children[dir]->enabled = true;
+			}
+			creeperPlant_disableChildren(childData);
+		}
+	}
 }
 
-struct AI* creeperPlant_createDetailed(int type, bool leftClinges, bool rightClinges) {
+void creeperPlant_destroy(struct AI *ai) {
+	struct creeperPlantData* data = (struct creeperPlantData*)ai->data;
+	int dir;
+
+	log0("destroying type %d\n", data->type);
+	if(data->type != TYPE_ROOT && data->children[dir_down] != NULL) {
+		log0("\tclearing parent's pointer\n");
+		struct creeperPlantData* parentData = (struct creeperPlantData*)data->children[dir_down]->data;
+		for(dir=0; dir<4; dir++) {
+			if(parentData->children[dir] == ai) {
+				parentData->children[dir] = NULL;
+				break;
+			}
+		}
+		data->children[dir_down] = NULL;
+	}
+
+	log0("destroying children\n");
+	struct creeperPlantData *childData;
+	for( dir=0; dir<4; dir++) {
+		if ( data->children[dir] != NULL) {
+			childData = (struct creeperPlantData*)data->children[dir]->data;
+			childData->children[dir_down] = NULL;
+			creeperPlant_disableChildren(childData);
+		}
+	}
+	free(data);
+	free(ai);
+	log0("destroyed\n");
+}
+
+struct AI* creeperPlant_createDetailed(int type, bool leftClinges, bool rightClinges, struct AI* parentAI) {
 	struct AI* ai = (struct AI*)malloc(sizeof(struct AI));
 
 	struct creeperPlantData *data = (struct creeperPlantData*)malloc(sizeof(struct creeperPlantData));
@@ -34,6 +74,12 @@ struct AI* creeperPlant_createDetailed(int type, bool leftClinges, bool rightCli
 	if(rightClinges)
 		data->clingeFlag = data->clingeFlag | dirFlags[dir_right];
 
+	int dir;
+	for(dir =0; dir<4; dir++) {
+		data->children[dir] = NULL;
+	}
+	data->children[dir_down] = parentAI;
+
 	ai->type = ai_creeperPlant;
 	ai->enabled = true;
 	ai->data = data;
@@ -42,42 +88,33 @@ struct AI* creeperPlant_createDetailed(int type, bool leftClinges, bool rightCli
 }
 
 struct AI* creeperPlant_create() {
-	return creeperPlant_createDetailed(TYPE_ROOT, false, false);
+	return creeperPlant_createDetailed(TYPE_ROOT, false, false, NULL);
 }
 
-void addNewSprout( struct creeperPlantData *parentAiData, enum direction dirFromParent, struct Map *map, int posX, int posY, enum direction sproutDir, bool leftClinges, bool rightClinges, unsigned int health) {
+void addNewSprout( struct AI* parentAi, enum direction dirFromParent, struct Map *map, int posX, int posY, enum direction sproutDir, bool leftClinges, bool rightClinges, unsigned int health) {
 	if(health > 0) {
 		struct object *newPlant = createObject(go_creeperPlant, posX, posY);
 		newPlant->dir = sproutDir;
 		newPlant->timerCounter = TURNS_PER_MOVE;
 		newPlant->health = health;
 
-		newPlant->ai = creeperPlant_createDetailed(TYPE_SPROUT, leftClinges, rightClinges);
+		newPlant->ai = creeperPlant_createDetailed(TYPE_SPROUT, leftClinges, rightClinges, parentAi);
 
-		parentAiData->children[dirFromParent] = newPlant;
-
+		((struct creeperPlantData*)parentAi->data)->children[dirFromParent] = newPlant->ai;
 
 		addObject( newPlant, map, posX, posY);
-		log0("sprout at (%d,%d)\n", posX, posY);
+		log0("sprout at (%d,%d)\n\tgrow from %d\n", posX, posY, dirFromParent);
 	}
 }
 
 void creeperPlant_update( struct Map *map, struct object *obj, void *data) {
-	log0("update\n");
-	if(obj->health == 0) {
-		creeperPlant_destroy(obj->ai);
-		obj->ai = 0;
-		return;
-	}
-	
-	
-	
 	obj->timerCounter = TURNS_PER_MOVE;
 
 	struct creeperPlantData *aiData = (struct creeperPlantData*)data;
+	log1("update creeperPlant. type: %d\n", aiData->type);
 
 	if( aiData->type == TYPE_SPROUT) {
-		log0("update for sprout. dir: %d\n", obj->dir);
+		log2("\tSprout dir: %d\n", obj->dir);
 		/* 	LC: leftClinges
 			RC: rightClinges
 			LW: leftWall //there is wall at left
@@ -106,37 +143,32 @@ void creeperPlant_update( struct Map *map, struct object *obj, void *data) {
 		goesRight = TILE_CLEAR(map, rightPos.i, rightPos.j) && ( !FE || RC);
 		goesForward = FE && ( LW || RW || ( !LC && !RC ));
 
-		log0("\tLC %d, RC %d, LW %d, RW %d, FE %d\n\t\tgoesLeft %d, goesRight %d, goesForward %d\n", LC, RC, LW, RW, FE, goesLeft, goesRight, goesForward);
+		log2("\tLC %d, RC %d, LW %d, RW %d, FE %d\n\t\tgoesLeft %d, goesRight %d, goesForward %d\n", LC, RC, LW, RW, FE, goesLeft, goesRight, goesForward);
 
 		if( goesLeft || goesRight || goesForward) {
 			aiData->type = TYPE_NODE;
 			obj->ai->enabled = false;
 
 			if(goesLeft)
-				addNewSprout(aiData, dir_left, map, leftPos.i, leftPos.j, DIR_ROTATE_LEFT(obj->dir), !LW && LC, !FE && !LW, obj->health);
-			else
-				aiData->children[dir_left] = NULL;
+				addNewSprout(obj->ai, dir_left, map, leftPos.i, leftPos.j, DIR_ROTATE_LEFT(obj->dir), !LW && LC, !FE && !LW, obj->health);
 
 			if(goesRight)
-				addNewSprout(aiData, dir_right, map, rightPos.i, rightPos.j, DIR_ROTATE_RIGHT(obj->dir), !FE && !RW, !RW && RC, obj->health);
-			else
-				aiData->children[dir_right] = NULL;
+				addNewSprout(obj->ai, dir_right, map, rightPos.i, rightPos.j, DIR_ROTATE_RIGHT(obj->dir), !FE && !RW, !RW && RC, obj->health);
 
 			if(goesForward)
-				addNewSprout(aiData, dir_up, map, fwdPos.i, fwdPos.j, obj->dir, FE && LW, FE && RW, obj->health - ((LC || RC) ? 0 : 1) );
-			else
-				aiData->children[dir_up] = NULL;
+				addNewSprout(obj->ai, dir_up, map, fwdPos.i, fwdPos.j, obj->dir, FE && LW, FE && RW, obj->health - ((LC || RC) ? 0 : 1) );
 		}
 		else {
 			obj->health --;
+			if(obj->health == 0) {
+				creeperPlant_destroy(obj->ai);
+				obj->ai=0;
+			}
 		}
 	}
 	else if(aiData->type == TYPE_NODE) {
-		log0("update for node\n");
-		//TODO
 	}
-	else { //TYPE_ROOT
-		log0("update for root. dir\n");
+	else if (aiData->type == TYPE_ROOT) {
 		int dir;
 		struct Vector newPos;
 		for(dir=0; dir<4; dir++) {
@@ -144,13 +176,38 @@ void creeperPlant_update( struct Map *map, struct object *obj, void *data) {
 			vectorAdd( &newPos, dirVector, &obj->pos);
 
 			if( TILE_CLEAR( map, newPos.i, newPos.j) ){
-				addNewSprout( aiData, dir, map, newPos.i, newPos.j, (obj->dir + dir)%4, false, false, obj->health);
+				addNewSprout( obj->ai, dir, map, newPos.i, newPos.j, (obj->dir + dir)%4, false, false, obj->health);
 			}
 			else
 				aiData->children[dir] = NULL;
 		}
 
 		obj->ai->enabled = false;
+	}
+	else /*if TYPE_DYING*/ { 
+
+		int numChildren = 0;
+		int dir;
+		for(dir=0; dir<4; dir++) {
+			if(dir != dir_down && aiData->children[dir] != NULL)
+				numChildren ++;
+		}
+		log2("\tnumChildren: %d\n", numChildren);
+		if(numChildren == 0) {
+			if(obj->health > 0)
+				obj->health --;
+			log2("\t\thealth decreased to %d\n", obj->health);
+			if(obj->health == 0){
+				if(aiData->children[dir_down] != NULL) {
+					aiData->children[dir_down]->enabled = true;
+					log2("\t\t\tenabling parent\n");
+				}
+				creeperPlant_destroy(obj->ai);
+				obj->ai = NULL;
+			}
+		}
+		else
+			obj->ai->enabled = false;
 	}
 
 	log0("update end\n");

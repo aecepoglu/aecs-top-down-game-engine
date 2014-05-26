@@ -38,10 +38,10 @@ void drawObjects() {
 	for( i=0; i<myMap->objListCount; i++) {
 		vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
 		if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
-			log2("drawing object %d\n", i);
+			log3("drawing object %d\n", i);
 			if( myMap->objList[i]->isDeleted ) //TODO remove these two lines after implementing object deletion
 				continue;
-			log2("drawing object %d for real\n", i);
+			log3("drawing object %d for real\n", i);
 			obj = myMap->objList[i];
 			//TODO use visual state only: don't do health check. if object died after attacking, set visual state in the hit() function
 			drawTexture( renderer, 
@@ -52,7 +52,7 @@ void drawObjects() {
 }
 
 void drawBackground() {
-	log2("generate background\n");
+	log3("generate background\n");
 	SDL_DestroyTexture( bgroundTexture);
 	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, viewSize.i*TILELEN, viewSize.j*TILELEN) ;
 	SDL_SetRenderTarget( renderer, bgroundTexture);
@@ -70,7 +70,7 @@ void drawBackground() {
 }
 
 void draw() {
-	log2("draw\n");
+	log3("draw\n");
 	SDL_RenderClear( renderer);
 	//render background
 	drawTexture( renderer, bgroundTexture, 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN);

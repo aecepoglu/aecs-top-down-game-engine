@@ -54,8 +54,9 @@ bool moveForward( struct Map *map, struct object* obj) {
 					if( objAtPos == player ) {
 						gameOver();
 					}
-					else {
-						
+					else if(objAtPos->ai){
+						AI_DESTROY(objAtPos->ai);
+						objAtPos->ai=0;
 					}
 				}
 			}
@@ -158,7 +159,7 @@ Uint32 timerCallback( Uint32 interval, void *param) {
 }
 
 void update() {
-	log2("update\n");
+	log3("update\n");
 	unsigned int i;
 	for( i=0; i<myMap->objListCount; i++) {
 		//update object at [i]

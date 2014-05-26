@@ -23,6 +23,8 @@ SDL_Texture ***loadTextureSheet( SDL_Renderer *ren, const char *path) {
     log1( "\tLoading sheet %s\n", path);
 	SDL_Surface *img = IMG_Load( path);
 
+	assert( img != NULL);
+
 	int numRotations = img->w / SPRITE_TILE_LEN;
 
 	int numStates = img->h / SPRITE_TILE_LEN;
@@ -82,7 +84,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_monster] = loadTextureSheet( ren, "res/monster.png");
 	result->obj[ go_apple] = loadTextureSheet( ren, "res/apple.png");
 	result->obj[ go_flower] = loadTextureSheet( ren, "res/flower.png");
-	result->obj[ go_creeperPlant] = loadTextureSheet( ren, "res/apple.png");
+	result->obj[ go_creeperPlant] = loadTextureSheet( ren, "res/creeper.png");
 	//MAKE SURE THE 
 
 	//TODO duplicate sprite sheet and color it
