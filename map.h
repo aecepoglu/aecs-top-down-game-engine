@@ -6,18 +6,30 @@
 #define MAP_H
 
 #include "object.h"
+#include "vector.h"
 
 /* -----------
  * DEFINITIONS
  */
 enum terrainType { terrain_none, terrain_wall};
 
+struct BasePfNode {
+	struct Vector pos;
+	struct BasePfNode *neighbours[4];
+};
+
 struct Map {
 	char *filePath;
+
 	unsigned int width;
 	unsigned int height;
+
 	enum terrainType** tiles;
+
+	struct BasePfNode ***pfBase;
+
 	struct object*** objs;
+
 	struct object** objList;
 	unsigned int objListCount;
 	unsigned int objListSize;
@@ -38,6 +50,7 @@ struct Map {
  *	FUNCTIONS
  */
 
+#define GET_PF_POS(x) (x != NULL ? &(x->pos) : NULL)
 #define TILE_CLEAR(_mapPtr,_x,_y) (_mapPtr->tiles[_x][_y] == terrain_none && _mapPtr->objs[_x][_y] == NULL)
 
 /*	Reads the map file at 'path'.
@@ -62,5 +75,7 @@ void saveMap( struct Map* map);
 struct Map* createNewMap( unsigned int width, unsigned int height);
 
 bool checkMapValidity( struct Map *map);
+
+struct BasePfNode ***createPfBase( enum terrainType **tiles, unsigned int width, unsigned int height);
 
 #endif //MAP_H

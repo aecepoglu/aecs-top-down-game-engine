@@ -70,6 +70,10 @@ struct Map* readMapFile( char *path) {
 		fread( m->tiles[x], sizeof(enum terrainType), m->height, fp);
 	}
 	fclose(fp);
+
+	//generate the base path-finding
+	m->pfBase = createPfBase( m->tiles, m->width, m->height);
+
 	log1("map \"%s\" has been read\n%dx%d\n", path, m->width, m->height);
 	m->filePath = path;
 	return m;
@@ -98,7 +102,7 @@ void addObject( struct object* obj, struct Map *map, int x, int y) {
 
 
 void saveMap( struct Map *map) {
-	log1( "saveMap( ... to %s)\n", map->filePath);
+	log1( "saveMap to '%s'\n", map->filePath);
 
 	//confirm the ground tiles are connected
 	if( ! checkMapValidity(map) ) {
@@ -162,6 +166,7 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 
 //TODO check if tiles are against the edges
 bool checkMapValidity( struct Map *map) {
+	log0("Validating map\n");
 	bool result;
 
 	unsigned int x,y;
@@ -260,4 +265,50 @@ bool checkMapValidity( struct Map *map) {
 	free(connectedTiles);
 
 	return result;
+}
+
+struct BasePfNode*** createPfBase( enum terrainType **tiles, unsigned int width, unsigned int height ) {
+	struct BasePfNode ***nodes = (struct BasePfNode***)calloc( width, sizeof(struct BasePfNode**));
+
+	unsigned int x,y,dir;
+	
+	for(x=0; x<width; x++) {
+		nodes[x] = (struct BasePfNode**)calloc( height, sizeof(struct BasePfNode*));
+
+		for(y=0; y<height; y++) {
+			struct BasePfNode *node = (struct BasePfNode*)malloc( sizeof(struct BasePfNode));
+
+			node->pos.i = x;
+			node->pos.j = y;
+
+			for(dir=0; dir<4; dir++)
+				node->neighbours[dir] = NULL;
+
+			nodes[x][y] = node;
+		}
+	}
+
+	struct Vector curPos, dirPos;
+	struct BasePfNode *curNode, *dirNode;
+	for(x=0; x<width; x++) {
+		for(y=0; y<height; y++) {
+			if( tiles[x][y] == terrain_none) {
+				curPos.i = x;
+				curPos.j = y;
+				curNode = nodes[x][y];
+
+				for( dir=1; dir<3; dir++) {
+					vectorAdd( &dirPos, &curPos, &dirVectors[dir]);
+
+					if( tiles[dirPos.i][dirPos.j] == terrain_none) {
+						dirNode = nodes[dirPos.i][dirPos.j];
+						curNode->neighbours[dir] = dirNode;
+						dirNode->neighbours[DIR_REVERSE(dir)] = curNode;
+					}
+				}
+			}
+		}
+	}
+
+	return nodes;
 }

@@ -11,10 +11,12 @@ typedef void (aiUpdateFun)(struct Map*, struct object*, void*);
 typedef void (aiDestroyFun)(struct AI*);
 typedef struct AI* (aiCreateFun)();
 
-bool moveForward	( struct Map*, struct object*);
-bool moveBackward	( struct Map*, struct object*);
-bool turnLeft		( struct Map*, struct object*);
-bool turnRight		( struct Map*, struct object*);
-bool eat			( struct Map*, struct object*);
+typedef bool (moveFun)( struct Map *, struct object*);
+
+moveFun moveForward;
+moveFun moveBackword;
+moveFun turnLeft;
+moveFun turnRight;
+moveFun eat;
 
 #endif

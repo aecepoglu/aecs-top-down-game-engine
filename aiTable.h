@@ -5,6 +5,7 @@
 #include "ai/hungryLeftTurner.h"
 #include "ai/simpleFlower.h"
 #include "ai/creeperPlant.h"
+#include "ai/peekaboo.h"
 
 #include "ai.h"
 #include "aiFun.h"
@@ -22,6 +23,7 @@ static struct aiTableItem aiTable[] = {
 	[ai_hungryLeftTurner] = { hungryLeftTurner_create, 	hungryLeftTurner_update,	hungryLeftTurner_destroy},
 	[ai_simpleFlower] = 	{ simpleFlower_create, 		simpleFlower_update,		common_ai_destroy},
 	[ai_creeperPlant] = 	{ creeperPlant_create, 		creeperPlant_update,		creeperPlant_destroy},
+	[ai_peekaboo] = 		{ peekaboo_create, 			peekaboo_update,			peekaboo_destroy},
 };
 
 /* table interface */

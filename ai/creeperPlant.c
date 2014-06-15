@@ -128,12 +128,13 @@ void creeperPlant_update( struct Map *map, struct object *obj, void *data) {
 		bool goesLeft, goesRight, goesForward;
 		struct Vector leftPos, rightPos, fwdPos;
 
+		struct BasePfNode *curPfNode = map->pfBase[ obj->pos.i ][ obj->pos.j ];
+
+		LW = curPfNode->neighbours[ DIR_ROTATE_LEFT(obj->dir) ] == NULL;
+		RW = curPfNode->neighbours[ DIR_ROTATE_RIGHT(obj->dir) ] == NULL;
 
 		vectorAdd( &leftPos, &obj->pos, &dirVectors[DIR_ROTATE_LEFT(obj->dir)]);
-		LW = map->tiles[leftPos.i][leftPos.j] == terrain_wall;
-
 		vectorAdd( &rightPos, &obj->pos, &dirVectors[DIR_ROTATE_RIGHT(obj->dir)]);
-		RW = map->tiles[rightPos.i][rightPos.j] == terrain_wall;
 
 		vectorAdd( &fwdPos, &obj->pos, &dirVectors[obj->dir]);
 		FE = TILE_CLEAR(map, fwdPos.i, fwdPos.j);

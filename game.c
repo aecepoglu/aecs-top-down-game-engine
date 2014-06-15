@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "aiTable.h"
 
+
 SDL_Event timerPushEvent;
 Uint32 timerDelay;
 
@@ -14,6 +15,7 @@ struct Vector playerMoveAreaStart, playerMoveAreaEnd;
 struct Vector PLAYER_PADDING_VECTOR = {VIEW_RANGE, VIEW_RANGE};
 //FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
 
+
 void gameOver() {
 	log0("game over...\n");
 	running=false;
@@ -21,29 +23,29 @@ void gameOver() {
 
 /* Moves forward only if that spot is empty */
 bool moveBackward( struct Map *map, struct object* obj) {
-	struct Vector newPos;
-	vectorSub( &newPos, &obj->pos, &dirVectors[ obj->dir ] );
-	if( map->tiles[newPos.i][newPos.j] == 0 && map->objs[newPos.i][newPos.j] == 0) {
+	struct BasePfNode *nextPfNode = map->pfBase[ obj->pos.i][ obj->pos.j]->neighbours[ DIR_REVERSE( obj->dir)];
+	struct Vector *pos = GET_PF_POS(nextPfNode);
+	if( pos != NULL && map->objs[ pos->i ][ pos->j ] == NULL) {
 		map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
-		map->objs[ newPos.i ][ newPos.j ] = obj;
-		vectorClone( &obj->pos, &newPos );
+		map->objs[ pos->i ][ pos->j ] = obj;
+		vectorClone( &obj->pos, pos);
 		return true;
 	}
-	else {
+	else
 		return false;
-	}
 }
 
 /* Move forward. Hit the object if can't move forward */
 bool moveForward( struct Map *map, struct object* obj) {
-	struct Vector newPos;
-	vectorAdd(  &newPos, &obj->pos, &dirVectors[ obj->dir ]);
-	if( map->tiles[newPos.i][newPos.j] == 0 ) {
-		struct object *objAtPos = map->objs[newPos.i][newPos.j];
+	struct BasePfNode *nextPfNode = map->pfBase[ obj->pos.i ][ obj->pos.j ]->neighbours[ obj->dir ];
+	struct Vector *pos = GET_PF_POS( nextPfNode);
+
+	if( pos != NULL ) {
+		struct object *objAtPos = map->objs[ pos->i ][ pos->j ];
 		if( ! objAtPos ) {
 			map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
-			map->objs[ newPos.i ][ newPos.j ] = obj;
-			vectorClone( &obj->pos, &newPos );
+			map->objs[ pos->i ][ pos->j ] = obj;
+			vectorClone( &obj->pos, pos );
 			return true;
 		}
 		else {
@@ -153,7 +155,7 @@ void handleKey( SDL_KeyboardEvent *e) {
 }
 
 Uint32 timerCallback( Uint32 interval, void *param) {
-	log2("tick\n");
+	log3("tick\n");
 	SDL_PushEvent( &timerPushEvent);
 	return interval;
 }

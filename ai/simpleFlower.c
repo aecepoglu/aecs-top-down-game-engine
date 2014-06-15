@@ -16,6 +16,7 @@ struct AI* simpleFlower_create() {
 	struct AI* ai = (struct AI*)malloc(sizeof(struct AI));
 	ai->type = ai_simpleFlower;
 	ai->data = NULL;
+	ai->enabled = true;
 
 	return ai;
 }

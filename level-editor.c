@@ -12,6 +12,7 @@ struct brushState* myBrushState;
 
 bool moveForward( struct Map *map, struct object* obj) { return false; }
 bool turnLeft( struct Map *map, struct object *obj) { return false; }
+bool turnRight( struct Map *map, struct object* obj) { return false; }
 
 struct object *player;
 

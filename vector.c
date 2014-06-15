@@ -36,6 +36,10 @@ void vectorRotate( struct Vector *v2, struct Vector *v, bool clockwise) {
 	v2->j = -x * tmp;
 }
 
+bool vectorEquals( struct Vector* v1, struct Vector *v2) {
+	return (v1->i == v2->i && v1->j == v2->j);
+}
+
 struct Vector *readVector( FILE *fp) {
 	struct Vector *v = (struct Vector*)malloc( sizeof( struct Vector));
 	//assume target is not null
