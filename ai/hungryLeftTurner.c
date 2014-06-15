@@ -60,10 +60,6 @@ int hungryLeftTurner_look( struct Map *map, struct Vector *pos, enum direction d
 void hungryLeftTurner_update( struct Map *map, struct object *obj, void *data) {
 	log1("update hungryleftturner\n");
 
-	//TODO remove this check. update shouldn't be called if dead
-	if(obj->health == 0)
-		return;
-
 	struct hungryLeftTurnerData *aiData = (struct hungryLeftTurnerData*)data;
 
 

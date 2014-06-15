@@ -23,13 +23,7 @@ struct AI* simpleFlower_create() {
 
 void simpleFlower_update( struct Map *map, struct object *obj, void *data) {
 	
-	if( obj->health == 0) {
-		log0("flower AI died at (%d,%d)\n", obj->pos.i, obj->pos.j);
-		free(obj->ai);
-		obj->ai = NULL;
-		return;
-	}
-	else if(obj->health < HEALTH_GROWN) {
+	if(obj->health < HEALTH_GROWN) {
 		log0("flower AI growing at (%d,%d)\n", obj->pos.i, obj->pos.j);
 		obj->health ++;
 		if(obj->health == HEALTH_GROWN)

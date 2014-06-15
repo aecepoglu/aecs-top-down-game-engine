@@ -16,9 +16,6 @@ struct AI* leftTurner_create() {
 }
 
 void leftTurner_update( struct Map *map, struct object *obj, void *data) {
-	if(obj->health == 0)
-		return;
-
 	if( ! moveForward( map, obj))
 		turnLeft( map, obj);
 	
