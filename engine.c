@@ -35,20 +35,30 @@ void drawObjects() {
 	unsigned i;
 	struct Vector screenPos;
 	struct object *obj;
+
+	struct object **newObjList = (struct object**)calloc( myMap->objListSize, sizeof( struct object*));
+	int newCount = 0;
+
 	for( i=0; i<myMap->objListCount; i++) {
-		vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
-		if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
-			log3("drawing object %d\n", i);
-			if( myMap->objList[i]->isDeleted ) //TODO remove these two lines after implementing object deletion
-				continue;
-			log3("drawing object %d for real\n", i);
-			obj = myMap->objList[i];
-			//TODO use visual state only: don't do health check. if object died after attacking, set visual state in the hit() function
-			drawTexture( renderer, 
-				textures->obj[obj->type][ obj->health > 0 ? obj->visualState : 0 ][obj->dir], 
-				screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
+		obj = myMap->objList[i];
+		if( ! obj->isDeleted) {
+			newObjList[ newCount] = obj;
+			newCount ++;
+
+			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
+			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
+				log3("drawing object %d\n", i);
+				//TODO use visual state only: don't do health check. if object died after attacking, set visual state in the hit() function
+				drawTexture( renderer, 
+					textures->obj[obj->type][ obj->health > 0 ? obj->visualState : 0 ][obj->dir], 
+					screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
+			}
 		}
 	}
+
+	free( myMap->objList);
+	myMap->objList = newObjList;
+	myMap->objListCount = newCount;
 }
 
 void drawBackground() {

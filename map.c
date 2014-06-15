@@ -100,7 +100,6 @@ void addObject( struct object* obj, struct Map *map, int x, int y) {
 }
 
 
-
 void saveMap( struct Map *map) {
 	log1( "saveMap to '%s'\n", map->filePath);
 

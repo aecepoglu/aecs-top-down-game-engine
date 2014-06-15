@@ -34,7 +34,7 @@ struct LinkedListNode* linkedList_find( struct LinkedListNode *head, void *data)
 
 	while(node) {
 		if(node->data == data)
-			break;
+			return node->data;
 		node = node->next;
 	}
 	return NULL;

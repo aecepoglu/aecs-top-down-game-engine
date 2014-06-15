@@ -58,7 +58,7 @@ bool moveForward( struct Map *map, struct object* obj) {
 					}
 					else if(objAtPos->ai){
 						AI_DESTROY(objAtPos->ai);
-						objAtPos->ai=0;
+						objAtPos->ai=NULL;
 					}
 				}
 			}
@@ -86,7 +86,7 @@ bool eat( struct Map *map, struct object *obj) {
 	struct object *otherObj = map->objs[newPos.i][newPos.j];
 	if( otherObj != 0 && otherObj->health == 0) {
 		objectSwallow( obj, otherObj);
-		map->objs[ newPos.i ][ newPos.j ] = 0;
+		map->objs[ newPos.i ][ newPos.j ] = NULL;
 		/* mark it for 'awaiting deletion'
 		It will be deleted in the next update cycle */
 		otherObj->isDeleted=true;

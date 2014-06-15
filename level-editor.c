@@ -18,39 +18,63 @@ struct object *player;
 
 
 bool defaultBrush( unsigned int x, unsigned int y, int type) {
-	return 0;
+	return false;
+}
+
+bool eraseObject( unsigned int x, unsigned int y, int type) {
+	struct object *obj = myMap->objs[x][y];
+	if( obj != NULL && obj->ai == NULL) {
+		obj->isDeleted = true;
+		if( obj->type == go_player)
+			player = NULL;
+		myMap->objs[x][y] = NULL;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool eraseAI( unsigned int x, unsigned int y, int type) {
+	struct object *obj = myMap->objs[x][y];
+	if( obj != NULL && obj->ai != NULL) {
+		AI_DESTROY( obj->ai);
+		obj->ai = NULL;
+		return true;
+	}
+	else
+		return false;
 }
 
 bool drawTerrain( unsigned int x, unsigned int y, int type){
 	if( myMap->tiles[x][y] != type) {
 		myMap->tiles[x][y] = type;
-		return 1;
+		return true;
 	}
 	else
-		return 0;
+		return false;
 }
 
 bool drawObject( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
 	if( myMap->objs[x][y]!=0 || myMap->tiles[x][y]!=terrain_none)
-		return 0;
+		return false;
 
 	//create and initialize a monster
 	struct object *obj = createObject( type, x, y);
 
 	addObject( obj, myMap, x, y);
 
-	return 1;
+	return true;
 }
 
 bool drawPlayer( unsigned int x, unsigned int y, int type) {
 	//don't do anything if a player exists already
 	if( player==0 && drawObject( x, y, go_player)) {
 		player = myMap->objs[x][y];
-		return 1;
+		return true;
 	}
 	else
-		return 0;
+		return false;
 }
 
 bool drawAI( unsigned int x, unsigned int y, int type) {
@@ -72,10 +96,10 @@ bool setDirection( unsigned int x, unsigned int y, int type) {
 	//if there is an object at the given location, and it dsoen't have an AI
 	if( myMap->objs[x][y] != 0) {
 		myMap->objs[x][y]->dir = (enum direction)type;
-		return 1;
+		return true;
 	}
-
-	return 0;
+	else
+		return false;
 }
 
 void handleKey( SDL_KeyboardEvent *e) {

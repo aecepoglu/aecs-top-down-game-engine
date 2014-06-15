@@ -22,11 +22,13 @@ brushFun drawTerrain;
 brushFun drawPlayer;
 brushFun drawAI;
 brushFun setDirection;
+brushFun eraseObject;
+brushFun eraseAI;
 
 #define no_var 0
 #define no_trans 0
 struct brushState initialBrushState =
-{"null", 1, defaultBrush, no_var, (struct stateTransition[]) {
+{"null", 2, defaultBrush, no_var, (struct stateTransition[]) {
 	//0
 	{SDLK_1, { "create/set", 4, defaultBrush, no_var, (struct stateTransition[]) {
 		//0
@@ -60,6 +62,12 @@ struct brushState initialBrushState =
 			{SDLK_3, { "down", 0, setDirection, dir_down, no_trans} },
 			{SDLK_4, { "left", 0, setDirection, dir_left, no_trans} },
 		}}}
+	}}},
+	{SDLK_2, { "erase", 2, defaultBrush, no_var, (struct stateTransition[]) {
+		//0
+		{SDLK_1, { "object", 6, eraseObject, no_var, no_trans }},
+		//2
+		{SDLK_2, { "AI", 5, eraseAI, no_var, no_trans }},
 	}}}
 }};
 #undef no_var
