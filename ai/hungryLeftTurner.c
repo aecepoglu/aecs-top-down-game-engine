@@ -6,8 +6,8 @@ struct hungryLeftTurnerData {
 	int goalDistance;
 };
 
-#define STATE_CALM 0
-#define STATE_EXCITED 1
+#define STATE_CALM 1
+#define STATE_EXCITED 2
 #define TURNS_PER_MOVE_CALM 4
 #define TURNS_PER_MOVE_EXCITED 1
 
@@ -70,6 +70,7 @@ void hungryLeftTurner_update( struct Map *map, struct object *obj, void *data) {
 		log1("hungryLeftTurner: found target %d away\n", leftDistance);
 		aiData->goalDistance = leftDistance;
 		aiData->state = STATE_EXCITED;
+		obj->visualState = STATE_EXCITED;
 		turnLeft( map, obj);
 		goto excited_end;
 	}
@@ -87,6 +88,7 @@ void hungryLeftTurner_update( struct Map *map, struct object *obj, void *data) {
 				goto excited_end;
 			else {
 				aiData->state = STATE_CALM;
+				obj->visualState = STATE_CALM;
 				goto calm_end;
 			}
 			break;

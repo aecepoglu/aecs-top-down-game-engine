@@ -11,7 +11,7 @@
 #include "basic.h"
 #include "vector.h"
 
-enum objType { go_player, go_monster, go_apple, go_flower, go_creeperPlant, go_peekaboo, go_NUM_ITEMS};
+enum objType { go_player, go_leftTurner, go_apple, go_flower, go_creeperPlant, go_peekaboo, go_NUM_ITEMS};
 
 /*struct AI defined in ai.h*/
 struct object {
