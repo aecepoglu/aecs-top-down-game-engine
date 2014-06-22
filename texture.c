@@ -75,7 +75,8 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	
 	result->trn = calloc( TEXTURES_COUNT_TERRAIN, sizeof(SDL_Texture*));
 
-	result->trn[ TEXTURE_TRN_NONE 		] = loadTexture( ren, "res/ground.png");
+	result->trn[ TEXTURE_TRN_NONE 		] = loadTexture( ren, "res/empty.png");
+	result->trn[ TEXTURE_TRN_GND 		] = loadTexture( ren, "res/ground.png");
 	result->trn[ TEXTURE_TRN_WALL 		] = loadTexture( ren, "res/brick.png");
 
 	result->obj = calloc( go_NUM_ITEMS, sizeof(SDL_Texture***));

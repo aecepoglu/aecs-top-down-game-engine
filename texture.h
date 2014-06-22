@@ -8,9 +8,10 @@
 #include <SDL.h>
 
 /* indexes for textures */
-#define TEXTURE_TRN_NONE 		0
+#define TEXTURE_TRN_GND 		0
 #define TEXTURE_TRN_WALL 		1
-#define TEXTURES_COUNT_TERRAIN	2
+#define TEXTURE_TRN_NONE 		2
+#define TEXTURES_COUNT_TERRAIN	3
 
 
 struct GameTextures {

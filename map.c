@@ -156,7 +156,7 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 		m->tiles[x] = (enum terrainType*)calloc( height, sizeof(enum terrainType));
 		m->objs[x] = (struct object**)calloc( height, sizeof(struct object*));
 		for(y=0; y<height; y++)
-			m->tiles[x][y] = terrain_none;
+			m->tiles[x][y] = terrain_gnd;
 	}
 
 	log1( "createMap() over\n");
@@ -177,7 +177,7 @@ bool checkMapValidity( struct Map *map) {
 	for(x=0; x<map->width; x++) {
 		connectedTiles[x] = (int*)calloc( map->height, sizeof(int));
 		for(y=0; y<map->height; y++) {
-			if( map->tiles[x][y] == terrain_none) {
+			if( map->tiles[x][y] == terrain_gnd) {
 
 				if( x == map->width -1 || x == 0 || y == map->height - 1 || y == 0) {
 					log0("\tGround tile at position %d,%d is at the edge. There cannot be ground tiles at map edges.\n", x, y);
@@ -291,7 +291,7 @@ struct BasePfNode*** createPfBase( enum terrainType **tiles, unsigned int width,
 	struct BasePfNode *curNode, *dirNode;
 	for(x=0; x<width; x++) {
 		for(y=0; y<height; y++) {
-			if( tiles[x][y] == terrain_none) {
+			if( tiles[x][y] == terrain_gnd) {
 				curPos.i = x;
 				curPos.j = y;
 				curNode = nodes[x][y];
@@ -299,7 +299,7 @@ struct BasePfNode*** createPfBase( enum terrainType **tiles, unsigned int width,
 				for( dir=1; dir<3; dir++) {
 					vectorAdd( &dirPos, &curPos, &dirVectors[dir]);
 
-					if( tiles[dirPos.i][dirPos.j] == terrain_none) {
+					if( tiles[dirPos.i][dirPos.j] == terrain_gnd) {
 						dirNode = nodes[dirPos.i][dirPos.j];
 						curNode->neighbours[dir] = dirNode;
 						dirNode->neighbours[DIR_REVERSE(dir)] = curNode;

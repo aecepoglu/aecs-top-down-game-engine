@@ -78,16 +78,8 @@ void drawBackground() {
 
 	SDL_SetRenderTarget( renderer, 0); //reset
 }
-
-void draw() {
-	log3("draw\n");
-	SDL_RenderClear( renderer);
-	//render background
-	drawTexture( renderer, bgroundTexture, 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN);
-	//render objects
-	drawObjects( );
-	SDL_RenderPresent( renderer);
-}
+/*
+*/
 
 bool scrollScreen( enum direction dir) {
 	bool canScroll = false;

@@ -47,7 +47,7 @@ int hungryLeftTurner_look( struct Map *map, struct Vector *pos, enum direction d
 			break;
 		}
 	}
-	while( map->tiles[cur.i][cur.j] == terrain_none && found != true);
+	while( map->tiles[cur.i][cur.j] == terrain_gnd && found != true);
 
 	log1("looked\n");
 

@@ -56,7 +56,7 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 
 bool drawObject( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
-	if( myMap->objs[x][y]!=0 || myMap->tiles[x][y]!=terrain_none)
+	if( myMap->objs[x][y]!=0 || myMap->tiles[x][y]!=terrain_gnd)
 		return false;
 
 	//create and initialize a monster
@@ -236,6 +236,16 @@ void run() {
 }
 
 
+void draw() {
+	log3("draw\n");
+	SDL_RenderClear( renderer);
+	//render background
+	drawTexture( renderer, bgroundTexture, 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN);
+	//render objects
+	drawObjects( );
+	SDL_RenderPresent( renderer);
+
+}
 
 
 int main( int argc, char *args[]) {

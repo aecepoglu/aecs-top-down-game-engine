@@ -14,7 +14,7 @@ endforeach(x ${MY_AI_SOURCES})
 set(MY_AI_SOURCES ${_tmp})
 
 
-set(MY_SOURCE_FILES engine.c engine.h texture.c texture.h map.c map.h object.c object.h brush.h vector.c vector.h basic.h array.h linkedList.h linkedList.c log.h ai.h aiFun.h aiTable.h pf/roughAStar.c pf/roughAStar.h )
+set(MY_SOURCE_FILES engine.c engine.h texture.c texture.h map.c map.h object.c object.h brush.h vector.c vector.h basic.h array.h linkedList.h linkedList.c log.h ai.h aiFun.h aiTable.h pf/roughAStar.c pf/roughAStar.h fov/fov.h fov/fov-line.c )
 
 
 set(ALL_SOURCE_FILES ${MY_SOURCE_FILES})

@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "aiTable.h"
+#include "fov/fov.h"
 
 
 SDL_Event timerPushEvent;
@@ -10,10 +11,13 @@ struct object *player;
 /* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
 bool playerMoved = false;
 
-#define VIEW_RANGE 3  //TODO Use FOV distance instead of '10'
+#define VIEW_RANGE 5
 struct Vector playerMoveAreaStart, playerMoveAreaEnd;
 struct Vector PLAYER_PADDING_VECTOR = {VIEW_RANGE, VIEW_RANGE};
 //FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
+
+#define PLAYER_FOV_TILES_LIM 11
+enum terrainType **playerVisibleTiles;
 
 
 void gameOver() {
@@ -160,8 +164,27 @@ Uint32 timerCallback( Uint32 interval, void *param) {
 	return interval;
 }
 
+void draw() {
+	log3("draw here\n");
+	SDL_RenderClear( renderer);
+
+	drawTexture( renderer, textures->trn[TEXTURE_TRN_NONE], 0, 0, windowW, windowH);
+
+	unsigned int i,j;
+	for( i=0; i<PLAYER_FOV_TILES_LIM; i++ )
+		for( j=0; j<PLAYER_FOV_TILES_LIM; j++)
+			drawTexture( renderer, textures->trn[ playerVisibleTiles[ i][ j]], 
+				i*TILELEN, j*TILELEN, TILELEN, TILELEN
+			);
+
+	SDL_RenderPresent( renderer);
+}
+
 void update() {
 	log3("update\n");
+
+	fov_line( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
+	
 	unsigned int i;
 	for( i=0; i<myMap->objListCount; i++) {
 		//update object at [i]
@@ -269,6 +292,11 @@ void setDefaults() {
 	player = findPlayer( myMap);
 	if( ! player)
 		quit( "No player was detected. You need a player object in the map.");
+
+	playerVisibleTiles = (enum terrainType**) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType*));
+	int i;
+	for( i=0; i< PLAYER_FOV_TILES_LIM; i++)
+		playerVisibleTiles[i] = (enum terrainType*) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType));
 }
 
 

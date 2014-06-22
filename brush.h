@@ -43,7 +43,7 @@ struct brushState initialBrushState =
 		//1
 		{SDLK_2, { "terrain", 2, defaultBrush, no_var, (struct stateTransition[]) {
 			//0
-			{SDLK_1, { "ground", 0, drawTerrain, terrain_none, no_trans} },
+			{SDLK_1, { "ground", 0, drawTerrain, terrain_gnd, no_trans} },
 			//1
 			{SDLK_2, { "wall", 0, drawTerrain, terrain_wall, no_trans} }
 		}}},
