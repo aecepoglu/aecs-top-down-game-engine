@@ -14,7 +14,7 @@ endforeach(x ${MY_AI_SOURCES})
 set(MY_AI_SOURCES ${_tmp})
 
 
-set(MY_SOURCE_FILES engine.c engine.h texture.c texture.h map.c map.h object.c object.h brush.h vector.c vector.h basic.h array.h linkedList.h linkedList.c log.h ai.h aiFun.h aiTable.h pf/roughAStar.c pf/roughAStar.h fov/fov.h fov/fov-line.c )
+set(MY_SOURCE_FILES engine.c engine.h texture.c texture.h map.c map.h object.c object.h brush.h vector.c vector.h basic.h array.h linkedList.h linkedList.c log.h ai.h aiFun.h aiTable.h pf/roughAStar.c pf/roughAStar.h fov/fov.h fov/fov-util.c fov/fov-line.c fov/fov-rough.c)
 
 
 set(ALL_SOURCE_FILES ${MY_SOURCE_FILES})
@@ -31,6 +31,7 @@ target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 add_definitions(-Wall)
+add_definitions(-g)
 
 #copy resources from source-dir to binary-dir
 file(COPY "res" DESTINATION ${CMAKE_BINARY_DIR}/)

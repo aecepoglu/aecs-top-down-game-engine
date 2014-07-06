@@ -176,6 +176,8 @@ void draw() {
 			drawTexture( renderer, textures->trn[ playerVisibleTiles[ i][ j]], 
 				i*TILELEN, j*TILELEN, TILELEN, TILELEN
 			);
+	
+	drawTexture( renderer, textures->obj[ player->type][ 1][ player->dir], VIEW_RANGE*TILELEN, VIEW_RANGE*TILELEN, TILELEN, TILELEN);
 
 	SDL_RenderPresent( renderer);
 }
@@ -183,7 +185,8 @@ void draw() {
 void update() {
 	log3("update\n");
 
-	fov_line( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
+	//fov_line( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
+	fov_rough( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
 	
 	unsigned int i;
 	for( i=0; i<myMap->objListCount; i++) {
@@ -297,6 +300,8 @@ void setDefaults() {
 	int i;
 	for( i=0; i< PLAYER_FOV_TILES_LIM; i++)
 		playerVisibleTiles[i] = (enum terrainType*) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType));
+
+	init_fovBase( VIEW_RANGE);
 }
 
 
