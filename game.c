@@ -11,12 +11,12 @@ struct object *player;
 /* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
 bool playerMoved = false;
 
-#define VIEW_RANGE 5
+#define VIEW_RANGE 7 //TODO assert this value is less than 1/4th of QUEUE_SIZE in fov/raycast.c
 struct Vector playerMoveAreaStart, playerMoveAreaEnd;
 struct Vector PLAYER_PADDING_VECTOR = {VIEW_RANGE, VIEW_RANGE};
 //FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
 
-#define PLAYER_FOV_TILES_LIM 11
+#define PLAYER_FOV_TILES_LIM 15
 enum terrainType **playerVisibleTiles;
 
 
@@ -186,7 +186,8 @@ void update() {
 	log3("update\n");
 
 	//fov_line( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
-	fov_rough( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
+	//fov_rough( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
+	fov_raycast( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
 	
 	unsigned int i;
 	for( i=0; i<myMap->objListCount; i++) {

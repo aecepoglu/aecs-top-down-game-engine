@@ -3,9 +3,10 @@
 
 #include <assert.h>
 
-struct FOVBase *queue[16];
+struct FOVBase *queue[64];
 int queueCount;
 
+//uses lowerLimVisible to mean 'visited'
 void fov_rough( struct Map *map, struct Vector *pos, enum direction objDir, enum terrainType **tiles, int range) {
 	log2("fov_rough from pos (%d,%d) with dir %d\n", pos->i, pos->j, objDir);
 
@@ -48,8 +49,8 @@ void fov_rough( struct Map *map, struct Vector *pos, enum direction objDir, enum
 		for( dir=0; dir<4; dir++) {
 			neighbourNode = node->neighbours[ dir];
 			
-			if( node->grows[dir] == true && neighbourNode->visited != true && neighbourNode->distance < range ) {
-				neighbourNode->visited = true;
+			if( node->grows[dir] == true && neighbourNode->lowerLimVisible != true && neighbourNode->distance < range ) {
+				neighbourNode->lowerLimVisible = true;
 				
 				neighbourNode->grows[ dir] = true;
 				neighbourNode->grows[ DIR_REVERSE( dir)] = false;
@@ -66,7 +67,7 @@ void fov_rough( struct Map *map, struct Vector *pos, enum direction objDir, enum
 
 	for( i=0; i<=2*range; i++)
 		for( j=0; j<=2*range; j++)
-			fovBase[i][j].visited = false;
+			fovBase[i][j].lowerLimVisible = false;
 
 	log2("fov_rough end\n");
 }

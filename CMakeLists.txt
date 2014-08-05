@@ -14,7 +14,7 @@ endforeach(x ${MY_AI_SOURCES})
 set(MY_AI_SOURCES ${_tmp})
 
 
-set(MY_SOURCE_FILES engine.c engine.h texture.c texture.h map.c map.h object.c object.h brush.h vector.c vector.h basic.h array.h linkedList.h linkedList.c log.h ai.h aiFun.h aiTable.h pf/roughAStar.c pf/roughAStar.h fov/fov.h fov/fov-util.c fov/fov-line.c fov/fov-rough.c)
+set(MY_SOURCE_FILES engine.c engine.h texture.c texture.h map.c map.h object.c object.h brush.h vector.c vector.h basic.h array.h linkedList.h linkedList.c log.h ai.h aiFun.h aiTable.h pf/roughAStar.c pf/roughAStar.h fov/fov.h fov/fov-util.c fov/fov-line.c fov/fov-rough.c fov/fov-raycast.c)
 
 
 set(ALL_SOURCE_FILES ${MY_SOURCE_FILES})
@@ -29,6 +29,9 @@ include_directories(levelEditor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 add_executable(aec-game game.c ${ALL_SOURCE_FILES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
+
+target_link_libraries(levelEditor m)
+target_link_libraries(aec-game m)
 
 add_definitions(-Wall)
 add_definitions(-g)

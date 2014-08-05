@@ -1,11 +1,23 @@
 #include "fov.h"
 #include <stdlib.h>
+#include <math.h>
 
 #include "../log.h"
 
+float fmodf_simple( float x, float mod) {
+	if( x < 0)
+		return x + mod;
+	else if( x >= mod)
+		return x - mod;
+	else
+		return x;
+}
+
 struct FOVBase** init_fovBase( int range) {
-	
+
 	struct FOVBase **result = (struct FOVBase**)calloc( 2*range + 1, sizeof( struct FOVBase*));
+
+	float TWO_PI = 2* M_PI;
 
 	int i,j;
 	for( i=0; i<=2*range; i++)
@@ -14,12 +26,29 @@ struct FOVBase** init_fovBase( int range) {
 	for( i=0; i<=2*range; i++) {
 		for( j=0; j<=2*range; j++) {
 			struct FOVBase *n = &result[i][j];
-			n->visited = false;
+			n->lowerLimVisible = false;
+			n->upperLimVisible = false;
 			
 			n->pos.i = i - range;
 			n->pos.j = j - range;
 
 			n->distance = (uint8_t)(abs( n->pos.i) + abs( n->pos.j));
+			if( n->distance != 0) {
+				int sliceIndex;
+				if( n->pos.j >= 0) {
+					sliceIndex = n->distance - n->pos.i;
+				}
+				else {
+					sliceIndex = 3*n->distance + n->pos.i;
+				}
+				float slice = M_PI_4 / n->distance;
+				n->angle = (M_PI_2 / n->distance )* sliceIndex;
+				n->maxLit[0] = fmodf_simple(n->angle - slice, TWO_PI);
+				n->maxLit[1] = fmodf_simple(n->angle + slice, TWO_PI);
+			}
+			else {
+				n->angle = 0;
+			}
 
 			n->neighbours[ dir_left] 	= n->pos.i<=0 && i>0 			? &result[i-1][j] : NULL;
 			n->neighbours[ dir_right] 	= n->pos.i>=0 && i<= 2*range 	? &result[i+1][j] : NULL;
