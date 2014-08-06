@@ -7,7 +7,7 @@ struct FOVBase *queue[64];
 int queueCount;
 
 //uses lowerLimVisible to mean 'visited'
-void fov_rough( struct Map *map, struct Vector *pos, enum direction objDir, enum terrainType **tiles, int range) {
+void fov_rough( struct Map *map, struct Vector *pos, enum direction objDir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount) {
 	log2("fov_rough from pos (%d,%d) with dir %d\n", pos->i, pos->j, objDir);
 
 	int i,j,dir;

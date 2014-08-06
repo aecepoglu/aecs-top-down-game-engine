@@ -1,7 +1,7 @@
 #include "fov.h"
 #include "../log.h"
 
-void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, enum terrainType **tiles, int range) {
+void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount) {
 	log2("fov_line\n");
 	int i,j;
 	for( i=0; i<2*range + 1; i++) {

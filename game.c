@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "aiTable.h"
 #include "fov/fov.h"
+#include "definitions.h"
 
 
 SDL_Event timerPushEvent;
@@ -11,13 +12,16 @@ struct object *player;
 /* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
 bool playerMoved = false;
 
-#define VIEW_RANGE 7 //TODO assert this value is less than 1/4th of QUEUE_SIZE in fov/raycast.c
-struct Vector playerMoveAreaStart, playerMoveAreaEnd;
-struct Vector PLAYER_PADDING_VECTOR = {VIEW_RANGE, VIEW_RANGE};
+//struct Vector playerMoveAreaStart, playerMoveAreaEnd; //TODO is this needed now?
+//struct Vector PLAYER_PADDING_VECTOR = {VIEW_RANGE, VIEW_RANGE}; //TODO is this needed now?
 //FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
 
-#define PLAYER_FOV_TILES_LIM 15
+#define PLAYER_FOV_TILES_LIM VIEW_BOX_LENGTH
 enum terrainType **playerVisibleTiles;
+struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
+int objsSeenCount;
+
+
 
 
 void gameOver() {
@@ -105,6 +109,7 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 	if( ! playerMoved) {
 		playerMoved = true;
 		if ( moveFunction( myMap, player) ) {
+			/*
 			//scroll if necessary
 
 			bool needsScroll = true;
@@ -127,7 +132,7 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 				vectorAdd( &playerMoveAreaStart, &playerMoveAreaStart, scrollVector );
 				vectorAdd( &playerMoveAreaEnd, &playerMoveAreaEnd, scrollVector );
 			}
-				
+			*/
 		}
 	}
 }
@@ -177,7 +182,14 @@ void draw() {
 				i*TILELEN, j*TILELEN, TILELEN, TILELEN
 			);
 	
-	drawTexture( renderer, textures->obj[ player->type][ 1][ player->dir], VIEW_RANGE*TILELEN, VIEW_RANGE*TILELEN, TILELEN, TILELEN);
+	struct ViewObject *vo;
+	for( i=0; i<objsSeenCount; i++) {
+		vo = &objsSeen[ i];
+		if( vo->isFullySeen)
+			drawTexture( renderer, textures->obj[ vo->obj->type ][ vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+		else
+			drawTexture( renderer, textures->obj[ go_apple ][ 0][ 0], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+	}
 
 	SDL_RenderPresent( renderer);
 }
@@ -185,9 +197,7 @@ void draw() {
 void update() {
 	log3("update\n");
 
-	//fov_line( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
-	//fov_rough( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
-	fov_raycast( myMap, &player->pos, player->dir, playerVisibleTiles, VIEW_RANGE);
+	fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount);
 	
 	unsigned int i;
 	for( i=0; i<myMap->objListCount; i++) {
@@ -233,8 +243,8 @@ void run() {
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
 						resizeView(e.window.data1, e.window.data2);
-						vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR);
-						vectorSub( &playerMoveAreaEnd, &viewEnd , &PLAYER_PADDING_VECTOR);
+						//vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR);
+						//vectorSub( &playerMoveAreaEnd, &viewEnd , &PLAYER_PADDING_VECTOR);
 
 						drawBackground();
 					    break;
@@ -346,8 +356,8 @@ int main( int argc, char *args[]) {
 	init();
 
 	//FIXME temporary placement here. need their default values set somewhere better, maybe
-	vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR );
-	vectorSub( &playerMoveAreaEnd, &viewEnd, &PLAYER_PADDING_VECTOR );
+	//vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR );
+	//vectorSub( &playerMoveAreaEnd, &viewEnd, &PLAYER_PADDING_VECTOR );
 
 	textures = loadAllTextures( renderer);
 

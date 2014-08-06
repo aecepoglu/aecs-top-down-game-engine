@@ -4,15 +4,20 @@
 #include "../vector.h"
 
 struct FOVBase {
-	struct FOVBase *neighbours[4];
-	bool lowerLimVisible, upperLimVisible;
-	uint8_t distance;
-	bool grows[4];
 	struct Vector pos;
+	uint8_t distance;
+	struct FOVBase *neighbours[4];
+	bool grows[4];
 
-	float angle;
+	bool lowerLimVisible, upperLimVisible;
 	float lit[2];
 	float maxLit[2];
+};
+
+struct ViewObject {
+	struct object *obj;
+	struct Vector pos;
+	bool isFullySeen;
 };
 
 struct FOVBase **fovBase;
@@ -25,18 +30,20 @@ struct FOVBase** init_fovBase( int range);
 	=============
 */
 
+typedef void (fovFun)( struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount);
+
 /* FOV covered by a single ray going towards the $dir direction
 */
-void fov_line( struct Map *map, struct Vector *pos, enum direction dir, enum terrainType **tiles, int range);
+fovFun fov_line;
 
 /* FOV covered by a half circle
 	Sees through walls and objects
 */
-void fov_rough( struct Map *map, struct Vector *pos, enum direction dir, enum terrainType **tiles, int range);
+fovFun fov_rough;
 
 /* Ray casting half a circle.
 	Penetrating through objects but not walls
 */
-void fov_raycast( struct Map *map, struct Vector *pos, enum direction dir, enum terrainType **tiles, int range);
+fovFun fov_raycast;
 
 #endif /* FOV_H */
