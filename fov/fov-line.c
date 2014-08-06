@@ -11,28 +11,39 @@ void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int ran
 	}
 	log3("reset tiles\n");
 
+	*objsSeenCount=0;
+
 	struct Vector tilesPos = { range, range};
 	struct Vector mapPos;
 	vectorClone( &mapPos, pos);
 	struct Vector *dPos = & dirVectors[ dir];
 
-	bool endNextTurn = false;
-	do {
-		if( map->tiles[ mapPos.i][ mapPos.j] == terrain_wall)
-			endNextTurn = true;
+	bool sawSelf = false;
+
+	while( range >= 0) {
 
 		log3("\tpos (%d,%d)-(%d,%d)\n", tilesPos.i, tilesPos.j, mapPos.i, mapPos.j);
 		tiles[ tilesPos.i][ tilesPos.j] = map->tiles[ mapPos.i][ mapPos.j];
+		if( map->tiles[ mapPos.i][ mapPos.j] == terrain_wall) {
+			break;
+		}
+		else if( map->objs[ mapPos.i][ mapPos.j] != NULL) {
+			struct ViewObject *vo = &objsSeen[ *objsSeenCount];
+			vo->obj = map->objs[ mapPos.i][ mapPos.j];
+			vo->isFullySeen = true;
+			vectorClone( &vo->pos, &tilesPos);
+
+			*objsSeenCount = *objsSeenCount + 1;
+			if( ! sawSelf )
+				sawSelf = true;
+			else
+				break;
+		}
+
 		vectorAdd( &tilesPos, &tilesPos, dPos);
 		vectorAdd( &mapPos, &mapPos, dPos);
 		range --;
-		/*
-		if( map->objs[ node->pos.i][ node->pos.j] != NULL) {
-			
-		}
-		*/
 	}
-	while( range >= 0 && endNextTurn != true);
 
 	return;
 }
