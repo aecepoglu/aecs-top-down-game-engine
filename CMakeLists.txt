@@ -34,7 +34,14 @@ target_link_libraries(levelEditor m)
 target_link_libraries(aec-game m)
 
 add_definitions(-Wall)
-add_definitions(-g)
+
+set(MY_BUILD_TYPE "release" CACHE STRING "build type; debug or release")
+if(MY_BUILD_TYPE STREQUAL "debug")
+	add_definitions(-D VERBOSE_3)
+	add_definitions(-g)
+else(MY_BUILD_TYPE strequal "debug")
+	add_definitions(-D VERBOSE_1)
+endif(MY_BUILD_TYPE STREQUAL "debug")
 
 #copy resources from source-dir to binary-dir
 file(COPY "res" DESTINATION ${CMAKE_BINARY_DIR}/)

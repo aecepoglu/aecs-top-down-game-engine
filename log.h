@@ -3,8 +3,6 @@
 #ifndef LOG_H
 #define LOG_H
 
-#define VERBOSE_3
-
 #ifdef VERBOSE_0
 	#define log0(...) fprintf(stdout, __VA_ARGS__)
 	#define log1(...)
