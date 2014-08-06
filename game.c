@@ -186,7 +186,7 @@ void draw() {
 	for( i=0; i<objsSeenCount; i++) {
 		vo = &objsSeen[ i];
 		if( vo->isFullySeen)
-			drawTexture( renderer, textures->obj[ vo->obj->type ][ vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+			drawTexture( renderer, textures->obj[ vo->obj->type ][ vo->obj->health > 0 && vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
 		else
 			drawTexture( renderer, textures->obj[ go_apple ][ 0][ 0], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
 	}
