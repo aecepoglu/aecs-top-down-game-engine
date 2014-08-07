@@ -67,3 +67,31 @@ struct FOVBase** init_fovBase( int range) {
 	log2( "init_fovBase over\n");
 	return result;
 }
+
+void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tiles, int range, struct ViewObject *objsSeen, int *objsSeenCount) {
+	*objsSeenCount = 0;
+
+	int i,j;
+	struct Vector originPos = { pos->i - range, pos->j - range};
+	struct Vector mapPos;
+
+	for(i=0; i<=2*range; i++)
+		for( j=0; j<=2*range; j++)
+			if( i>=0 && j>=0 && i<map->width && j<map->height && tiles[i][j] == terrain_gnd) {
+				struct FOVBase *base = &fovBase[i][j];
+
+				mapPos.i = originPos.i + i;
+				mapPos.j = originPos.j + j;
+
+				if( map->objs[ mapPos.i][ mapPos.j] != NULL) {
+					struct ViewObject *vo = &objsSeen[ *objsSeenCount];
+
+					vo->obj =  map->objs[ mapPos.i][ mapPos.j];
+					vo->isFullySeen = base->lowerLimVisible && base->upperLimVisible;
+					vo->pos.i = i;
+					vo->pos.j = j;
+
+					*objsSeenCount = *objsSeenCount +1;
+				}
+			}
+}

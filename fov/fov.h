@@ -24,6 +24,7 @@ struct FOVBase **fovBase;
 
 float fmodf_simple( float angle, float mod);
 struct FOVBase** init_fovBase( int range);
+void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tiles, int tilesLen, struct ViewObject *objsSeen, int *objsSeenCount);
 
 /*
 	FOV FUNCTIONS

@@ -12,8 +12,6 @@ struct object *player;
 /* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
 bool playerMoved = false;
 
-//struct Vector playerMoveAreaStart, playerMoveAreaEnd; //TODO is this needed now?
-//struct Vector PLAYER_PADDING_VECTOR = {VIEW_RANGE, VIEW_RANGE}; //TODO is this needed now?
 //FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
 
 #define PLAYER_FOV_TILES_LIM VIEW_BOX_LENGTH
@@ -21,8 +19,7 @@ enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
 
-
-
+#define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 
 void gameOver() {
 	log0("game over...\n");
@@ -108,32 +105,9 @@ bool eat( struct Map *map, struct object *obj) {
 void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 	if( ! playerMoved) {
 		playerMoved = true;
-		if ( moveFunction( myMap, player) ) {
-			/*
-			//scroll if necessary
-
-			bool needsScroll = true;
-			enum direction scrollDirection;
-
-			if( player->pos.i >= playerMoveAreaEnd.i && scrollScreen(dir_right))
-				scrollDirection = dir_right;
-			else if( player->pos.i < playerMoveAreaStart.i && scrollScreen(dir_left))
-				scrollDirection = dir_left;
-			else if( player->pos.j >= playerMoveAreaEnd.j && scrollScreen(dir_down))
-				scrollDirection = dir_down;
-			else if( player->pos.j < playerMoveAreaStart.j && scrollScreen(dir_up))
-				scrollDirection = dir_up;
-			else
-				needsScroll = false;
-
-			if(needsScroll) {
-				log1("Screen needs scroll. Player:(%d,%d) and viewPos:(%d,%d) viewEnd:(%d,%d)\n", player->pos.i, player->pos.j, viewPos.i, viewPos.j, viewEnd.i, viewEnd.j);
-				struct Vector *scrollVector = &dirVectors[scrollDirection];
-				vectorAdd( &playerMoveAreaStart, &playerMoveAreaStart, scrollVector );
-				vectorAdd( &playerMoveAreaEnd, &playerMoveAreaEnd, scrollVector );
-			}
-			*/
-		}
+		moveFunction( myMap, player);
+		CALL_FOV_FCN();
+		
 	}
 }
 
@@ -197,7 +171,6 @@ void draw() {
 void update() {
 	log3("update\n");
 
-	fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount);
 	
 	unsigned int i;
 	for( i=0; i<myMap->objListCount; i++) {
@@ -216,12 +189,14 @@ void update() {
 			myMap->objList[i]->timerCounter --;
 		}
 	}
+
+	getFovObjects( myMap, &player->pos, playerVisibleTiles, VIEW_RANGE, objsSeen, &objsSeenCount);
+
 	playerMoved = false;
 }
 
 void run() {
-    drawBackground();
-	draw(); //the initial draw. TODO check if this draw() call is necessary
+	CALL_FOV_FCN();
 
 	SDL_AddTimer( timerDelay, timerCallback, 0);
 
@@ -243,10 +218,6 @@ void run() {
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
 						resizeView(e.window.data1, e.window.data2);
-						//vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR);
-						//vectorSub( &playerMoveAreaEnd, &viewEnd , &PLAYER_PADDING_VECTOR);
-
-						drawBackground();
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:
 					    log1("Window %d minimized\n", e.window.windowID);
