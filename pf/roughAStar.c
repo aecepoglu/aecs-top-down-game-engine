@@ -62,12 +62,15 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 	node->gValue = 0;
 	node->fValue = HEURISTICS( node->base->pos, toPos);
 
-	linkedList_add( &data->openSet, node);
+	linkedList_push( &data->openSet, node);
 
 	bool isFirstIteration = true;
 
 	while( data->openSet) {
-		//find the node with minimum f-value
+		/* Find node with minimum fValue in data->openSet
+            _node_ will be the RoughPfNode with min fValue
+            _minListNode_ will be the LinkedListNode whose _data_ is _node_
+        */
 		log2("\tfind node with min f value\n");
 		struct LinkedListNode *listNode = data->openSet;
 		struct LinkedListNode *minListNode = data->openSet;
@@ -84,6 +87,8 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 		}
 		log2(" } \n");
 
+        /* Found node */
+
 		log2("\tExpanding node %d,%d. fValue=%d\n", node->base->pos.i, node->base->pos.j, node->fValue);
 
 		if( vectorEquals( & node->base->pos, toPos)) {
@@ -94,7 +99,7 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 
 		linkedList_remove( &data->openSet, minListNode);
 		free( minListNode);
-		linkedList_add( &data->closedSet, node);
+		linkedList_push( &data->closedSet, node);
 
 		log2("\tcheck neighbours\n");
 
@@ -125,7 +130,7 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 					neighbourNode->cameDir = dir;
 
 					if( neighbourNotInOpenSet)
-						linkedList_add( &data->openSet, neighbourNode);
+						linkedList_push( &data->openSet, neighbourNode);
 				}
 			}
 		}
@@ -142,29 +147,24 @@ void* constructPath( struct RoughPfNode ***map, struct RoughPfNode *first, struc
 	struct Vector pos = last->base->neighbours[ DIR_REVERSE( last->cameDir)]->pos;
 	struct RoughPfNode *cur = map[ pos.i][ pos.j];
 	struct RoughPfNode *next = last;
-			//linkedList_add( &result, moveForward);
 
 	while(true) {
 		log2("\t(%d,%d (%d))\n", pos.i, pos.j, cur->cameDir);
-		//if( cur != first)
 
-		linkedList_add( &result, moveForward);
+		linkedList_push( &result, moveForward);
 
 		int diff = (cur->cameDir - next->cameDir) %4;
 		log2("\t\tdiff: %d\n", diff);
 		switch( diff) {
-			//case 0:
-			//	linkedList_add( &result, moveForward);
-			//	break;
 			case 1:
-				linkedList_add( &result, turnLeft);
+				linkedList_push( &result, turnLeft);
 				break;
 			case 2:
-				linkedList_add( &result, turnLeft);
-				linkedList_add( &result, turnLeft);
+				linkedList_push( &result, turnLeft);
+				linkedList_push( &result, turnLeft);
 				break;
 			case 3:
-				linkedList_add( &result, turnRight);
+				linkedList_push( &result, turnRight);
 				break;
 		};
 		

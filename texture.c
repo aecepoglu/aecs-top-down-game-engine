@@ -40,9 +40,6 @@ SDL_Texture ***loadTextureSheet( SDL_Renderer *ren, const char *path) {
 	surfRect.w = SPRITE_TILE_LEN;
 	surfRect.h = SPRITE_TILE_LEN;
 
-	//SDL_UnlockSurface(img);
-	//SDL_UnlockSurface(&surf);
-
 	int state, rot;
 	for( state=0; state<numStates; state++) {
 		surfRect.y = state * SPRITE_TILE_LEN;
@@ -87,11 +84,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_flower] = loadTextureSheet( ren, "res/flower.png");
 	result->obj[ go_creeperPlant] = loadTextureSheet( ren, "res/creeper.png");
 	result->obj[ go_peekaboo] = loadTextureSheet( ren, "res/peekaboo.png");
-	//MAKE SURE THE 
-
-	//TODO duplicate sprite sheet and color it
-	//SDL_SetTextureColorMod( result->objectTextures[ TEXTURE_OBJ_MONSTER], 255, 150, 255);
-
+	
 	return result;
 }
 

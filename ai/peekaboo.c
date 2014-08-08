@@ -29,6 +29,8 @@ struct AI* peekaboo_create() {
 }
 
 void peekaboo_destroy(struct AI* ai) {
+    struct PeekabooData *aiData = (struct PeekabooData*)ai->data;
+    linkedList_free( aiData->path);
 	free(ai);
 	//TODO free the path and map and all that jazz
 }

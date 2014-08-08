@@ -12,7 +12,7 @@ void linkedList_remove( struct LinkedListNode **head, struct LinkedListNode *nod
 		*head = node->next;
 }
 
-void linkedList_add( struct LinkedListNode **head, void *data) {
+void linkedList_push( struct LinkedListNode **head, void *data) {
 	struct LinkedListNode *newNode = (struct LinkedListNode*)malloc( sizeof( struct LinkedListNode));
 	newNode->data = data;
 	newNode->prev = NULL;
@@ -38,4 +38,13 @@ struct LinkedListNode* linkedList_find( struct LinkedListNode *head, void *data)
 		node = node->next;
 	}
 	return NULL;
+}
+
+void linkedList_free( struct LinkedListNode *head) {
+    struct LinkedListNode *next;
+    while( head) {
+        next = head->next;
+        free( head);
+        head = next;
+    }
 }
