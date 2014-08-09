@@ -173,18 +173,21 @@ void update() {
 
 	
 	unsigned int i;
+	struct object *obj;
 	for( i=0; i<myMap->objListCount; i++) {
+		obj = myMap->objList[i];
 		//update object at [i]
 		/* Some objects are marked for deletion
 		Copy all non-deleted objects into a new-list
 		and that list is the new object-list */
-		if( myMap->objList[i]->isDeleted ) {
+		if( obj->isDeleted ) {
 			//TODO implement obj deletion. Just not showing the deleted objects now
 			//TODO don't forget to remove the matching code from draw()
 		}
-		else if( myMap->objList[i]->ai && myMap->objList[i]->ai->enabled ) {
-			if( myMap->objList[i]->timerCounter == 0) {
-				AI_UPDATE( myMap, myMap->objList[i] );
+		else if( obj->ai && myMap->objList[i]->ai->enabled ) {
+			if( obj->timerCounter == 0) {
+				AI_SEEN( obj->ai);
+				AI_UPDATE( myMap, obj );
 			}
 			myMap->objList[i]->timerCounter --;
 		}
