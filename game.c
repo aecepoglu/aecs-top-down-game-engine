@@ -163,6 +163,9 @@ void draw() {
 			drawTexture( renderer, textures->obj[ vo->obj->type ][ vo->obj->health > 0 && vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
 		else
 			drawTexture( renderer, textures->obj[ go_apple ][ 0][ 0], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+		
+		if( vo->obj->ai)
+			AI_SEEN( vo->obj->ai);
 	}
 
 	SDL_RenderPresent( renderer);
@@ -186,7 +189,6 @@ void update() {
 		}
 		else if( obj->ai && myMap->objList[i]->ai->enabled ) {
 			if( obj->timerCounter == 0) {
-				AI_SEEN( obj->ai);
 				AI_UPDATE( myMap, obj );
 			}
 			myMap->objList[i]->timerCounter --;

@@ -84,6 +84,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_flower] = loadTextureSheet( ren, "res/flower.png");
 	result->obj[ go_creeperPlant] = loadTextureSheet( ren, "res/creeper.png");
 	result->obj[ go_peekaboo] = loadTextureSheet( ren, "res/peekaboo.png");
+	result->obj[ go_weepingAngel] = loadTextureSheet( ren, "res/weepingAngel.png");
 	
 	return result;
 }

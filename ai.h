@@ -6,7 +6,7 @@
 #include "map.h"
 
 
-enum aiType { ai_none, ai_leftTurner, ai_hungryLeftTurner, ai_simpleFlower, ai_creeperPlant, ai_peekaboo};
+enum aiType { ai_none, ai_leftTurner, ai_hungryLeftTurner, ai_simpleFlower, ai_creeperPlant, ai_peekaboo, ai_weepingAngel};
 
 struct AI {
 	enum aiType type;

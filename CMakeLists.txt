@@ -6,7 +6,7 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
 #list ai names here. They'll be prepended by "ai/" and appended by ".c" and ".h"
-set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo)
+set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel)
 
 foreach(x ${MY_AI_SOURCES})
 	list(APPEND _tmp "ai/${x}.c" "ai/${x}.h")

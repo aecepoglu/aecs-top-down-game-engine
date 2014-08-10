@@ -6,6 +6,18 @@
 
 #define HEURISTICS( pos1, pos2) ( abs( pos1.i - pos2->i) + abs( pos1.j - pos2->j) + (pos1.i != pos2->i) + (pos1.j != pos2->j) )
 
+void free_roughAStarData( struct RoughAStarData *data, struct Map *map) {
+	int x,y;
+	for( x=0; x<map->width; x++){
+		for( y=0; y<map->height; y++) {
+			free( data->map[x][y]);
+		}
+	}
+
+	linkedList_free( data->openSet);
+	linkedList_free( data->closedSet);
+}
+
 struct RoughAStarData* roughAStar_initData( struct Map *map) {
 	struct RoughAStarData *result = (struct RoughAStarData*)malloc( sizeof( struct RoughAStarData));
 
