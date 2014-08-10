@@ -82,12 +82,6 @@ bool eat( struct Map *map, struct object *obj) {
 	if( otherObj != 0 && otherObj->health == 0) {
 		objectSwallow( obj, otherObj);
 		map->objs[ newPos.i ][ newPos.j ] = NULL;
-		/* mark it for 'awaiting deletion'
-		It will be deleted in the next update cycle */
-		otherObj->isDeleted=true;
-		if( otherObj == player) {
-			gameOver();
-		}
 	}
 	return true;
 }
@@ -150,7 +144,7 @@ void draw() {
 	for( i=0; i<objsSeenCount; i++) {
 		vo = &objsSeen[ i];
 		if( vo->isFullySeen)
-			drawTexture( renderer, textures->obj[ vo->obj->type ][ vo->obj->health > 0 && vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+			drawTexture( renderer, textures->obj[ vo->obj->type ][ vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
 		else
 			drawTexture( renderer, textures->obj[ go_apple ][ 0][ 0], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
 		
@@ -166,23 +160,34 @@ void update() {
 
 	
 	unsigned int i;
+
+	struct object **newObjList = (struct object**)calloc( myMap->objListSize, sizeof( struct object*)); //instead of reallocating this array, keep it and swap between it and the actual list
+	int newCount = 0;
+
 	struct object *obj;
 	for( i=0; i<myMap->objListCount; i++) {
 		obj = myMap->objList[i];
-		//update object at [i]
-		/* Some objects are marked for deletion
-		Copy all non-deleted objects into a new-list
-		and that list is the new object-list */
-		if( obj->isDeleted ) {
-			//TODO implement obj deletion. Just not showing the deleted objects now
-			//TODO don't forget to remove the matching code from draw()
+		if( obj->isDeleted != true) {
+			newObjList[ newCount] = obj;
+			newCount++;
 		}
-		else if( obj->ai && myMap->objList[i]->ai->enabled ) {
+		else {
+			free( obj);
+		}
+
+		if( obj->ai && obj->ai->enabled ) {
+			
 			if( obj->timerCounter == 0) {
 				AI_UPDATE( myMap, obj );
 			}
-			myMap->objList[i]->timerCounter --;
+			obj->timerCounter --;
 		}
+	}
+
+	if( newCount != myMap->objListCount) {
+		free( myMap->objList);
+		myMap->objList = newObjList;
+		myMap->objListCount = newCount;
 	}
 
 	getFovObjects( myMap, &player->pos, playerVisibleTiles, VIEW_RANGE, objsSeen, &objsSeenCount);

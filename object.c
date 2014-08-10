@@ -36,7 +36,6 @@ struct object* readObject( FILE *fp) {
 	fread( &type,      sizeof(enum aiType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
 
-	//TODO save and load health, timerCounter, visualState
 	obj->health = 3;
 	obj->maxHealth = 3;
 	obj->timerCounter= 0;
@@ -61,8 +60,10 @@ bool objectHit( struct object *obj1, struct object *obj2) {
 		obj2->health -= 1;
 
 		if( obj2->health ==0) {
-			AI_DESTROY( obj2->ai);
-			obj2->ai = NULL;
+			if( obj2->ai) {
+				AI_DESTROY( obj2->ai);
+				obj2->ai = NULL;
+			}
 			obj2->visualState = 0; //0 is always the state for dead
 		}
 			
@@ -77,5 +78,6 @@ bool objectHit( struct object *obj1, struct object *obj2) {
 void objectSwallow( struct object *obj1, struct object *obj2) {
 	if( obj2->health == 0) {
 		obj1->health += obj2->maxHealth;
+		obj2->isDeleted = true;
 	}
 }

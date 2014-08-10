@@ -163,7 +163,6 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 	return m;
 }
 
-//TODO check if tiles are against the edges
 bool checkMapValidity( struct Map *map) {
 	log0("Validating map\n");
 	bool result;
@@ -180,7 +179,7 @@ bool checkMapValidity( struct Map *map) {
 			if( map->tiles[x][y] == terrain_gnd) {
 
 				if( x == map->width -1 || x == 0 || y == map->height - 1 || y == 0) {
-					log0("\tGround tile at position %d,%d is at the edge. There cannot be ground tiles at map edges.\n", x, y);
+					log0("\tGround tile at position %d,%d is at the edge. There cannot be ground tiles at map edges. Edges must be covered with walls.\n", x, y);
 					goto freeConnectedTiles;
 				}
 					
