@@ -31,8 +31,8 @@ struct AI* weepingAngel_create() {
 }
 
 void weepingAngel_destroy(struct AI* ai) {
-    //struct WeepingAngelData *aiData = (struct WeepingAngelData*)ai->data;
-	//TODO free aiData->pfData as well
+    struct WeepingAngelData *aiData = (struct WeepingAngelData*)ai->data;
+	roughAStarData_free( aiData->pfData);
 	free(ai);
 }
 

@@ -16,7 +16,7 @@ struct RoughAStarData {
 
 struct RoughAStarData* roughAStar_initData( struct Map *map);
 
-void free_roughAStarData( struct RoughAStarData *data, struct Map *map);
+void roughAStarData_free( struct RoughAStarData *data);
 
 void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, enum direction fromDir, struct Vector *toPos);
 
