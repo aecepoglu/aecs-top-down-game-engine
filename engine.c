@@ -48,9 +48,8 @@ void drawObjects() {
 			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
 			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
 				log3("drawing object %d\n", i);
-				//TODO use visual state only: don't do health check. if object died after attacking, set visual state in the hit() function
 				drawTexture( renderer, 
-					textures->obj[obj->type][ obj->health > 0 ? obj->visualState : 0 ][obj->dir], 
+					textures->obj[obj->type][ obj->visualState][obj->dir], 
 					screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
 			}
 		}

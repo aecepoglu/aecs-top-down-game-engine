@@ -54,18 +54,8 @@ bool moveForward( struct Map *map, struct object* obj) {
 			return true;
 		}
 		else {
-			if (objectHit( obj, objAtPos) ) {
-				//if objAtPos died
-				if( objAtPos->health == 0 ) {
-					log0("object died\n");
-					if( objAtPos == player ) {
-						gameOver();
-					}
-					else if(objAtPos->ai){
-						AI_DESTROY(objAtPos->ai);
-						objAtPos->ai=NULL;
-					}
-				}
+			if (objectHit( obj, objAtPos) && objAtPos == player && objAtPos->health == 0 ) {
+				gameOver();
 			}
 			return false;
 		}

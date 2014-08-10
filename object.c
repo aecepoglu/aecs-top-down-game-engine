@@ -60,6 +60,13 @@ bool objectHit( struct object *obj1, struct object *obj2) {
 	if( obj2->health > 0) {
 		obj2->health -= 1;
 
+		if( obj2->health ==0) {
+			AI_DESTROY( obj2->ai);
+			obj2->ai = NULL;
+			obj2->visualState = 0; //0 is always the state for dead
+		}
+			
+
 		return true;
 	}
 	else {
