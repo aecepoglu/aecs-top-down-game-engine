@@ -34,5 +34,6 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 /* Loads all the textures
 */
 struct GameTextures* loadAllTextures( SDL_Renderer *ren);
+void freeTextures( struct GameTextures* textures);
 
 #endif //TEXTURE_H

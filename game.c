@@ -19,7 +19,7 @@ enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
 
-#define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
+#define CALL_FOV_FCN() fov_line( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 
 void gameOver() {
 	log0("game over...\n");
@@ -337,6 +337,10 @@ int main( int argc, char *args[]) {
 	running = 1;
 	run();
 
-	log0("Program over\nPeace\n");
+	
+	log0("Program over\nDeallocating because I'm just OCD like that\n");
+	SDL_RenderClear( renderer);
+	SDL_DestroyRenderer( renderer);
+	//freeTextures( textures);
 	return 0;
 }

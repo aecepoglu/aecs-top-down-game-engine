@@ -89,4 +89,21 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	return result;
 }
 
+void freeTextures( struct GameTextures* textures) {
+	int i,j,k;
+	for( i=0; i<go_NUM_ITEMS; i++) {
+		for( j=0; j< sizeof(textures->obj[i]) / sizeof(SDL_Texture**); j++) {
+			for( k=0; k<4; k++) {
+				free( textures->obj[i][j][k]);
+			}
+		}
+	}
+	free( textures->obj);
+
+	free( textures->trn[ TEXTURE_TRN_NONE]);
+	free( textures->trn[ TEXTURE_TRN_GND	]);
+	free( textures->trn[ TEXTURE_TRN_WALL]);
+	free( textures->trn);
+}
+
 #undef SPRITE_TILE_LEN

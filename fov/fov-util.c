@@ -52,9 +52,9 @@ struct FOVBase** init_fovBase( int range) {
 			}
 
 			n->neighbours[ dir_left] 	= n->pos.i<=0 && i>0 			? &result[i-1][j] : NULL;
-			n->neighbours[ dir_right] 	= n->pos.i>=0 && i<= 2*range 	? &result[i+1][j] : NULL;
+			n->neighbours[ dir_right] 	= n->pos.i>=0 && i<2*range 	? &result[i+1][j] : NULL;
 			n->neighbours[ dir_up] 		= n->pos.j<=0 && j>0 			? &result[i][j-1] : NULL;
-			n->neighbours[ dir_down] 	= n->pos.j>=0 && j<=2*range 	? &result[i][j+1] : NULL;
+			n->neighbours[ dir_down] 	= n->pos.j>=0 && j<2*range 	? &result[i][j+1] : NULL;
 		}
 	}
 
