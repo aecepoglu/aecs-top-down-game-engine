@@ -19,7 +19,7 @@ enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
 
-#define CALL_FOV_FCN() fov_line( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
+#define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 
 void gameOver() {
 	log0("game over...\n");
@@ -161,7 +161,7 @@ void update() {
 	
 	unsigned int i;
 
-	struct object **newObjList = (struct object**)calloc( myMap->objListSize, sizeof( struct object*)); //instead of reallocating this array, keep it and swap between it and the actual list
+	struct object **newObjList = (struct object**)calloc( myMap->objListSize, sizeof( struct object*)); //TODO instead of reallocating this array, keep it and swap between it and the actual list
 	int newCount = 0;
 
 	struct object *obj;

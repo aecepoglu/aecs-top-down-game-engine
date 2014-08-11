@@ -7,6 +7,8 @@ void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int ran
 	for( i=0; i<2*range + 1; i++) {
 		for( j=0; j<2*range + 1; j++) {
 			tiles[i][j] = terrain_dark;
+			fovBase[i][j].lowerLimVisible = false;
+			fovBase[i][j].upperLimVisible = false;
 		}
 	}
 	log3("reset tiles\n");
@@ -31,6 +33,8 @@ void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int ran
 			struct ViewObject *vo = &objsSeen[ *objsSeenCount];
 			vo->obj = map->objs[ mapPos.i][ mapPos.j];
 			vo->isFullySeen = true;
+			fovBase[ tilesPos.i][ tilesPos.j].lowerLimVisible = true;
+			fovBase[ tilesPos.i][ tilesPos.j].upperLimVisible = true;
 			vectorClone( &vo->pos, &tilesPos);
 
 			*objsSeenCount = *objsSeenCount + 1;
