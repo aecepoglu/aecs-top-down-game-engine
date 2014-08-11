@@ -19,7 +19,7 @@ SDL_Texture *loadTexture( SDL_Renderer *ren, const char *path){
 	return tex;
 }
 
-SDL_Texture ***loadTextureSheet( SDL_Renderer *ren, const char *path) {
+struct TextureSheet* loadTextureSheet( SDL_Renderer *ren, const char *path) {
     log1( "\tLoading sheet %s\n", path);
 	SDL_Surface *img = IMG_Load( path);
 
@@ -31,8 +31,9 @@ SDL_Texture ***loadTextureSheet( SDL_Renderer *ren, const char *path) {
 	log0( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 	assert(numStates >= 2);
 
-	SDL_Texture ***result = calloc( numStates, sizeof(SDL_Texture **));
-
+	struct TextureSheet *result = (struct TextureSheet*)malloc( sizeof( struct TextureSheet));
+	result->numStates = numStates;
+	result->textures = (SDL_Texture***)calloc( numStates, sizeof( SDL_Texture**));
 
 
 	SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, SPRITE_TILE_LEN, SPRITE_TILE_LEN, img->format->BitsPerPixel, img->format->Rmask, img->format->Gmask, img->format->Bmask, img->format->Amask);
@@ -43,7 +44,7 @@ SDL_Texture ***loadTextureSheet( SDL_Renderer *ren, const char *path) {
 	int state, rot;
 	for( state=0; state<numStates; state++) {
 		surfRect.y = state * SPRITE_TILE_LEN;
-		result[state] = calloc( 4, sizeof(SDL_Texture*));
+		result->textures[state] = calloc( 4, sizeof(SDL_Texture*));
 		for( rot=0; rot<4; rot++) {
 			surfRect.x = (rot % numRotations)*SPRITE_TILE_LEN;
 	
@@ -51,7 +52,7 @@ SDL_Texture ***loadTextureSheet( SDL_Renderer *ren, const char *path) {
 			if (SDL_BlitSurface( img, &surfRect, blitSurf, NULL) != 0)
 				printf("SDL_BlitSurface failed: %s\n", SDL_GetError());
 
-			result[state][rot] = SDL_CreateTextureFromSurface( ren, blitSurf);
+			result->textures[state][rot] = SDL_CreateTextureFromSurface( ren, blitSurf);
 		}
 	}
 	SDL_FreeSurface(img);
@@ -76,7 +77,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->trn[ TEXTURE_TRN_GND 		] = loadTexture( ren, "res/ground.png");
 	result->trn[ TEXTURE_TRN_WALL 		] = loadTexture( ren, "res/brick.png");
 
-	result->obj = calloc( go_NUM_ITEMS, sizeof(SDL_Texture***));
+	result->obj = calloc( go_NUM_ITEMS, sizeof(struct TextureSheet*));
 
 	result->obj[ go_player] = loadTextureSheet( ren, "res/player.png");
 	result->obj[ go_leftTurner] = loadTextureSheet( ren, "res/left-turner.png");
@@ -92,18 +93,22 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 void freeTextures( struct GameTextures* textures) {
 	int i,j,k;
 	for( i=0; i<go_NUM_ITEMS; i++) {
-		for( j=0; j< sizeof(textures->obj[i]) / sizeof(SDL_Texture**); j++) {
+		for( j=0; j<textures->obj[i]->numStates; j++) {
 			for( k=0; k<4; k++) {
-				free( textures->obj[i][j][k]);
+				SDL_DestroyTexture( textures->obj[i]->textures[j][k]);
 			}
+			free( textures->obj[i]->textures[j]);
 		}
+		free( textures->obj[i]->textures);
+		free( textures->obj[i]);
 	}
 	free( textures->obj);
 
-	free( textures->trn[ TEXTURE_TRN_NONE]);
-	free( textures->trn[ TEXTURE_TRN_GND	]);
-	free( textures->trn[ TEXTURE_TRN_WALL]);
+	for( i=0; i<TEXTURES_COUNT_TERRAIN; i++) {
+		SDL_DestroyTexture( textures->trn[ i]);
+	}
 	free( textures->trn);
+	free( textures);
 }
 
 #undef SPRITE_TILE_LEN

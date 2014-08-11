@@ -38,4 +38,6 @@ void objectUse( struct object *obj1, struct object *obj2);
 void objectSwallow( struct object *obj1, struct object *obj2);
 bool objectHit( struct object *obj1, struct object *obj2);
 
+void objectFree( struct object *obj);
+
 #endif //OBJECT_H

@@ -49,7 +49,7 @@ void drawObjects() {
 			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
 				log3("drawing object %d\n", i);
 				drawTexture( renderer, 
-					textures->obj[obj->type][ obj->visualState][obj->dir], 
+					textures->obj[obj->type]->textures[ obj->visualState][obj->dir], 
 					screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
 			}
 		}

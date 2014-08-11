@@ -68,6 +68,13 @@ struct FOVBase** init_fovBase( int range) {
 	return result;
 }
 
+void free_fovBase( struct FOVBase **fovBase) {
+	int i;
+	for( i=0; i<sizeof(fovBase)/sizeof(struct FOVBase*); i++) {
+		free( fovBase[i]);
+	}
+}
+
 void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tiles, int range, struct ViewObject *objsSeen, int *objsSeenCount) {
 	*objsSeenCount = 0;
 

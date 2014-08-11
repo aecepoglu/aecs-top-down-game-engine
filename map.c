@@ -310,3 +310,25 @@ struct BasePfNode*** createPfBase( enum terrainType **tiles, unsigned int width,
 
 	return nodes;
 }
+
+void freeMap( struct Map *map) {
+	int i,j;
+	for( i=0; i<map->width; i++) {
+		free( map->tiles[i]);
+		free( map->objs[i]);
+		for( j=0; j<map->height; j++) {
+			free( map->pfBase[i][j]);
+		}
+		free( map->pfBase[i]);
+	}
+	free(map->tiles);
+	free(map->objs);
+	free(map->pfBase);
+
+	for( i=0; i<map->objListCount; i++) {
+		objectFree( map->objList[i]);
+	}
+	free( map->objList);
+
+	free(map);
+}

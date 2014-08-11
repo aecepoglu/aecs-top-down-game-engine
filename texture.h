@@ -13,10 +13,14 @@
 #define TEXTURE_TRN_NONE 		2
 #define TEXTURES_COUNT_TERRAIN	3
 
+struct TextureSheet {
+	SDL_Texture ***textures;
+	int numStates;
+};
 
 struct GameTextures {
 	SDL_Texture **trn;
-	SDL_Texture ****obj;
+	struct TextureSheet **obj;
 };
 
 
@@ -25,7 +29,7 @@ struct GameTextures {
 */
 SDL_Texture* loadTexture( SDL_Renderer *ren, const char *path);
 
-SDL_Texture*** loadTextureSheet( SDL_Renderer *ren, const char *path);
+struct TextureSheet* loadTextureSheet( SDL_Renderer *ren, const char *path);
 
 /* Draws given texture 'tex' inside the given rectangle
 */

@@ -78,4 +78,6 @@ bool checkMapValidity( struct Map *map);
 
 struct BasePfNode ***createPfBase( enum terrainType **tiles, unsigned int width, unsigned int height);
 
+void freeMap( struct Map *map);
+
 #endif //MAP_H

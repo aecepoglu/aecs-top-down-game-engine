@@ -81,3 +81,10 @@ void objectSwallow( struct object *obj1, struct object *obj2) {
 		obj2->isDeleted = true;
 	}
 }
+
+void objectFree( struct object *obj) {
+	if( obj->ai) {
+		AI_DESTROY( obj->ai);
+	}
+	free( obj);
+}

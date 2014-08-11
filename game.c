@@ -144,9 +144,9 @@ void draw() {
 	for( i=0; i<objsSeenCount; i++) {
 		vo = &objsSeen[ i];
 		if( vo->isFullySeen)
-			drawTexture( renderer, textures->obj[ vo->obj->type ][ vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+			drawTexture( renderer, textures->obj[ vo->obj->type ]->textures[ vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
 		else
-			drawTexture( renderer, textures->obj[ go_apple ][ 0][ 0], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+			drawTexture( renderer, textures->obj[ go_apple ]->textures[ 0][ 0], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
 		
 		if( vo->obj->ai)
 			AI_SEEN( vo->obj->ai);
@@ -188,6 +188,9 @@ void update() {
 		free( myMap->objList);
 		myMap->objList = newObjList;
 		myMap->objListCount = newCount;
+	}
+	else {
+		free( newObjList);
 	}
 
 	getFovObjects( myMap, &player->pos, playerVisibleTiles, VIEW_RANGE, objsSeen, &objsSeenCount);
@@ -339,8 +342,11 @@ int main( int argc, char *args[]) {
 
 	
 	log0("Program over\nDeallocating because I'm just OCD like that\n");
+	freeTextures( textures);
 	SDL_RenderClear( renderer);
 	SDL_DestroyRenderer( renderer);
-	//freeTextures( textures);
+	SDL_DestroyWindow( window);
+	free_fovBase( fovBase);
+	freeMap( myMap);
 	return 0;
 }
