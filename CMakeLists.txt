@@ -30,6 +30,10 @@ add_executable(aec-game game.c ${ALL_SOURCE_FILES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
+add_executable(gui-test log.h sdl2gui/gui-test.c sdl2gui/sdl2gui.h)
+target_link_libraries(gui-test ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
+include_directories(gui-test ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
+
 target_link_libraries(levelEditor m)
 target_link_libraries(aec-game m)
 
