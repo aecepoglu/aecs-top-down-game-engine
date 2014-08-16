@@ -4,10 +4,12 @@
 
 #include "../log.h"
 #include "../basic.h"
+#include "../texture.h"
 
 SDL_Window *window;
 SDL_Renderer *renderer;
 bool running;
+struct GameTextures *textures;
 
 void quit( const char *msg) {
 	//TODO handle the termination properly.
@@ -58,6 +60,18 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 void draw() {
 	log3("draw\n");
 	SDL_RenderClear( renderer);
+
+	char *text1 = "quick brown fox jumps over the lazy dog! Or did he?";
+	//char *text2 = "QUICK BROWN FOX JUMPS OVER THE LAZY DOG! Or did he?";
+
+	int i = 0;
+	char c = text1[i];
+	while( c != '\0') {
+		drawTexture( renderer, textures->font[c-32], i*10, 10, 10, 20);
+		i++;
+		c = text1[i];
+	}
+
 	SDL_RenderPresent( renderer);
 }
 
@@ -141,6 +155,7 @@ void init() {
 int main( int argc, char *args[]) {
 	init();
 
+	textures = loadAllTextures( renderer);
 	log0("All set and ready\nStarting...\n");
 
 	running = 1;

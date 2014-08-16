@@ -21,6 +21,7 @@ struct TextureSheet {
 struct GameTextures {
 	SDL_Texture **trn;
 	struct TextureSheet **obj;
+	SDL_Texture **font;
 };
 
 

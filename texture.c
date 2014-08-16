@@ -87,31 +87,18 @@ struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const char *path) {
 	result->textures = loadTexturesIntoTable( texturesList, numStates*numRotations, numStates, 4);
 
 	free( texturesList);
+	SDL_FreeSurface( img);
 
-	//result->textures = (SDL_Texture***)calloc( numStates, sizeof( SDL_Texture**));
-	//
-	//
-	//SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, SPRITE_TILE_LEN, SPRITE_TILE_LEN, img->format->BitsPerPixel, img->format->Rmask, img->format->Gmask, img->format->Bmask, img->format->Amask);
-	//SDL_Rect surfRect;
-	//surfRect.w = SPRITE_TILE_LEN;
-	//surfRect.h = SPRITE_TILE_LEN;
+	return result;
+}
 
-	//int state, rot;
-	//for( state=0; state<numStates; state++) {
-	//	surfRect.y = state * SPRITE_TILE_LEN;
-	//	result->textures[state] = calloc( 4, sizeof(SDL_Texture*));
-	//	for( rot=0; rot<4; rot++) {
-	//		surfRect.x = (rot % numRotations)*SPRITE_TILE_LEN;
-	//
-	//		SDL_FillRect( blitSurf, NULL, 0);
-	//		if (SDL_BlitSurface( img, &surfRect, blitSurf, NULL) != 0)
-	//			log0("SDL_BlitSurface failed: %s\n", SDL_GetError());
+SDL_Texture** loadFontSheet( SDL_Renderer *ren, const char *path) {
+	SDL_Surface *img = IMG_Load( path);
+	assert( img != NULL);
 
-	//		result->textures[state][rot] = SDL_CreateTextureFromSurface( ren, blitSurf);
-	//	}
-	//}
-	//SDL_FreeSurface(img);
-	//SDL_FreeSurface(blitSurf);
+	SDL_Texture **result = loadTextureSheet( ren, img, 3, 32, img->w/32, img->h/3);
+
+	SDL_FreeSurface( img);
 	return result;
 }
 
@@ -141,6 +128,8 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_creeperPlant] = loadObjTextures( ren, "res/creeper.png");
 	result->obj[ go_peekaboo] = loadObjTextures( ren, "res/peekaboo.png");
 	result->obj[ go_weepingAngel] = loadObjTextures( ren, "res/weepingAngel.png");
+
+	result->font = loadFontSheet( ren, "res/font-sheet.png");
 	
 	return result;
 }
