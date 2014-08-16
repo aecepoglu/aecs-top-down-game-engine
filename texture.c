@@ -19,44 +19,99 @@ SDL_Texture *loadTexture( SDL_Renderer *ren, const char *path){
 	return tex;
 }
 
-struct TextureSheet* loadTextureSheet( SDL_Renderer *ren, const char *path) {
+/* Loads a texture sheet into a 1d array*/
+SDL_Texture** loadTextureSheet( SDL_Renderer *ren, SDL_Surface *sheet, int inNumRows, int inNumCols, int unitWidth, int unitHeight) {
+	assert( sheet->w == inNumCols * unitWidth);
+	assert( sheet->h == inNumRows * unitHeight);
+
+	SDL_Texture **result = (SDL_Texture**)calloc( inNumRows * inNumCols, sizeof( SDL_Texture **));
+
+	SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, unitWidth, unitHeight, sheet->format->BitsPerPixel, sheet->format->Rmask, sheet->format->Gmask, sheet->format->Bmask, sheet->format->Amask);
+	
+	SDL_Rect surfRect;
+	surfRect.w = unitWidth;
+	surfRect.h = unitHeight;
+
+	int row, col;
+	for( row=0; row<inNumRows; row++) {
+		surfRect.y = row * unitHeight;
+		for( col=0; col<inNumCols; col++) {
+			surfRect.x = col * unitWidth;
+
+			SDL_FillRect( blitSurf, NULL, 0);
+			if (SDL_BlitSurface( sheet, &surfRect, blitSurf, NULL) != 0)
+				log0("SDL_BlitSurface failed: %s\n", SDL_GetError());
+			result[ row*inNumCols + col] = SDL_CreateTextureFromSurface( ren, blitSurf);
+			log3("loadTextureSheet: %d <- (%d, %d)\n", row*inNumCols + col, surfRect.x, surfRect.y);
+		}
+	}
+
+	SDL_FreeSurface( blitSurf);
+	return result;
+}
+
+/* takes a 1d list of textures, and returns a 2d array of textures
+*/
+SDL_Texture*** loadTexturesIntoTable( SDL_Texture **list, int listLen, int outNumRows, int outNumCols) {
+	assert( (outNumRows * outNumCols) % listLen == 0);
+	int rowJumpLen = listLen / outNumRows;
+
+	SDL_Texture ***table = (SDL_Texture***)calloc( outNumRows, sizeof( SDL_Texture**));
+	int row, col;
+	for( row=0; row<outNumRows; row++) {
+		table[ row] = (SDL_Texture**)calloc( outNumCols, sizeof( SDL_Texture*));
+		for( col=0; col<outNumCols; col++) {
+			table[ row][ col] = list[ row*rowJumpLen + col%rowJumpLen];
+			log3("loadTexturesIntoTablo: table[%d,%d] <- #%d\n", row, col, row*rowJumpLen + col%rowJumpLen);
+		}
+	}
+
+	return table;
+}
+
+struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const char *path) {
     log1( "\tLoading sheet %s\n", path);
 	SDL_Surface *img = IMG_Load( path);
-
 	assert( img != NULL);
 
 	int numRotations = img->w / SPRITE_TILE_LEN;
-
 	int numStates = img->h / SPRITE_TILE_LEN;
-	log0( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 	assert(numStates >= 2);
+	log0( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 
 	struct TextureSheet *result = (struct TextureSheet*)malloc( sizeof( struct TextureSheet));
-	result->numStates = numStates;
-	result->textures = (SDL_Texture***)calloc( numStates, sizeof( SDL_Texture**));
-
-
-	SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, SPRITE_TILE_LEN, SPRITE_TILE_LEN, img->format->BitsPerPixel, img->format->Rmask, img->format->Gmask, img->format->Bmask, img->format->Amask);
-	SDL_Rect surfRect;
-	surfRect.w = SPRITE_TILE_LEN;
-	surfRect.h = SPRITE_TILE_LEN;
-
-	int state, rot;
-	for( state=0; state<numStates; state++) {
-		surfRect.y = state * SPRITE_TILE_LEN;
-		result->textures[state] = calloc( 4, sizeof(SDL_Texture*));
-		for( rot=0; rot<4; rot++) {
-			surfRect.x = (rot % numRotations)*SPRITE_TILE_LEN;
 	
-			SDL_FillRect( blitSurf, NULL, 0);
-			if (SDL_BlitSurface( img, &surfRect, blitSurf, NULL) != 0)
-				printf("SDL_BlitSurface failed: %s\n", SDL_GetError());
+	SDL_Texture **texturesList = loadTextureSheet( ren, img, numStates, numRotations, SPRITE_TILE_LEN, SPRITE_TILE_LEN);
 
-			result->textures[state][rot] = SDL_CreateTextureFromSurface( ren, blitSurf);
-		}
-	}
-	SDL_FreeSurface(img);
-	SDL_FreeSurface(blitSurf);
+	result->numStates = numStates;
+	result->textures = loadTexturesIntoTable( texturesList, numStates*numRotations, numStates, 4);
+
+	free( texturesList);
+
+	//result->textures = (SDL_Texture***)calloc( numStates, sizeof( SDL_Texture**));
+	//
+	//
+	//SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, SPRITE_TILE_LEN, SPRITE_TILE_LEN, img->format->BitsPerPixel, img->format->Rmask, img->format->Gmask, img->format->Bmask, img->format->Amask);
+	//SDL_Rect surfRect;
+	//surfRect.w = SPRITE_TILE_LEN;
+	//surfRect.h = SPRITE_TILE_LEN;
+
+	//int state, rot;
+	//for( state=0; state<numStates; state++) {
+	//	surfRect.y = state * SPRITE_TILE_LEN;
+	//	result->textures[state] = calloc( 4, sizeof(SDL_Texture*));
+	//	for( rot=0; rot<4; rot++) {
+	//		surfRect.x = (rot % numRotations)*SPRITE_TILE_LEN;
+	//
+	//		SDL_FillRect( blitSurf, NULL, 0);
+	//		if (SDL_BlitSurface( img, &surfRect, blitSurf, NULL) != 0)
+	//			log0("SDL_BlitSurface failed: %s\n", SDL_GetError());
+
+	//		result->textures[state][rot] = SDL_CreateTextureFromSurface( ren, blitSurf);
+	//	}
+	//}
+	//SDL_FreeSurface(img);
+	//SDL_FreeSurface(blitSurf);
 	return result;
 }
 
@@ -79,13 +134,13 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 
 	result->obj = calloc( go_NUM_ITEMS, sizeof(struct TextureSheet*));
 
-	result->obj[ go_player] = loadTextureSheet( ren, "res/player.png");
-	result->obj[ go_leftTurner] = loadTextureSheet( ren, "res/left-turner.png");
-	result->obj[ go_apple] = loadTextureSheet( ren, "res/apple.png");
-	result->obj[ go_flower] = loadTextureSheet( ren, "res/flower.png");
-	result->obj[ go_creeperPlant] = loadTextureSheet( ren, "res/creeper.png");
-	result->obj[ go_peekaboo] = loadTextureSheet( ren, "res/peekaboo.png");
-	result->obj[ go_weepingAngel] = loadTextureSheet( ren, "res/weepingAngel.png");
+	result->obj[ go_player] = loadObjTextures( ren, "res/player.png");
+	result->obj[ go_leftTurner] = loadObjTextures( ren, "res/left-turner.png");
+	result->obj[ go_apple] = loadObjTextures( ren, "res/apple.png");
+	result->obj[ go_flower] = loadObjTextures( ren, "res/flower.png");
+	result->obj[ go_creeperPlant] = loadObjTextures( ren, "res/creeper.png");
+	result->obj[ go_peekaboo] = loadObjTextures( ren, "res/peekaboo.png");
+	result->obj[ go_weepingAngel] = loadObjTextures( ren, "res/weepingAngel.png");
 	
 	return result;
 }

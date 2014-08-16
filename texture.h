@@ -29,8 +29,6 @@ struct GameTextures {
 */
 SDL_Texture* loadTexture( SDL_Renderer *ren, const char *path);
 
-struct TextureSheet* loadTextureSheet( SDL_Renderer *ren, const char *path);
-
 /* Draws given texture 'tex' inside the given rectangle
 */
 void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int h);
