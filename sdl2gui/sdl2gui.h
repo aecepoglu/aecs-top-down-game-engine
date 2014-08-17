@@ -24,6 +24,9 @@ void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font);
 void SDLGUI_Add_Element( struct SDLGUI_Element *element);
 void SDLGUI_Draw();
 void SDLGUI_Destroy();
+int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e);
+void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e);
+
 
 struct SDLGUI_Element* SDLGUI_Create_Element( int xPos, int yPos, int width, int height, void *data, SDLGUI_Clicked *clicked, SDLGUI_Destructor *dtor, SDLGUI_DrawFun *drawFun);
 #define SDLGUI_Destroy_Element( element) (element)->destructor( element)

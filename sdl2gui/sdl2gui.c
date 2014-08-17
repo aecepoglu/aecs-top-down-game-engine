@@ -11,11 +11,15 @@ struct SDLGUI_Core {
 	SDL_Texture **font;
 
 	struct SDLGUI_List elements;
+
+	struct SDLGUI_Element *mouseDownElement;
 } guiCore;
 
 /* ---------------------
 	SDLGUI Core
 */
+
+#define IS_POINT_IN_RECT( p, r) 
 
 void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font) {
 	guiCore.renderer = renderer;
@@ -36,7 +40,26 @@ void SDLGUI_Draw() {
 		guiCore.elements.list[i]->drawFun( guiCore.elements.list[i]);
 	}
 
-	log0("sdlgui_draw()\n");
+	log3("sdlgui_draw()\n");
+}
+
+int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
+	struct SDLGUI_Element *elem;
+	int i;
+	for(i=0; i<guiCore.elements.count; i++) {
+		elem = guiCore.elements.list[i];
+		if (e->x >= elem->rect.x && e->y >= elem->rect.y && e->x<elem->rect.x+elem->rect.w && e->y<elem->rect.y+elem->rect.h) {
+			guiCore.mouseDownElement = elem;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e) {
+	if( guiCore.mouseDownElement->clicked != 0)
+		guiCore.mouseDownElement->clicked( guiCore.mouseDownElement);
+	guiCore.mouseDownElement = NULL;
 }
 
 void SDLGUI_Add_Element( struct SDLGUI_Element *element) {

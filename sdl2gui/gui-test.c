@@ -14,13 +14,16 @@ SDL_Renderer *renderer;
 bool running;
 struct GameTextures *textures;
 
+bool mouseDownInGui = false;
+bool mouseDownStarted = false;
+
 
 //SDL_Texture *coloredText;
 //int width, height;
 
 void quit( const char *msg) {
-	//TODO handle the termination properly.
 	fprintf(stderr, "Error msg: \"%s\"\n", msg);
+	freeTextures( textures);
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
 	SDL_Quit();
@@ -131,21 +134,34 @@ void run() {
 				break;
 			case SDL_KEYDOWN:
 				log1("key down\n");
-				handleKey( (SDL_KeyboardEvent*)&e);
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				log0("mouse button down\n");
-				break;
-			case SDL_MOUSEMOTION:
-				log0("mouse motion\n");
 				break;
 			case SDL_KEYUP:
+				handleKey( (SDL_KeyboardEvent*)&e);
+				break;
 			case SDL_MOUSEBUTTONUP:
-				/*don't do anything for those events*/
+				mouseDownStarted = false;
+				if( mouseDownInGui) {
+					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
+				}
+				else {
+					log0("level-editor mouse up\n");
+				}
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
+					mouseDownInGui=true;
+				}
+				else {
+					mouseDownInGui = false;
+					log0("level-editor mouse down\n");
+				}
+				break;
+			case SDL_MOUSEMOTION:
+				log3("mouse motion\n");
 				continue;
-			default:
-				log1("unhandled event type: %d\n", e.type);
-				continue;
+			//default:
+			//	log1("unhandled event type: %d\n", e.type);
+			//	continue;
 		};
 		draw();
 	}
@@ -182,14 +198,6 @@ int main( int argc, char *args[]) {
 
 	log0("Program over\nPeace\n");
 	SDLGUI_Destroy();
-	log0("gui destroyed\n");
-	freeTextures( textures);
-	quit("Willingly quitting\n");
-	//SDL_DestroyRenderer( renderer);
-	//log0("renderer destroyed\n");
-	//SDL_DestroyWindow( window);
-	//log0("window destroyed\n");
-	//SDL_Quit();
-	log0("returning 0 and out\n");
+	quit("Willingly quitting");
 	return 0;
 }
