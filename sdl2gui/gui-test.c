@@ -5,11 +5,18 @@
 #include "../log.h"
 #include "../basic.h"
 #include "../texture.h"
+#include "../text.h"
+
+#include "sdl2gui.h"
 
 SDL_Window *window;
 SDL_Renderer *renderer;
 bool running;
 struct GameTextures *textures;
+
+
+//SDL_Texture *coloredText;
+//int width, height;
 
 void quit( const char *msg) {
 	//TODO handle the termination properly.
@@ -59,18 +66,19 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 
 void draw() {
 	log3("draw\n");
+	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);
 	SDL_RenderClear( renderer);
 
-	char *text1 = "quick brown fox jumps over the lazy dog! Or did he?";
-	//char *text2 = "QUICK BROWN FOX JUMPS OVER THE LAZY DOG! Or did he?";
+	char *text1 = "quick brown fox jumps over the lazy dog!";
+	drawText( renderer, textures->font, text1, 10, 10, 6, 8);
+	drawText( renderer, textures->font, text1, 10, 30, 12, 16);
+	drawText( renderer, textures->font, text1, 10, 70, 18, 24);
 
-	int i = 0;
-	char c = text1[i];
-	while( c != '\0') {
-		drawTexture( renderer, textures->font[c-32], i*10, 10, 10, 20);
-		i++;
-		c = text1[i];
-	}
+	//drawTexture( renderer, coloredText, 150, 150, width, height);
+
+	SDLGUI_Draw();
+
+
 
 	SDL_RenderPresent( renderer);
 }
@@ -146,24 +154,42 @@ void run() {
 
 void init() {
 	assert( SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER) >= 0);
-	window = SDL_CreateWindow("sdl-window", 0, 0, 400, 400, 0);
+	window = SDL_CreateWindow("sdl-window", 0, 0, 800, 400, 0);
 	assert( window);
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	assert( renderer);
+}
+
+void myButton_clicked( struct SDLGUI_Element *from) {
+	log0("my button clicked\n");
 }
 
 int main( int argc, char *args[]) {
 	init();
 
 	textures = loadAllTextures( renderer);
+	SDLGUI_Init( renderer, textures->font);
+	int color[4] = {255,0,0,0};
+	struct SDLGUI_Element *myButton = SDLGUI_Create_Text( 10, 20, 200, 100, &myButton_clicked, "my button", (int[4]){255,0,0,0}, color);
+	SDLGUI_Add_Element( myButton);
+
+
 	log0("All set and ready\nStarting...\n");
+	//coloredText = getTextTexture( "red", 12, 20, 255, 0, 0, &width, &height);
 
 	running = 1;
 	run();
 
 	log0("Program over\nPeace\n");
-	SDL_DestroyRenderer( renderer);
-	SDL_DestroyWindow( window);
-	SDL_Quit();
+	SDLGUI_Destroy();
+	log0("gui destroyed\n");
+	freeTextures( textures);
+	quit("Willingly quitting\n");
+	//SDL_DestroyRenderer( renderer);
+	//log0("renderer destroyed\n");
+	//SDL_DestroyWindow( window);
+	//log0("window destroyed\n");
+	//SDL_Quit();
+	log0("returning 0 and out\n");
 	return 0;
 }
