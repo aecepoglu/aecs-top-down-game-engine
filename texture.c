@@ -135,11 +135,20 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 }
 
 void freeTextures( struct GameTextures* textures) {
-	int i,j,k;
+	int i,j,k,tmpK;
 	for( i=0; i<go_NUM_ITEMS; i++) {
 		for( j=0; j<textures->obj[i]->numStates; j++) {
 			for( k=0; k<4; k++) {
-				SDL_DestroyTexture( textures->obj[i]->textures[j][k]);
+				if( textures->obj[i]->textures[j][k] != NULL) {
+					SDL_DestroyTexture( textures->obj[i]->textures[j][k]);
+
+					/* in those rotations, there can be multiple elements pointing to the same texture.
+						mark those that point to the same texture with NULL
+					*/
+					for( tmpK=k+1; tmpK<4; tmpK++)
+						if( textures->obj[i]->textures[j][tmpK] == textures->obj[i]->textures[j][k])
+							textures->obj[i]->textures[j][tmpK] = NULL;
+				}
 			}
 			free( textures->obj[i]->textures[j]);
 		}
@@ -152,6 +161,12 @@ void freeTextures( struct GameTextures* textures) {
 		SDL_DestroyTexture( textures->trn[ i]);
 	}
 	free( textures->trn);
+
+	for( i=0; i<96; i++) {
+		SDL_DestroyTexture( textures->font[i]);
+	}
+	free( textures->font);
+
 	free( textures);
 }
 
