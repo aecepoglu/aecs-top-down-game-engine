@@ -18,9 +18,6 @@ bool mouseDownInGui = false;
 bool mouseDownStarted = false;
 
 
-//SDL_Texture *coloredText;
-//int width, height;
-
 void quit( const char *msg) {
 	fprintf(stderr, "Error msg: \"%s\"\n", msg);
 	freeTextures( textures);
@@ -69,7 +66,7 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 
 void draw() {
 	log3("draw\n");
-	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);
+	SDL_SetRenderDrawColor( renderer, 0, 150, 0, 255);
 	SDL_RenderClear( renderer);
 
 	char *text1 = "quick brown fox jumps over the lazy dog!";
@@ -77,11 +74,7 @@ void draw() {
 	drawText( renderer, textures->font, text1, 10, 30, 12, 16);
 	drawText( renderer, textures->font, text1, 10, 70, 18, 24);
 
-	//drawTexture( renderer, coloredText, 150, 150, width, height);
-
 	SDLGUI_Draw();
-
-
 
 	SDL_RenderPresent( renderer);
 }
@@ -170,7 +163,7 @@ void run() {
 
 void init() {
 	assert( SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER) >= 0);
-	window = SDL_CreateWindow("sdl-window", 0, 0, 800, 400, 0);
+	window = SDL_CreateWindow("sdl-window", 0, 0, 800, 600, 0);
 	assert( window);
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	assert( renderer);
@@ -185,13 +178,11 @@ int main( int argc, char *args[]) {
 
 	textures = loadAllTextures( renderer);
 	SDLGUI_Init( renderer, textures->font);
-	int color[4] = {255,0,0,0};
-	struct SDLGUI_Element *myButton = SDLGUI_Create_Text( 10, 20, 200, 100, &myButton_clicked, "my button", (int[4]){255,0,0,0}, color);
+	struct SDLGUI_Element *myButton = SDLGUI_Create_Text( 10, 20, 200, 100, &myButton_clicked, "my button", (int[4]){255,0,255,0}, (int[4]){200,200,200,255}, 12, 20);
 	SDLGUI_Add_Element( myButton);
 
 
 	log0("All set and ready\nStarting...\n");
-	//coloredText = getTextTexture( "red", 12, 20, 255, 0, 0, &width, &height);
 
 	running = 1;
 	run();

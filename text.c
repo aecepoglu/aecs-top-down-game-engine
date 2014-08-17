@@ -19,7 +19,7 @@ void drawText( SDL_Renderer *ren, SDL_Texture **font, const char *text, int xPos
 	}
 }
 
-SDL_Texture* getTextTexture( SDL_Renderer *ren, SDL_Texture **font, const char *text, int charWidth, int charHeight, int R, int G, int B, int *width, int *height) {
+SDL_Texture* getTextTexture( SDL_Renderer *ren, SDL_Texture **font, const char *text, int charWidth, int charHeight, int bgColor[4], int R, int G, int B, int *width, int *height) {
 	
 	int numRows=1, numCols=0;
 	int i=0, x=0;
@@ -38,19 +38,37 @@ SDL_Texture* getTextTexture( SDL_Renderer *ren, SDL_Texture **font, const char *
 	}
 	numCols = MAX( numCols, x);
 
-	SDL_Texture *result = SDL_CreateTexture( ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, charWidth*numCols, charHeight*numRows) ;
-	SDL_SetRenderTarget( ren, result);
+	int textWidth = charWidth*numCols;
+	int textHeight = charHeight*numRows;
 
+	SDL_Texture *result = SDL_CreateTexture( ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textWidth, textHeight) ;
+	SDL_SetRenderTarget( ren, result);
+	SDL_SetRenderDrawColor( ren, bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
+	SDL_RenderClear( ren);
+
+	SDL_Texture *container= SDL_CreateTexture( ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textWidth, textHeight) ;
+	SDL_SetRenderTarget( ren, container);
+	SDL_SetRenderDrawColor( ren, 0,0,0,0);
+	SDL_RenderClear( ren);
+
+	SDL_SetRenderTarget( ren, container);
 	drawText( ren, font, text, 0, 0, charWidth, charHeight);
+
+	SDL_SetTextureColorMod( container, R, G, B);
+
+	SDL_SetRenderTarget( ren, result);
+	SDL_SetTextureBlendMode( container, SDL_BLENDMODE_BLEND);
+	drawTexture( ren, container, 0, 0, textWidth, textHeight);
 
 	SDL_SetRenderTarget( ren, 0);
 
-	SDL_SetTextureColorMod( result, R, G, B);
 
 	if( width)
-		*width = charWidth*numCols;
+		*width = textWidth;
 	if( height)
-		*height = charHeight*numRows;
+		*height = textHeight;
 
+	SDL_DestroyTexture( container);
+	SDL_SetTextureBlendMode(result, SDL_BLENDMODE_BLEND);
 	return result;
 }

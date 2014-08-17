@@ -35,7 +35,7 @@ struct SDLGUI_Element* SDLGUI_Create_Element( int xPos, int yPos, int width, int
 void SDLGUI_Draw_Texture( struct SDLGUI_Element *element);
 void SDLGUI_Destroy_Texture( struct SDLGUI_Element *element);
 
-struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int height, SDLGUI_Clicked *clicked, const char *text, int bgColor[4], int fgColor[4]);
+struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int height, SDLGUI_Clicked *clicked, const char *text, int bgColor[4], int fgColor[4], int fontWidth, int fontHeight);
 
 struct SDLGUI_Element* SDLGUI_Create_Image( int xPos, int yPos, int width, int height, SDLGUI_Clicked *clicked, const char *imgPath, int bgColor[4]);
 

@@ -106,21 +106,38 @@ struct SDLGUI_Element* SDLGUI_Create_Element( int xPos, int yPos, int width, int
 	return e;
 }
 
-struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int height, SDLGUI_Clicked *clicked, const char *text, int bgColor[4], int fgColor[4]) {
-	
-	SDL_Texture *elementTexture = SDL_CreateTexture( guiCore.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height) ;
+SDL_Texture *createElementTexture( int width, int height, int bgColor[4], int borderColor[4], int borderThickness, SDL_Texture *fgTexture, int fgWidth, int fgHeight) {
+	SDL_Texture *texture = SDL_CreateTexture( guiCore.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height) ;
+	SDL_SetTextureBlendMode( texture, SDL_BLENDMODE_BLEND);
 
-	int textWidth, textHeight;
-	SDL_Texture *textTexture = getTextTexture( guiCore.renderer, guiCore.font, text, 6, 10, fgColor[0], fgColor[1], fgColor[2], &textWidth, &textHeight);
-	
-	SDL_SetRenderTarget( guiCore.renderer, elementTexture);
-	SDL_SetRenderDrawColor( guiCore.renderer, bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
+
+	SDL_SetRenderTarget( guiCore.renderer, texture);
+
+	SDL_SetRenderDrawColor( guiCore.renderer, borderColor[0], borderColor[1], borderColor[2], borderColor[3]);
 	SDL_RenderClear( guiCore.renderer);
 
-	drawText( guiCore.renderer, guiCore.font, text, xPos, yPos, 6, 10);
+	SDL_SetRenderDrawColor( guiCore.renderer, bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
+	SDL_Rect rect = {.x=borderThickness, .y=borderThickness, .w=width-2*borderThickness, .h=height-2*borderThickness};
+	SDL_RenderFillRect( guiCore.renderer, &rect);
+
+	//TODO assert width > fgWidth, height>fgHeight
+	rect.x = (width - fgWidth) / 2;
+	rect.y = (height - fgHeight) / 2;
+	rect.w = fgWidth;
+	rect.h = fgHeight;
+	SDL_RenderCopy( guiCore.renderer, fgTexture, NULL, &rect);
 
 	SDL_SetRenderTarget( guiCore.renderer, 0);
 
+	return texture;
+}
+
+struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int height, SDLGUI_Clicked *clicked, const char *text, int bgColor[4], int fgColor[4], int fontWidth, int fontHeight) {
+	
+	int textWidth, textHeight;
+	SDL_Texture *textTexture = getTextTexture( guiCore.renderer, guiCore.font, text, fontWidth, fontHeight, (int[4]){0,0,0,0}, fgColor[0], fgColor[1], fgColor[2], &textWidth, &textHeight);
+
+	SDL_Texture *elementTexture = createElementTexture( width, height, bgColor, fgColor, 2, textTexture, textWidth, textHeight);
 	SDL_DestroyTexture( textTexture);
 
 	return SDLGUI_Create_Texture( xPos, yPos, width, height, elementTexture, clicked);
