@@ -185,7 +185,7 @@ int main( int argc, char *args[]) {
 	struct SDLGUI_Element *myButton = SDLGUI_Create_Text( 10, 20, 200, 100, &myButton_clicked, "my button", (int[4]){255,0,255,0}, (int[4]){200,200,200,255}, 12, 20, 1, 0);
 	SDLGUI_Add_Element( myButton);
 
-	struct SDLGUI_Element *myPanel = SDLGUI_Create_Panel( 50, 150, 120, 320, (int[4]){150,150,150,255}, (int[4]){0,0,0,255}, 0, 0);
+	struct SDLGUI_Element *myPanel = SDLGUI_Create_Panel( 50, 150, 120, 320, (int[4]){150,150,150,255}, (int[4]){0,0,0,255}, 0);
 	struct SDLGUI_List *myPanelItems = SDLGUI_Get_Panel_Elements( myPanel);
 	SDLGUI_Add_Element( myPanel);
 
