@@ -19,6 +19,11 @@ struct SDLGUI_Element {
 	SDLGUI_DrawFun *drawFun;
 };
 
+struct SDLGUI_Panel_Data {
+    SDL_Texture *texture;
+    SDLGUI_List elements;
+};
+
 
 void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font);
 void SDLGUI_Add_Element( struct SDLGUI_Element *element);
@@ -39,12 +44,5 @@ struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int he
 
 struct SDLGUI_Element* SDLGUI_Create_Image( int xPos, int yPos, int width, int height, SDLGUI_Clicked *clicked, const char *imgPath, int bgColor[4]);
 
-
-/*
-
-mouse-down event is used for painting tiles etc on level
-mouse-up event is used for the 'click' event, used for buttons
-
-*/
 
 #endif /*SDL2GUI_H*/
