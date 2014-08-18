@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include "sdl2gui-list.h"
-#include "sdl2gui.h"
 
 void SDLGUI_List_Add( struct SDLGUI_List *list, struct SDLGUI_Element *item) {
 	if ( list->count == list->size) {
@@ -50,6 +49,12 @@ void SDLGUI_List_Destroy( struct SDLGUI_List *list, int freeSelf) {
 	free( list->list);
 	if( freeSelf)
 		free( list);
+}
+
+struct SDLGUI_List* SDLGUI_List_Create( int initSize) {
+	struct SDLGUI_List *x = (struct SDLGUI_List*)malloc( sizeof(struct SDLGUI_List));
+	SDLGUI_List_Init( x, initSize);
+	return x;
 }
 
 void SDLGUI_List_Init( struct SDLGUI_List *list, int initSize) {

@@ -30,7 +30,7 @@ add_executable(aec-game game.c ${ALL_SOURCE_FILES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
-add_executable(gui-test log.h texture.h texture.c text.h text.c sdl2gui/gui-test.c sdl2gui/sdl2gui.h sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.h sdl2gui/sdl2gui-list.c)
+add_executable(gui-test log.h texture.h texture.c text.h text.c sdl2gui/gui-test.c sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c)
 target_link_libraries(gui-test ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(gui-test ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 

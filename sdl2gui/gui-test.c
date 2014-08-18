@@ -171,6 +171,10 @@ void init() {
 
 void myButton_clicked( struct SDLGUI_Element *from) {
 	log0("my button clicked\n");
+	if( from->userData) {
+		int *ptr = (int*)from->userData;
+		log0("user data was %d\n", *ptr);
+	}
 }
 
 int main( int argc, char *args[]) {
@@ -178,8 +182,19 @@ int main( int argc, char *args[]) {
 
 	textures = loadAllTextures( renderer);
 	SDLGUI_Init( renderer, textures->font);
-	struct SDLGUI_Element *myButton = SDLGUI_Create_Text( 10, 20, 200, 100, &myButton_clicked, "my button", (int[4]){255,0,255,0}, (int[4]){200,200,200,255}, 12, 20);
+	struct SDLGUI_Element *myButton = SDLGUI_Create_Text( 10, 20, 200, 100, &myButton_clicked, "my button", (int[4]){255,0,255,0}, (int[4]){200,200,200,255}, 12, 20, 1, 0);
 	SDLGUI_Add_Element( myButton);
+
+	struct SDLGUI_Element *myPanel = SDLGUI_Create_Panel( 50, 150, 120, 320, (int[4]){150,150,150,255}, (int[4]){0,0,0,255}, 0, 0);
+	struct SDLGUI_List *myPanelItems = SDLGUI_Get_Panel_Elements( myPanel);
+	SDLGUI_Add_Element( myPanel);
+
+	int i1=1, i2=2, i3=3, i4=4;
+
+	SDLGUI_List_Add( myPanelItems, SDLGUI_Create_Text( 10, 10, 100, 50, &myButton_clicked, "item 1", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 0, &i1));
+	SDLGUI_List_Add( myPanelItems, SDLGUI_Create_Text( 10, 70, 100, 50, &myButton_clicked, "item 2", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 0, &i2));
+	SDLGUI_List_Add( myPanelItems, SDLGUI_Create_Text( 10, 130, 100, 50, &myButton_clicked, "item 3", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 0, &i3));
+	SDLGUI_List_Add( myPanelItems, SDLGUI_Create_Text( 10, 190, 100, 50, &myButton_clicked, "item 4", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 0, &i4));
 
 
 	log0("All set and ready\nStarting...\n");
