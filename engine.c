@@ -50,7 +50,7 @@ void drawObjects() {
 				log3("drawing object %d\n", i);
 				drawTexture( renderer, 
 					textures->obj[obj->type]->textures[ obj->visualState][obj->dir], 
-					screenPos.i*TILELEN, screenPos.j*TILELEN, TILELEN, TILELEN );
+					screenPos.i*TILELEN + 160, screenPos.j*TILELEN, TILELEN, TILELEN );
 			}
 		}
 	}
@@ -72,7 +72,7 @@ void drawBackground() {
 	for( x=0, rx=viewPos.i; rx< MIN(myMap->width, viewEnd.i); x++, rx++)
     	for( y=0, ry=viewPos.j; ry< MIN(myMap->height, viewEnd.j); y++, ry ++)
     		drawTexture( renderer, textures->trn[ myMap->tiles[rx][ry] ],
-    			x*TILELEN, y*TILELEN, TILELEN, TILELEN
+    			x*TILELEN + 160, y*TILELEN, TILELEN, TILELEN
     			);
 
 	SDL_SetRenderTarget( renderer, 0); //reset

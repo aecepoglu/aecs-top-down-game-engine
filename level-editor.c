@@ -2,6 +2,8 @@
 #include "brush.h"
 #include "aiTable.h"
 
+#include "sdl2gui/sdl2gui.h"
+
 
 
 /* The drawing brushes. These are used to draw terrain and objects on map */
@@ -16,6 +18,15 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 
 struct object *player;
 
+/* GUI Elements */
+#define GUI_LEFTPANEL_WIDTH 160
+struct SDLGUI_Element *bodyContainer;
+bool mouseDownInGui;
+
+
+
+/* -----
+*/
 
 bool defaultBrush( unsigned int x, unsigned int y, int type) {
 	return false;
@@ -102,18 +113,21 @@ bool setDirection( unsigned int x, unsigned int y, int type) {
 		return false;
 }
 
+void levelEditor_quit() {
+	running =0;
+}
+void levelEditor_save() {
+	saveMap( myMap);
+}
+
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
 		case SDLK_s:
-			/* saves the map, and continues */
-			saveMap( myMap);
-			log0("saved\n");
+			levelEditor_save();
 			break;
 		case SDLK_q:
-			/* terminates program without saving anything */
-			running =0;
+			levelEditor_quit();
 			break;
-
 		case SDLK_UP:
 			scrollScreen( dir_up);
 			break;
@@ -139,7 +153,7 @@ void handleKey( SDL_KeyboardEvent *e) {
 bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	unsigned int x,y;
 	if( e) {
-		x = e->x / TILELEN;
+		x = (e->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
 		y = e->y / TILELEN;
 	}
 	else {
@@ -181,6 +195,7 @@ void run() {
 					            e.window.windowID, e.window.data1,
 					            e.window.data2);
 						resizeView(e.window.data1, e.window.data2);
+						bodyContainer->rect.h = e.window.data2;
 						drawBackground();
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:
@@ -209,22 +224,35 @@ void run() {
 				handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if (handleMouse( (SDL_MouseButtonEvent*)&e, 0) ) {
-					drawBackground();
-					break;
+				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
+					log0("mouse down gui\n");
+					mouseDownInGui = true;
 				}
-				else
-					continue;
+				else {
+					log0("mouse down level\n");
+					mouseDownInGui = false;
+					if (handleMouse( (SDL_MouseButtonEvent*)&e, 0) ) {
+						drawBackground();
+						break;
+					}
+				}
+				continue;
+			case SDL_MOUSEBUTTONUP:
+				if( mouseDownInGui) {
+					log0("mouse up gui\n");
+					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
+				}
 				break;
 			case SDL_MOUSEMOTION:
-				if( handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
-					drawBackground();
-					break;
-				}
-				else
-					continue;
+				//TODO get this working again
+				//if( handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
+				//	drawBackground();
+				//	break;
+				//}
+				//else
+				//	continue;
+				continue;
 			case SDL_KEYUP:
-			case SDL_MOUSEBUTTONUP:
 				/*don't do anything for those events*/
 				continue;
 			default:
@@ -243,8 +271,29 @@ void draw() {
 	drawTexture( renderer, bgroundTexture, 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN);
 	//render objects
 	drawObjects( );
+
+	SDLGUI_Draw();
+
 	SDL_RenderPresent( renderer);
 
+}
+
+void buttonQuit_clicked( struct SDLGUI_Element *from) {
+	levelEditor_quit();
+}
+
+void buttonSave_clicked( struct SDLGUI_Element *from) {
+	log0("save button clicked\n");
+}
+
+void initGui() {
+	SDLGUI_Init( renderer, textures->font);
+	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, (int[4]){100,100,100,128}, (int[4]){255,0,0,255}, 2);
+	SDLGUI_Add_Element( bodyContainer);
+	
+	struct SDLGUI_List *bodyItems = SDLGUI_Get_Panel_Elements( bodyContainer);
+	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 10, 140, 30, &buttonSave_clicked, "(s)ave", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
+	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 50, 140, 30, &buttonQuit_clicked, "(q)uit", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
 }
 
 
@@ -301,12 +350,15 @@ int main( int argc, char *args[]) {
 	myBrushState = &initialBrushState;
 	brush = defaultBrush;
 
+	initGui();
+
 	log0("All set and ready\nStarting...\n");
 
 	running = 1;
 	run();
 
 	log0("Program over\nPeace\n");
+	SDLGUI_Destroy();
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
 	SDL_Quit();
