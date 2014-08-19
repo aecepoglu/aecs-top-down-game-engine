@@ -84,13 +84,16 @@ void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tile
 
 	for(i=0; i<=2*range; i++)
 		for( j=0; j<=2*range; j++)
-			if( i>=0 && j>=0 && i<map->width && j<map->height && tiles[i][j] == terrain_gnd) {
+			if( /*i>=0 && j>=0 && i<map->width && j<map->height &&*/ tiles[i][j] == terrain_gnd) {
 				struct FOVBase *base = &fovBase[i][j];
 
 				mapPos.i = originPos.i + i;
 				mapPos.j = originPos.j + j;
 
-				if( map->objs[ mapPos.i][ mapPos.j] != NULL) {
+				if( mapPos.i>=0 && mapPos.j >= 0 
+					&& mapPos.i<map->width && mapPos.j<map->height 
+					&& map->objs[ mapPos.i][ mapPos.j] != NULL)
+				{
 					struct ViewObject *vo = &objsSeen[ *objsSeenCount];
 
 					vo->obj =  map->objs[ mapPos.i][ mapPos.j];
