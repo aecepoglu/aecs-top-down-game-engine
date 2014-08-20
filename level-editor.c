@@ -6,7 +6,7 @@
 #include "sdl2gui/sdl2gui-list.h"
 #include "stack.h"
 
-
+#include "error.h"
 
 
 
@@ -20,6 +20,7 @@ struct SDLGUI_Element *bodyContainer;
 struct SDLGUI_Element *brushContainer;
 struct SDLGUI_List *brushList;
 bool mouseDownInGui;
+bool isMessageBoxOn = false;
 
 struct SDLGUI_List *brushStack[4];
 int brushStackCount = 0;
@@ -202,7 +203,18 @@ void buttonQuit_clicked( struct SDLGUI_Element *from) {
 }
 
 void buttonSave_clicked( struct SDLGUI_Element *from) {
-	saveMap( myMap);
+	enum SDLGUI_Message_Type msgType;
+	char *msgText;
+	if( saveMap( myMap) != true) {
+		msgType = SDLGUI_MESSAGE_ERROR;
+		msgText = errorMessage;
+	}
+	else {
+		msgType = SDLGUI_MESSAGE_INFO;
+		msgText = "Map saved";
+	}
+	isMessageBoxOn = true;
+	SDLGUI_Show_Message(0, 0, windowW, windowH, msgType, msgText);
 }
 
 void brushBack_clicked( struct SDLGUI_Element *from) {
@@ -218,33 +230,40 @@ void brushListItem_clicked( struct SDLGUI_Element *from) {
 }
 
 void handleKey( SDL_KeyboardEvent *e) {
-	switch (e->keysym.sym) {
-		case SDLK_s:
-			buttonSave_clicked(NULL);
-			break;
-		case SDLK_q:
-			buttonQuit_clicked(NULL);
-			break;
-		case SDLK_UP:
-			scrollScreen( dir_up);
-			break;
-		case SDLK_DOWN:
-			scrollScreen( dir_down);
-			break;
-		case SDLK_RIGHT:
-			scrollScreen( dir_right);
-			break;
-		case SDLK_LEFT:
-			scrollScreen( dir_left);
-			break;
-		case SDLK_TAB:
-			brushBack_clicked( NULL);
-			break;
-		default:
-			if( e->keysym.sym >= SDLK_0 && e->keysym.sym <= SDLK_9)
-				selectBrushWithKeysym( e->keysym.sym);
-			break;
-	};
+	log0("is repeat: %d\n", e->repeat);
+	if( e->repeat) {
+		switch( e->keysym.sym) {
+			case SDLK_UP:
+				scrollScreen( dir_up);
+				break;
+			case SDLK_DOWN:
+				scrollScreen( dir_down);
+				break;
+			case SDLK_RIGHT:
+				scrollScreen( dir_right);
+				break;
+			case SDLK_LEFT:
+				scrollScreen( dir_left);
+				break;
+		};
+	}
+	else {
+		switch (e->keysym.sym) {
+			case SDLK_s:
+				buttonSave_clicked(NULL);
+				break;
+			case SDLK_q:
+				buttonQuit_clicked(NULL);
+				break;
+			case SDLK_TAB:
+				brushBack_clicked( NULL);
+				break;
+			default:
+				if( e->keysym.sym >= SDLK_0 && e->keysym.sym <= SDLK_9)
+					selectBrushWithKeysym( e->keysym.sym);
+				break;
+		};
+	}
 }
 
 /* The mouse button-event and motion-events are handled the same
@@ -275,8 +294,6 @@ void run() {
 	draw();
 	SDL_Event e;
 	while( running) {
-		//while( SDL_PollEvent( &e)) {
-		//}
 		SDL_WaitEvent( &e);
 		switch (e.type) {
 			case SDL_WINDOWEVENT:
@@ -320,10 +337,20 @@ void run() {
 				running =0;
 				break;
 			case SDL_KEYDOWN:
-				log1("key down\n");
+				if( isMessageBoxOn) {
+					log0("msg box on\n");
+					SDLGUI_Hide_Message();
+					isMessageBoxOn =false;
+					break;
+				}
 				handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
+				if( isMessageBoxOn) {
+					SDLGUI_Hide_Message();
+					isMessageBoxOn =false;
+					break;
+				}
 				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
 					log0("mouse down gui\n");
 					mouseDownInGui = true;
@@ -338,6 +365,11 @@ void run() {
 				}
 				continue;
 			case SDL_MOUSEBUTTONUP:
+				if( isMessageBoxOn) {
+					SDLGUI_Hide_Message();
+					isMessageBoxOn =false;
+					break;
+				}
 				if( mouseDownInGui) {
 					log0("mouse up gui\n");
 					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
@@ -442,10 +474,10 @@ void initGui() {
 	brushList = SDLGUI_List_Create_From_Array(
 		(struct SDLGUI_Element*[]){
 			CREATE_LIST_BUTTON( 0, "1. rotate", CREATE_BRUSH_WRAPPER( SDLK_1, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
-					CREATE_LIST_BUTTON( 0, "(1) up"	, 				CREATE_BRUSH_WRAPPER( SDLK_1, &setDirection, dir_up, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "(2) right", 			CREATE_BRUSH_WRAPPER( SDLK_2, &setDirection, dir_right, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 2, "(3) down", 				CREATE_BRUSH_WRAPPER( SDLK_3, &setDirection, dir_down,		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 3, "(4) left", 				CREATE_BRUSH_WRAPPER( SDLK_4, &setDirection, dir_left,		NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 0, "(1) \x80 up"	, 				CREATE_BRUSH_WRAPPER( SDLK_1, &setDirection, dir_up, 		NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 1, "(2) \x81 right", 			CREATE_BRUSH_WRAPPER( SDLK_2, &setDirection, dir_right, 	NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 2, "(3) \x82 down", 				CREATE_BRUSH_WRAPPER( SDLK_3, &setDirection, dir_down,		NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 3, "(4) \x83 left", 				CREATE_BRUSH_WRAPPER( SDLK_4, &setDirection, dir_left,		NO_CHILDREN)),
 				}, 4
 			))),
 			CREATE_LIST_BUTTON( 1, "2. terrain", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 

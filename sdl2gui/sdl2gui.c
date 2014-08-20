@@ -12,17 +12,18 @@ struct SDLGUI_Core {
 	struct SDLGUI_List elements;
 
 	struct SDLGUI_Element *mouseDownElement;
+	struct SDLGUI_Element *messageBox;
 } guiCore;
 
 /* ---------------------
 	SDLGUI Core
 */
 
-#define IS_POINT_IN_RECT( p, r) 
-
 void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font) {
 	guiCore.renderer = renderer;
 	guiCore.font = font;
+	guiCore.mouseDownElement = 0;
+	guiCore.messageBox = 0;
 
 	SDLGUI_List_Init( &guiCore.elements, 4);
 }
@@ -31,6 +32,11 @@ void SDLGUI_Destroy() {
 	SDLGUI_List_Destroy( &guiCore.elements, 0);
 	guiCore.renderer = 0;
 	guiCore.font = 0;
+
+	if( guiCore.messageBox) {
+		SDLGUI_Destroy_Element( guiCore.messageBox);
+		guiCore.messageBox = 0;
+	}
 }
 
 void SDLGUI_Draw() {
@@ -38,6 +44,9 @@ void SDLGUI_Draw() {
 	for( i=0; i<guiCore.elements.count; i++) {
 		guiCore.elements.list[i]->drawFun( guiCore.elements.list[i], 0, 0);
 	}
+
+	if( guiCore.messageBox)
+		guiCore.messageBox->drawFun( guiCore.messageBox, 0, 0);
 
 	log3("sdlgui_draw()\n");
 }
@@ -68,9 +77,11 @@ int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
 }
 
 void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e) {
-	if( guiCore.mouseDownElement->clicked != 0)
-		guiCore.mouseDownElement->clicked( guiCore.mouseDownElement);
-	guiCore.mouseDownElement = 0;
+	if( guiCore.mouseDownElement) {
+		if( guiCore.mouseDownElement->clicked != 0)
+			guiCore.mouseDownElement->clicked( guiCore.mouseDownElement);
+		guiCore.mouseDownElement = 0;
+	}
 }
 
 void SDLGUI_Add_Element( struct SDLGUI_Element *element) {
@@ -221,4 +232,37 @@ void SDLGUI_Set_Panel_Elements( struct SDLGUI_Element *panel, struct SDLGUI_List
 	if( destroy)
 		SDLGUI_List_Destroy( data->elements, 1);
 	data->elements = list;
+}
+
+/* Message Box
+*/
+
+void SDLGUI_Show_Message( int xPos, int yPos, int width, int height, enum SDLGUI_Message_Type msgType, const char *text) {
+	int color[4] = {0,0,0,192};
+
+	switch(msgType) {
+		case SDLGUI_MESSAGE_INFO:
+			color[0] = 0;
+			color[1] = 100;
+			color[2] = 0;
+			break;
+		case SDLGUI_MESSAGE_ERROR:
+			color[0] = 100;
+			color[1] = 0;
+			color[2] = 0;
+			break;
+	};
+
+	if( guiCore.messageBox) {
+		SDLGUI_Destroy_Element( guiCore.messageBox);
+	}
+		
+	guiCore.messageBox = SDLGUI_Create_Text ( xPos, yPos, width, height, NULL, text, color, (int[4]){255,255,255,255}, 18, 30, 5, NULL);
+}
+
+void SDLGUI_Hide_Message() {
+	if( guiCore.messageBox) {
+		SDLGUI_Destroy_Element( guiCore.messageBox);
+		guiCore.messageBox = 0;
+	}
 }

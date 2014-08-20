@@ -30,6 +30,11 @@ struct SDLGUI_Panel_Data {
     SDL_Texture *texture;
 };
 
+enum SDLGUI_Message_Type {
+	SDLGUI_MESSAGE_INFO,
+	SDLGUI_MESSAGE_ERROR,
+};
+
 
 void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font);
 void SDLGUI_Add_Element( struct SDLGUI_Element *element);
@@ -53,5 +58,7 @@ struct SDLGUI_Element* SDLGUI_Create_Panel( int xPos, int yPos, int width, int h
 #define SDLGUI_Get_Panel_Elements( elem) ((struct SDLGUI_Panel_Data *)((elem)->data))->elements
 void SDLGUI_Set_Panel_Elements( struct SDLGUI_Element *elem, struct SDLGUI_List *list, int  destroy);
 
+void SDLGUI_Show_Message( int xPos, int yPos, int width, int height, enum SDLGUI_Message_Type msgType, const char *text);
+void SDLGUI_Hide_Message();
 
 #endif /*SDL2GUI_H*/

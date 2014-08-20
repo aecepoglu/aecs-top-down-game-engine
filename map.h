@@ -68,7 +68,7 @@ void addObject( struct object*, struct Map *map, int, int);
 
 /* 	Saves the map to disk
  */
-void saveMap( struct Map* map);
+bool saveMap( struct Map* map);
 
 /* Create a new map that matches the given parameters
  */

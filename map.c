@@ -5,6 +5,7 @@
 
 #include "map.h"
 #include "log.h"
+#include "error.h"
 
 #define MAP_VERSION 0
 
@@ -100,13 +101,13 @@ void addObject( struct object* obj, struct Map *map, int x, int y) {
 }
 
 
-void saveMap( struct Map *map) {
+bool saveMap( struct Map *map) {
 	log1( "saveMap to '%s'\n", map->filePath);
 
 	//confirm the ground tiles are connected
 	if( ! checkMapValidity(map) ) {
 		log0("\tMap is not valid. Not gonna save\n");
-		return;
+		return false;
 	}
 
 
@@ -134,6 +135,7 @@ void saveMap( struct Map *map) {
 	fclose(fp);
 
 	log0("Map saved to \"%s\"\n", map->filePath);
+	return true;
 }
 
 /* Create a new map that matches the given parameters
@@ -165,7 +167,7 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 
 bool checkMapValidity( struct Map *map) {
 	log0("Validating map\n");
-	bool result;
+	bool result = false;
 
 	unsigned int x,y;
 
@@ -179,7 +181,7 @@ bool checkMapValidity( struct Map *map) {
 			if( map->tiles[x][y] == terrain_gnd) {
 
 				if( x == map->width -1 || x == 0 || y == map->height - 1 || y == 0) {
-					log0("\tGround tile at position %d,%d is at the edge. There cannot be ground tiles at map edges. Edges must be covered with walls.\n", x, y);
+					ERROR("Ground tile at position %d,%d is at the edge.\nThere cannot be ground tiles at map edges.\nEdges must be covered with walls.\n", x, y);
 					goto freeConnectedTiles;
 				}
 					
@@ -196,14 +198,12 @@ bool checkMapValidity( struct Map *map) {
 	}
 
 	if( playerCount != 1) {
-		log0("\tplayer count is %d. must be 1.\n", playerCount);
-		result = false;
+		ERROR("player count is %d. must be 1.\n", playerCount);
 		goto freeConnectedTiles;
 	}
 	
 	if( groundCount == 0) {
-		log0("\tgroundCount is %d. must be > 0.\n", groundCount);
-		result = false;
+		ERROR("groundCount is %d. must be > 0.\n", groundCount);
 		goto freeConnectedTiles;
 	}
 
@@ -248,8 +248,7 @@ bool checkMapValidity( struct Map *map) {
 	}
 
 	if( connectedGroupsCount > 1) {
-		log0("\tThere must be only 1 connected group of ground tiles. Map has %d\n", connectedGroupsCount);
-		result = false;
+		ERROR("There must be only 1 connected group of ground tiles.\nMap has %d\n", connectedGroupsCount);
 		goto end;
 	}
 	result = true;

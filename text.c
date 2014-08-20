@@ -11,7 +11,7 @@ void drawText( SDL_Renderer *ren, SDL_Texture **font, const char *text, int xPos
 			x=0;
 		}
 		else {
-			drawTexture( ren, font[c-32], xPos + x*unitWidth, yPos + y*unitHeight, unitWidth, unitHeight);
+			drawTexture( ren, font[(unsigned char)c], xPos + x*unitWidth, yPos + y*unitHeight, unitWidth, unitHeight);
 			x++;
 		}
 		i++;

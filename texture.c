@@ -96,7 +96,7 @@ SDL_Texture** loadFontSheet( SDL_Renderer *ren, const char *path) {
 	SDL_Surface *img = IMG_Load( path);
 	assert( img != NULL);
 
-	SDL_Texture **result = loadTextureSheet( ren, img, 3, 32, img->w/32, img->h/3);
+	SDL_Texture **result = loadTextureSheet( ren, img, 5, 32, 6, 8);
 
 	SDL_FreeSurface( img);
 	return result;
