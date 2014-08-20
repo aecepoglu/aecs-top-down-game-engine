@@ -214,3 +214,11 @@ struct SDLGUI_Element* SDLGUI_Create_Panel( int xPos, int yPos, int width, int h
 
     return SDLGUI_Create_Element( xPos, yPos, width, height, panelData, 0, &SDLGUI_Destroy_Panel, &SDLGUI_Draw_Panel, &SDLGUI_MouseDownHandler_Panel, 0);
 }
+
+void SDLGUI_Set_Panel_Elements( struct SDLGUI_Element *panel, struct SDLGUI_List *list, int destroy) {
+	
+	struct SDLGUI_Panel_Data *data = (struct SDLGUI_Panel_Data*)panel->data;
+	if( destroy)
+		SDLGUI_List_Destroy( data->elements, 1);
+	data->elements = list;
+}

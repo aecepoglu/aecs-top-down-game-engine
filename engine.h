@@ -55,10 +55,6 @@ void quit( const char *);
 */
 void init();
 
-/* Draws objects over the renderere
-*/
-void drawObjects();
-
 /* Creates the background texture
 */
 void drawBackground();

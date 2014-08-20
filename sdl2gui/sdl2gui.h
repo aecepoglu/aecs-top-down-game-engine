@@ -51,6 +51,7 @@ struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int he
 void SDLGUI_Destroy_Panel( struct SDLGUI_Element *element);
 struct SDLGUI_Element* SDLGUI_Create_Panel( int xPos, int yPos, int width, int height, int bgColor[4], int borderColor[4], int borderThickness);
 #define SDLGUI_Get_Panel_Elements( elem) ((struct SDLGUI_Panel_Data *)((elem)->data))->elements
+void SDLGUI_Set_Panel_Elements( struct SDLGUI_Element *elem, struct SDLGUI_List *list, int  destroy);
 
 
 #endif /*SDL2GUI_H*/

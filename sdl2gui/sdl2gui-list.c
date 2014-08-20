@@ -57,6 +57,19 @@ struct SDLGUI_List* SDLGUI_List_Create( int initSize) {
 	return x;
 }
 
+struct SDLGUI_List* SDLGUI_List_Create_From_Array( struct SDLGUI_Element **items, int count) {
+	struct SDLGUI_List *list = SDLGUI_List_Create( count);
+	
+	list->count = count;
+
+	int i;
+	for( i=0; i<count; i++) {
+		list->list[i] = items[i];
+	}
+
+	return list;
+}
+
 void SDLGUI_List_Init( struct SDLGUI_List *list, int initSize) {
 	list->list = (struct SDLGUI_Element**)calloc( initSize, sizeof( struct SDLGUI_Element*));
 	list->size = initSize;

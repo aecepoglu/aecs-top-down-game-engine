@@ -3,6 +3,8 @@
 #include "aiTable.h"
 
 #include "sdl2gui/sdl2gui.h"
+#include "sdl2gui/sdl2gui-list.h"
+#include "stack.h"
 
 
 
@@ -19,8 +21,10 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 struct object *player;
 
 /* GUI Elements */
-#define GUI_LEFTPANEL_WIDTH 160
+#define GUI_LEFTPANEL_WIDTH 192
 struct SDLGUI_Element *bodyContainer;
+struct SDLGUI_Element *brushContainer;
+struct SDLGUI_List *brushList;
 bool mouseDownInGui;
 
 
@@ -63,6 +67,25 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 	}
 	else
 		return false;
+}
+
+
+void drawBackground() {
+	log3("generate background\n");
+	SDL_DestroyTexture( bgroundTexture);
+	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, viewSize.i*TILELEN, viewSize.j*TILELEN) ;
+	SDL_SetRenderTarget( renderer, bgroundTexture);
+
+	drawTexture( renderer, textures->trn[TEXTURE_TRN_NONE], 0, 0, windowW, windowH);
+
+	unsigned int x,y,rx,ry;
+	for( x=0, rx=viewPos.i; rx< MIN(myMap->width, viewEnd.i); x++, rx++)
+    	for( y=0, ry=viewPos.j; ry< MIN(myMap->height, viewEnd.j); y++, ry ++)
+    		drawTexture( renderer, textures->trn[ myMap->tiles[rx][ry] ],
+    			x*TILELEN + GUI_LEFTPANEL_WIDTH, y*TILELEN, TILELEN, TILELEN
+    			);
+
+	SDL_SetRenderTarget( renderer, 0); //reset
 }
 
 bool drawObject( unsigned int x, unsigned int y, int type){
@@ -119,6 +142,40 @@ void levelEditor_quit() {
 void levelEditor_save() {
 	saveMap( myMap);
 }
+
+bool scrollScreen( enum direction dir) {
+	bool canScroll = false;
+	switch(dir) {
+		case dir_up:
+			if(viewPos.j > 0)
+				canScroll = true;
+			break;
+		case dir_left:
+			if(viewPos.i > 0)
+				canScroll = true;
+			break;
+		case dir_right:
+			if(viewEnd.i < myMap->width )
+				canScroll = true;
+			break;
+		case dir_down:
+			if(viewEnd.j < myMap->height )
+				canScroll = true;
+			break;
+	};
+
+	if(canScroll) {
+		struct Vector *dirVector = &dirVectors[dir];
+		vectorAdd( &viewPos, &viewPos, dirVector );
+		vectorAdd( &viewEnd, &viewEnd, dirVector );
+
+		log1("scrolled to [(%d,%d), (%d,%d)]\n", viewPos.i, viewPos.j, viewEnd.i, viewEnd.j);
+		drawBackground();
+	}
+
+	return canScroll;
+}
+
 
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
@@ -263,6 +320,36 @@ void run() {
 	}
 }
 
+/* Draws the map and objects viewed on screen */
+void drawObjects() {
+	unsigned i;
+	struct Vector screenPos;
+	struct object *obj;
+
+	struct object **newObjList = (struct object**)calloc( myMap->objListSize, sizeof( struct object*));
+	int newCount = 0;
+
+	for( i=0; i<myMap->objListCount; i++) {
+		obj = myMap->objList[i];
+		if( ! obj->isDeleted) {
+			newObjList[ newCount] = obj;
+			newCount ++;
+
+			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
+			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
+				log3("drawing object %d\n", i);
+				drawTexture( renderer, 
+					textures->obj[obj->type]->textures[ obj->visualState][obj->dir], 
+					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN, TILELEN, TILELEN );
+			}
+		}
+	}
+
+	free( myMap->objList);
+	myMap->objList = newObjList;
+	myMap->objListCount = newCount;
+}
+
 
 void draw() {
 	log3("draw\n");
@@ -284,17 +371,88 @@ void buttonQuit_clicked( struct SDLGUI_Element *from) {
 
 void buttonSave_clicked( struct SDLGUI_Element *from) {
 	log0("save button clicked\n");
+	levelEditor_save();
 }
 
+struct brushWrapper {
+	SDL_Keycode key;
+	brushFun *brush;
+	int brushVariant;
+	struct SDLGUI_List *children;
+};
+
+struct SDLGUI_List *brushStack[4];
+int brushStackCount = 0;
+
+struct brushWrapper* CREATE_BRUSH_WRAPPER( SDL_Keycode key, brushFun *brush, int brushVariant, struct SDLGUI_List *children) {
+	struct brushWrapper *result = (struct brushWrapper*)malloc( sizeof( struct brushWrapper));
+	result->key = key;
+	result->brush = brush;
+	result->brushVariant = brushVariant;
+	result->children = children;
+	return result;
+}
+
+void listItem_clicked( struct SDLGUI_Element *from) {
+	log0("list item clicked\n");
+
+	assert(from->userData != NULL);
+	struct brushWrapper *tmp = (struct brushWrapper*)from->userData;
+
+	if( tmp->brush) {
+		brush = tmp->brush;
+		brushVariant = tmp->brushVariant;
+	}
+	if( tmp->children) {
+		log0("changing list\n");
+		STACK_PUSH( brushStack, brushList, brushStackCount);
+		brushList = tmp->children;
+		SDLGUI_Set_Panel_Elements( brushContainer, brushList, false);
+	}
+}
+
+void brushBack_clicked( struct SDLGUI_Element *from) {
+	if( STACK_IS_EMPTY( brushStackCount) != true) {
+		STACK_POP( brushStack, brushList, brushStackCount);
+		SDLGUI_Set_Panel_Elements( brushContainer, brushList, false);
+	}
+}
+
+#define CREATE_LIST_BUTTON( i, text, data) SDLGUI_Create_Text( 5, 5 + 35*i, 160, 30, &listItem_clicked, text, (int[4]){255,255,255,255}, (int[4]){0,0,0,255}, 12, 20, 1, data)
 void initGui() {
 	SDLGUI_Init( renderer, textures->font);
-	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, (int[4]){100,100,100,128}, (int[4]){255,0,0,255}, 2);
+	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, (int[4]){170,180,190,255}, (int[4]){100,100,100,255}, 4);
 	SDLGUI_Add_Element( bodyContainer);
 	
 	struct SDLGUI_List *bodyItems = SDLGUI_Get_Panel_Elements( bodyContainer);
-	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 10, 140, 30, &buttonSave_clicked, "(s)ave", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
-	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 50, 140, 30, &buttonQuit_clicked, "(q)uit", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
+	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 50, GUI_LEFTPANEL_WIDTH - 2*10, 30, &buttonSave_clicked, "(s)ave", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
+	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 90, GUI_LEFTPANEL_WIDTH - 2*10, 30, &buttonQuit_clicked, "(q)uit", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
+
+	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 200, GUI_LEFTPANEL_WIDTH - 2*10, 30, &brushBack_clicked, "(Esc) Back", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
+
+	brushContainer = SDLGUI_Create_Panel( 10, 240, GUI_LEFTPANEL_WIDTH - 2*10, 300, (int[4]){0,0,0,255}, (int[4]){255,255,255,255}, 1);
+	SDLGUI_List_Add( bodyItems, brushContainer);
+
+	brushList = SDLGUI_List_Create_From_Array(
+		(struct SDLGUI_Element*[]){
+			CREATE_LIST_BUTTON( 0, "rotate", CREATE_BRUSH_WRAPPER(/*key*/SDLK_1, /*brushFun*/&setDirection, /*brushVariant*/0, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 0, "(1) up"		, CREATE_BRUSH_WRAPPER(/*key*/SDLK_1, /*brushFun*/&setDirection, /*brushVariant*/dir_up, /*children*/NULL)),
+					CREATE_LIST_BUTTON( 1, "(2) right"	, CREATE_BRUSH_WRAPPER(/*key*/SDLK_2, /*brushFun*/&setDirection, /*brushVariant*/dir_right, /*children*/NULL)),
+					CREATE_LIST_BUTTON( 2, "(3) down"	, CREATE_BRUSH_WRAPPER(/*key*/SDLK_3, /*brushFun*/&setDirection, /*brushVariant*/dir_down, /*children*/NULL)),
+					CREATE_LIST_BUTTON( 3, "(4) left"	, CREATE_BRUSH_WRAPPER(/*key*/SDLK_4, /*brushFun*/&setDirection, /*brushVariant*/dir_left, /*children*/NULL)),
+				}, 4
+			))),
+			CREATE_LIST_BUTTON( 1, "terrain", CREATE_BRUSH_WRAPPER(/*key*/SDLK_2, /*brushFun*/NULL, /*brushVariant*/0, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 0, "(1) ground"	, CREATE_BRUSH_WRAPPER(/*key*/SDLK_1, /*brushFun*/&drawTerrain, /*brushVariant*/terrain_gnd, /*children*/NULL)),
+					CREATE_LIST_BUTTON( 1, "(2) wall"	, CREATE_BRUSH_WRAPPER(/*key*/SDLK_2, /*brushFun*/&drawTerrain, /*brushVariant*/terrain_wall, /*children*/NULL)),
+				}, 2
+			)))
+		}, 2
+	);
+	SDLGUI_Set_Panel_Elements( brushContainer, brushList, true);
+	
 }
+#undef CREATE_LIST_BUTTON
 
 
 int main( int argc, char *args[]) {
@@ -335,10 +493,8 @@ int main( int argc, char *args[]) {
 			fprintf( stderr, "There is no map. Open a map with '-m map-path' or create new map with '-m map-path -n map-width map-height'\n");
 			exit(0);
 		}
-		else
-			log1( "reading map file %s\n", mapPath);
-			log0( "reading map file %s\n", mapPath);
-			myMap = readMapFile( mapPath);
+		log0( "reading map file %s\n", mapPath);
+		myMap = readMapFile( mapPath);
 	}
 
 	player = findPlayer( myMap);
