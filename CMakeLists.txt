@@ -29,9 +29,9 @@ list(APPEND ALL_SOURCE_FILES ${MY_AI_SOURCES})
 
 
 
-add_executable(levelEditor level-editor.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES})
-target_link_libraries(levelEditor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
-include_directories(levelEditor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
+add_executable(level-editor level-editor.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES})
+target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
+include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 add_executable(aec-game game.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
@@ -41,7 +41,7 @@ add_executable(gui-test log.h texture.h texture.c text.h text.c sdl2gui/gui-test
 target_link_libraries(gui-test ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(gui-test ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
-target_link_libraries(levelEditor m)
+target_link_libraries(level-editor m)
 target_link_libraries(aec-game m)
 
 add_definitions(-Wall)

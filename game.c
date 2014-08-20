@@ -220,7 +220,7 @@ void run() {
 						break;
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
-						resizeView(e.window.data1, e.window.data2);
+						resizeView( 0, e.window.data1, e.window.data2);
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:
 					    log1("Window %d minimized\n", e.window.windowID);

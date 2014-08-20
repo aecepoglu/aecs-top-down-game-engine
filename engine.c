@@ -33,11 +33,12 @@ void init() {
 /*
 */
 
-void resizeView( int winW, int winH) {
+void resizeView( int posX, int winW, int winH) {
 	windowW = winW;
 	windowH = winH;
-	viewSize.i = (winW-1) / TILELEN;
+	viewSize.i = (winW-1-posX) / TILELEN;
 	viewSize.j = (winH-1) / TILELEN;
+	log0("size is %dx%d\n", viewSize.i, viewSize.j);
 	vectorAdd( &viewEnd, &viewPos, &viewSize );
 }
 
