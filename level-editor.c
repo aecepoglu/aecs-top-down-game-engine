@@ -65,7 +65,7 @@ bool eraseAI( unsigned int x, unsigned int y, int type) {
 }
 
 bool drawTerrain( unsigned int x, unsigned int y, int type){
-	if( myMap->tiles[x][y] != type) {
+	if( myMap->tiles[x][y] != type && myMap->objs[x][y]==NULL) {
 		myMap->tiles[x][y] = type;
 		return true;
 	}
@@ -75,7 +75,7 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 
 bool drawObject( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
-	if( myMap->objs[x][y]!=0 || myMap->tiles[x][y]!=terrain_gnd)
+	if( myMap->objs[x][y]!=NULL || myMap->tiles[x][y]!=terrain_gnd)
 		return false;
 
 	//create and initialize a monster
