@@ -291,7 +291,7 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	x += viewPos.i;
 	y += viewPos.j;
 
-	return ( x < myMap->width && y < myMap->height && brush( x, y, brushVariant) );
+	return ( brush != NULL && x < myMap->width && y < myMap->height && brush( x, y, brushVariant) );
 }
 
 
