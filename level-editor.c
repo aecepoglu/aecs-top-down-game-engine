@@ -48,6 +48,7 @@ bool eraseObject( unsigned int x, unsigned int y, int type) {
 	if( obj != NULL && obj->ai == NULL) {
 		obj->isDeleted = true;
 		myMap->objs[x][y] = NULL;
+		
 		return true;
 	}
 	else
@@ -59,6 +60,9 @@ bool eraseAI( unsigned int x, unsigned int y, int type) {
 	if( obj != NULL && obj->ai != NULL) {
 		AI_DESTROY( obj->ai);
 		obj->ai = NULL;
+		
+		SDLGUI_Show_Tooltip( x*TILELEN + GUI_LEFTPANEL_WIDTH, y*TILELEN, "AI removed");
+
 		return true;
 	}
 	else
@@ -96,6 +100,7 @@ bool drawAI( unsigned int x, unsigned int y, int type) {
 		struct AI *ai = AI_CREATE( type);
 		myMap->objs[x][y]->ai = ai;
 
+		SDLGUI_Show_Tooltip( x*TILELEN + GUI_LEFTPANEL_WIDTH, y*TILELEN, "AI put");
 		return true;
 	}
 
@@ -270,6 +275,7 @@ void handleKey( SDL_KeyboardEvent *e) {
  * I just need to extract the x,y from the event-data.
  */
 bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
+
 	unsigned int x,y;
 	if( e) {
 		x = (e->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
@@ -352,11 +358,11 @@ void run() {
 					break;
 				}
 				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
-					log0("mouse down gui\n");
+					log0("mouse down - gui\n");
 					mouseDownInGui = true;
 				}
 				else {
-					log0("mouse down level\n");
+					log0("mouse down - editor\n");
 					mouseDownInGui = false;
 					if (handleMouse( (SDL_MouseButtonEvent*)&e, 0) ) {
 						drawBackground();
@@ -387,6 +393,11 @@ void run() {
 			case SDL_KEYUP:
 				/*don't do anything for those events*/
 				continue;
+			case SDL_USEREVENT: {
+				void (*p) (void*) = e.user.data1;
+				p( e.user.data2);
+				break;
+			}
 			default:
 				log1("unhandled event type: %d\n", e.type);
 				continue;

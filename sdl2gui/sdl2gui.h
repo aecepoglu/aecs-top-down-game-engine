@@ -61,4 +61,6 @@ void SDLGUI_Set_Panel_Elements( struct SDLGUI_Element *elem, struct SDLGUI_List 
 void SDLGUI_Show_Message( int xPos, int yPos, int width, int height, enum SDLGUI_Message_Type msgType, const char *text);
 void SDLGUI_Hide_Message();
 
+void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text);
+
 #endif /*SDL2GUI_H*/

@@ -12,7 +12,7 @@ void SDLGUI_List_Add( struct SDLGUI_List *list, struct SDLGUI_Element *item) {
 }
 
 void SDLGUI_List_Remove( struct SDLGUI_List *list, struct SDLGUI_Element *item) {
-	int newSize = list->count < list->size / 2
+	int newSize = list->count < list->size / 4
 		? list->size/2
 		: list->size;
 	struct SDLGUI_Element **new = (struct SDLGUI_Element**)calloc( newSize, sizeof( struct SDLGUI_Element*));
@@ -28,7 +28,10 @@ void SDLGUI_List_Remove( struct SDLGUI_List *list, struct SDLGUI_Element *item) 
 	}
 
 	free( list->list);
+
 	list->list = new;
+	list->size = newSize;
+	list->count = newCount;
 }
 
 void SDLGUI_List_Clear( struct SDLGUI_List *list, int freeItems) {

@@ -13,6 +13,8 @@ struct SDLGUI_Core {
 
 	struct SDLGUI_Element *mouseDownElement;
 	struct SDLGUI_Element *messageBox;
+	struct SDLGUI_Element *tooltip;
+	SDL_TimerID tooltipTimer;
 } guiCore;
 
 /* ---------------------
@@ -24,6 +26,7 @@ void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font) {
 	guiCore.font = font;
 	guiCore.mouseDownElement = 0;
 	guiCore.messageBox = 0;
+	guiCore.tooltip = 0;
 
 	SDLGUI_List_Init( &guiCore.elements, 4);
 }
@@ -47,6 +50,9 @@ void SDLGUI_Draw() {
 
 	if( guiCore.messageBox)
 		guiCore.messageBox->drawFun( guiCore.messageBox, 0, 0);
+
+	if( guiCore.tooltip)
+		guiCore.tooltip->drawFun( guiCore.tooltip, 0, 0);
 
 	log3("sdlgui_draw()\n");
 }
@@ -85,9 +91,7 @@ void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e) {
 }
 
 void SDLGUI_Add_Element( struct SDLGUI_Element *element) {
-	log0("add element %p \n", element);
 	SDLGUI_List_Add( &guiCore.elements, element);
-	log0("added element to %p\n", guiCore.elements.list[ guiCore.elements.count - 1]);
 }
 
 void SDLGUI_Remove_Element( struct SDLGUI_Element *element) {
@@ -265,4 +269,46 @@ void SDLGUI_Hide_Message() {
 		SDLGUI_Destroy_Element( guiCore.messageBox);
 		guiCore.messageBox = 0;
 	}
+}
+
+void SDLGUI_Destroy_Tooltip( struct SDLGUI_Element *tooltip) {
+	SDLGUI_Destroy_Element( guiCore.tooltip);
+	guiCore.tooltip = 0;
+}
+
+Uint32 mycallback(Uint32 interval, void *param) {
+	if( guiCore.tooltip) {
+		SDL_Event event;
+		SDL_UserEvent userevent;
+		
+		
+		userevent.type = SDL_USEREVENT;
+		userevent.code = 0;
+		userevent.data1 = &SDLGUI_Destroy_Tooltip;
+		userevent.data2 = guiCore.tooltip;
+		
+		event.type = SDL_USEREVENT;
+		event.user = userevent;
+		
+		SDL_PushEvent(&event);
+	}
+	return 0;
+}
+
+void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text) {
+	int tooltipWidth, tooltipHeight;
+	SDL_Texture *tooltipTexture = getTextTexture( guiCore.renderer, guiCore.font, text, 12, 16, (int[4]){255,255,255,128}, 0,0,0, &tooltipWidth, &tooltipHeight);
+
+	if( xPos>tooltipWidth)
+		xPos -= tooltipWidth;
+
+	if( yPos>tooltipHeight)
+		yPos -= tooltipHeight;
+
+	if( guiCore.tooltip) {
+		SDLGUI_Destroy_Element( guiCore.tooltip);
+		SDL_RemoveTimer( guiCore.tooltipTimer);
+	}
+	guiCore.tooltip = SDLGUI_Create_Texture( xPos, yPos, tooltipWidth, tooltipHeight, tooltipTexture, &SDLGUI_Destroy_Tooltip, NULL);
+	guiCore.tooltipTimer = SDL_AddTimer(1000, mycallback, 0);
 }
