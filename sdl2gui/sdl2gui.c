@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "sdl2gui.h"
 #include "../text.h"
@@ -12,10 +13,16 @@ struct SDLGUI_Core {
 	struct SDLGUI_List elements;
 
 	struct SDLGUI_Element *mouseDownElement;
+	struct SDLGUI_Element *focusedElement;
 	struct SDLGUI_Element *messageBox;
 	struct SDLGUI_Element *tooltip;
 	SDL_TimerID tooltipTimer;
 } guiCore;
+
+/* Fwd declarations
+*/
+void SDLGUI_ChangeText_Textbox( struct SDLGUI_Element *textbox, char c, int backspace);
+
 
 /* ---------------------
 	SDLGUI Core
@@ -53,8 +60,6 @@ void SDLGUI_Draw() {
 
 	if( guiCore.tooltip)
 		guiCore.tooltip->drawFun( guiCore.tooltip, 0, 0);
-
-	log3("sdlgui_draw()\n");
 }
 
 struct SDLGUI_Element* SDLGUI_Handle_MouseDown_List( struct SDLGUI_List *list, SDL_MouseButtonEvent *e) {
@@ -83,12 +88,40 @@ int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
 }
 
 void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e) {
-	if( guiCore.mouseDownElement) {
-		if( guiCore.mouseDownElement->clicked != 0)
-			guiCore.mouseDownElement->clicked( guiCore.mouseDownElement);
+	if( guiCore.mouseDownElement && guiCore.mouseDownElement->clicked != 0) {
+		guiCore.mouseDownElement->clicked( guiCore.mouseDownElement);
 		guiCore.mouseDownElement = 0;
 	}
+	else
+		guiCore.focusedElement = 0;
 }
+
+int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e) {
+	if( guiCore.focusedElement) {
+		SDL_Keycode sym = e->keysym.sym;
+		char c = 0;
+		int backspace = 0;
+		log0("%d\n", e->keysym.sym);
+		if( sym >= SDLK_0 && sym <= SDLK_9) {
+			c = '0' + sym - SDLK_0;
+		}
+		/* Can uncomment this if I want text-boxes to work with ascii letters
+		else if ( sym >= SDLK_a && sym <= SDLK_z) {
+			c = 'A' + sym - SDLK_a;
+		}
+		*/
+		else if( sym == SDLK_BACKSPACE) {
+			backspace = 1;
+		}
+		
+		if( c != 0 || backspace != 0) {
+			log0("input: %c, backspace: %d\n", c, backspace);
+			SDLGUI_ChangeText_Textbox( guiCore.focusedElement, c, backspace);
+			return 1;
+		}
+	}
+	return 0;
+};
 
 void SDLGUI_Add_Element( struct SDLGUI_Element *element) {
 	SDLGUI_List_Add( &guiCore.elements, element);
@@ -146,8 +179,6 @@ struct SDLGUI_Element* SDLGUI_Create_Element( int xPos, int yPos, int width, int
 	e->mouseDownHandler = mouseDownHandler;
 	e->userData = userData;
 
-	log0("created element %p\n", e);
-
 	return e;
 }
 
@@ -169,7 +200,6 @@ void SDLGUI_Destroy_Texture( struct SDLGUI_Element *element) {
 	SDL_Texture *t = (SDL_Texture*)element->data;
 	SDL_DestroyTexture( t);
 	free( element);
-	log0("destroyed texture\n");
 }
 
 /* Text
@@ -179,6 +209,11 @@ struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int he
 	
 	int textWidth, textHeight;
 	SDL_Texture *textTexture = getTextTexture( guiCore.renderer, guiCore.font, text, fontWidth, fontHeight, (int[4]){0,0,0,0}, fgColor[0], fgColor[1], fgColor[2], &textWidth, &textHeight);
+
+	if( width < 0)
+		width = textWidth;
+	if( height < 0)
+		height = textHeight;
 
 	SDL_Texture *elementTexture = createElementTexture( width, height, bgColor, fgColor, borderThickness, textTexture, textWidth, textHeight);
 	SDL_DestroyTexture( textTexture);
@@ -250,6 +285,11 @@ void SDLGUI_Show_Message( int xPos, int yPos, int width, int height, enum SDLGUI
 			color[1] = 100;
 			color[2] = 0;
 			break;
+		case SDLGUI_MESSAGE_WARNING:
+			color[0] = 100;
+			color[1] = 100;
+			color[2] = 0;
+			break;
 		case SDLGUI_MESSAGE_ERROR:
 			color[0] = 100;
 			color[1] = 0;
@@ -270,6 +310,9 @@ void SDLGUI_Hide_Message() {
 		guiCore.messageBox = 0;
 	}
 }
+
+/* Tooltip
+*/
 
 void SDLGUI_Destroy_Tooltip( struct SDLGUI_Element *tooltip) {
 	SDLGUI_Destroy_Element( guiCore.tooltip);
@@ -311,4 +354,114 @@ void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text) {
 	}
 	guiCore.tooltip = SDLGUI_Create_Texture( xPos, yPos, tooltipWidth, tooltipHeight, tooltipTexture, &SDLGUI_Destroy_Tooltip, NULL);
 	guiCore.tooltipTimer = SDL_AddTimer(1000, mycallback, 0);
+}
+
+/* Textbox
+*/
+
+struct SDLGUI_Text_Data {
+	SDL_Texture *bg, *fg;
+	char *text;
+	int maxLen;
+	int textWidth, textHeight;
+	int fontWidth, fontHeight;
+	int textColor[4];
+	SDLGUI_TextChanged *textChanged;
+};
+
+void SDLGUI_Destroy_Textbox( struct SDLGUI_Element *textbox) {
+	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
+	SDL_DestroyTexture( data->bg);
+	free( data);
+	free( textbox);
+}
+
+void SDLGUI_Draw_Textbox( struct SDLGUI_Element *textbox, int x0, int y0) {
+	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
+
+	SDL_Rect rect = { textbox->rect.x + x0, textbox->rect.y + y0, textbox->rect.w, textbox->rect.h};
+
+	SDL_RenderCopy( guiCore.renderer, data->bg, NULL, &rect);
+	rect.x += data->fontWidth/2;
+	rect.y += data->fontHeight/2;
+	rect.w = data->textWidth;
+	rect.h = data->textHeight;
+	SDL_RenderCopy( guiCore.renderer, data->fg, NULL, &rect);
+}
+
+void SDLGUI_Focused_Textbox( struct SDLGUI_Element *textbox) {
+	log0("focusing\n");
+	guiCore.focusedElement = textbox;
+}
+
+struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int maxLen, int bgColor[4], int textColor[4], int fontWidth, int fontHeight, SDLGUI_TextChanged *textChanged) {
+	if( maxLen >= 64)
+		return 0;
+	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)malloc( sizeof( struct SDLGUI_Text_Data));
+
+	int width = fontWidth*(maxLen+1);
+	int height = fontHeight*2;
+	data->bg = createElementTexture( width, height, bgColor, textColor, 1, NULL, 0, 0);
+	data->fontWidth = fontWidth;
+	data->fontHeight = fontHeight;
+	data->maxLen = maxLen;
+	data->textColor[0] = textColor[0];
+	data->textColor[1] = textColor[1];
+	data->textColor[2] = textColor[2];
+	data->textColor[3] = textColor[3];
+	data->text = (char*)calloc( maxLen+1, sizeof(char));
+	data->textChanged = textChanged;
+
+	return SDLGUI_Create_Element( xPos, yPos, width, height, data, &SDLGUI_Focused_Textbox, &SDLGUI_Destroy_Textbox, &SDLGUI_Draw_Textbox, NULL, 0);
+}
+
+void SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, char *text) {
+	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
+	if( text && strlen(text) > data->maxLen) 
+		return; //TODO throw an error instead
+
+	sprintf( data->text, "%s", text);
+
+	if( data->fg)
+		SDL_DestroyTexture( data->fg);
+
+	data->fg = getTextTexture( guiCore.renderer, guiCore.font, text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
+}
+			
+void SDLGUI_ChangeText_Textbox( struct SDLGUI_Element *textbox, char c, int backspace) {
+	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
+
+	int curLen = strlen(data->text);
+	int changed = 0;
+
+	if( backspace) {
+		if( curLen > 0) {
+			data->text[ curLen-1] = '\0';
+			changed = 1;
+		}
+	}
+	else {
+		if( curLen < data->maxLen) {
+			data->text[ curLen] = c;
+			data->text[ curLen + 1] = '\0';
+			changed = 1;
+		}
+	}
+
+	if( changed) {
+		SDL_DestroyTexture( data->fg);
+		data->fg = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
+
+		if( data->textChanged)
+			data->textChanged( textbox, data->text);
+	}
+}
+
+void SDLGUI_ClearText_Textbox( struct SDLGUI_Element *textbox) {
+	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
+	if( data->text) {
+		SDL_DestroyTexture( data->fg);
+		sprintf( data->text, "%s", ""); //Writing it this way is necessary to avoid the zero-length warning
+		data->fg = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
+	}
 }

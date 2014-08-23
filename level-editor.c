@@ -37,6 +37,9 @@ struct brushWrapper {
 brushFun *brush = NULL; //draws something on the given location
 int brushVariant;
 
+struct SDLGUI_Element *textbox_health;
+struct SDLGUI_Element *textbox_maxHealth;
+struct object *selectedObj = NULL;
 
 
 /* ---------------------------
@@ -78,7 +81,7 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 		return false;
 }
 
-bool drawObject( unsigned int x, unsigned int y, int type){
+bool editor_createObj( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
 	if( myMap->objs[x][y]!=NULL || myMap->tiles[x][y]!=terrain_gnd)
 		return false;
@@ -87,6 +90,31 @@ bool drawObject( unsigned int x, unsigned int y, int type){
 	struct object *obj = createObject( type, x, y);
 
 	addObject( obj, myMap, x, y);
+
+	return true;
+}
+
+bool editor_changeObjType( unsigned int x, unsigned int y, int type) {
+	if( myMap->objs[x][y]==NULL)
+		return false;
+	
+	myMap->objs[x][y]->type = type;
+	return true;
+}
+
+bool editor_selectObj( unsigned int x, unsigned int y, int type) {
+	if( myMap->objs[x][y] == NULL)
+		return false;
+	
+	selectedObj = myMap->objs[x][y];
+
+	char tmp[4];
+
+	sprintf(tmp, "%d", selectedObj->health);
+	SDLGUI_SetText_Textbox( textbox_health, strdup(tmp));
+
+	sprintf(tmp, "%d", selectedObj->maxHealth);
+	SDLGUI_SetText_Textbox( textbox_maxHealth, strdup(tmp));
 
 	return true;
 }
@@ -234,8 +262,49 @@ void brushListItem_clicked( struct SDLGUI_Element *from) {
 	changeBrush( (struct brushWrapper*)from->userData);
 }
 
+int parseText( const char *text) {
+	if( strlen(text) == 0)
+		return 0;
+	else
+		return atoi( text);
+}
+
+void textbox_health_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj) {
+		int newHealth = parseText( text);
+		if( newHealth < 256) {
+			selectedObj->health = newHealth;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health should be less than 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_maxHealth_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj) {
+		int newHealth = parseText( text);
+		if( newHealth < 256) {
+			selectedObj->maxHealth = newHealth;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Max-Health should be less than 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
 void handleKey( SDL_KeyboardEvent *e) {
-	log0("is repeat: %d\n", e->repeat);
+	log2("is repeat: %d\n", e->repeat);
 	if( e->repeat) {
 		switch( e->keysym.sym) {
 			case SDLK_UP:
@@ -344,12 +413,13 @@ void run() {
 				break;
 			case SDL_KEYDOWN:
 				if( isMessageBoxOn) {
-					log0("msg box on\n");
+					log2("msg box on\n");
 					SDLGUI_Hide_Message();
 					isMessageBoxOn =false;
 					break;
 				}
-				handleKey( (SDL_KeyboardEvent*)&e);
+				else if(SDLGUI_Handle_TextInput( (SDL_KeyboardEvent*)&e) != true)
+					handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				if( isMessageBoxOn) {
@@ -358,11 +428,11 @@ void run() {
 					break;
 				}
 				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
-					log0("mouse down - gui\n");
+					log2("mouse down - gui\n");
 					mouseDownInGui = true;
 				}
 				else {
-					log0("mouse down - editor\n");
+					log2("mouse down - editor\n");
 					mouseDownInGui = false;
 					if (handleMouse( (SDL_MouseButtonEvent*)&e, 0) ) {
 						drawBackground();
@@ -377,7 +447,7 @@ void run() {
 					break;
 				}
 				if( mouseDownInGui) {
-					log0("mouse up gui\n");
+					log2("mouse up gui\n");
 					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
 				}
 				break;
@@ -484,46 +554,63 @@ void initGui() {
 	/* Table readable with tab-width 4 */
 	brushList = SDLGUI_List_Create_From_Array(
 		(struct SDLGUI_Element*[]){
-			CREATE_LIST_BUTTON( 0, "1. rotate", CREATE_BRUSH_WRAPPER( SDLK_1, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
-					CREATE_LIST_BUTTON( 0, "(1) \x80 up"	, 				CREATE_BRUSH_WRAPPER( SDLK_1, &setDirection, dir_up, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "(2) \x81 right", 			CREATE_BRUSH_WRAPPER( SDLK_2, &setDirection, dir_right, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 2, "(3) \x82 down", 				CREATE_BRUSH_WRAPPER( SDLK_3, &setDirection, dir_down,		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 3, "(4) \x83 left", 				CREATE_BRUSH_WRAPPER( SDLK_4, &setDirection, dir_left,		NO_CHILDREN)),
-				}, 4
-			))),
-			CREATE_LIST_BUTTON( 1, "2. terrain", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
-					CREATE_LIST_BUTTON( 0, "(1) ground", 			CREATE_BRUSH_WRAPPER( SDLK_1, &drawTerrain, terrain_gnd, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "(2) wall", 	 			CREATE_BRUSH_WRAPPER( SDLK_2, &drawTerrain, terrain_wall, 	NO_CHILDREN)),
+			CREATE_LIST_BUTTON( 0, "1. terrain", CREATE_BRUSH_WRAPPER( SDLK_1, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 0, "1. ground", 			CREATE_BRUSH_WRAPPER( SDLK_1, &drawTerrain, terrain_gnd, 	NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 1, "2. wall", 	 			CREATE_BRUSH_WRAPPER( SDLK_2, &drawTerrain, terrain_wall, 	NO_CHILDREN)),
 				}, 2
 			))),
-			CREATE_LIST_BUTTON( 2, "3. erase", CREATE_BRUSH_WRAPPER(/*key*/SDLK_3, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
-					CREATE_LIST_BUTTON( 0, "(1) object", 			CREATE_BRUSH_WRAPPER( SDLK_1, &eraseObject, NO_VAR, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "(2) ai",	 			CREATE_BRUSH_WRAPPER( SDLK_2, &eraseAI, 	NO_VAR, 		NO_CHILDREN)),
+			CREATE_LIST_BUTTON( 1, "2. object", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 0, "1. select", 	CREATE_BRUSH_WRAPPER( SDLK_1, &editor_selectObj, 	NO_VAR, 	NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 1, "2. create", 	CREATE_BRUSH_WRAPPER( SDLK_2, &editor_createObj,	go_apple, 	NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 2, "3. change type",CREATE_BRUSH_WRAPPER( SDLK_3, NO_FUN, 				NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+							CREATE_LIST_BUTTON( 0, "1. player", 			CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_player, 		NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 1, "2. left turner", 		CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_leftTurner, 	NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 2, "3. apple", 				CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_apple, 			NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 3, "4. flower", 			CREATE_BRUSH_WRAPPER( SDLK_4, &editor_changeObjType, go_flower, 		NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 4, "5. creeper plant", 		CREATE_BRUSH_WRAPPER( SDLK_5, &editor_changeObjType, go_creeperPlant, 	NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 5, "6. peekaboo monster", 	CREATE_BRUSH_WRAPPER( SDLK_6, &editor_changeObjType, go_peekaboo, 		NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 6, "7. weeping angel", 		CREATE_BRUSH_WRAPPER( SDLK_7, &editor_changeObjType, ai_weepingAngel, 	NO_CHILDREN)),
+						}, 7
+					))),
+					CREATE_LIST_BUTTON( 3, "4. remove", CREATE_BRUSH_WRAPPER( SDLK_4, &eraseObject, NO_VAR, NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 4, "5. rotate", CREATE_BRUSH_WRAPPER( SDLK_5, NO_FUN, NO_VAR, 		/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+							CREATE_LIST_BUTTON( 0, "(1) \x80 up", 		CREATE_BRUSH_WRAPPER( SDLK_1, &setDirection, dir_up, 		NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 1, "(2) \x81 right", 	CREATE_BRUSH_WRAPPER( SDLK_2, &setDirection, dir_right, 	NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 2, "(3) \x82 down", 	CREATE_BRUSH_WRAPPER( SDLK_3, &setDirection, dir_down,		NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 3, "(4) \x83 left", 	CREATE_BRUSH_WRAPPER( SDLK_4, &setDirection, dir_left,		NO_CHILDREN)),
+						}, 4
+					))),
+				}, 5
+			))),
+			CREATE_LIST_BUTTON( 2, "3. ai", CREATE_BRUSH_WRAPPER(/*key*/SDLK_3, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 0, "1. erase",	CREATE_BRUSH_WRAPPER( SDLK_1, &eraseAI, NO_VAR, 	NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 1, "2. put", 	CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 	NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+							CREATE_LIST_BUTTON( 0, "(1) left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &drawAI, ai_leftTurner, 		NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 1, "(2) hungry left turner",CREATE_BRUSH_WRAPPER( SDLK_2, &drawAI, ai_hungryLeftTurner, NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 2, "(3) simple flower", 	CREATE_BRUSH_WRAPPER( SDLK_3, &drawAI, ai_simpleFlower, 	NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 3, "(4) creeper plant", 	CREATE_BRUSH_WRAPPER( SDLK_4, &drawAI, ai_creeperPlant, 	NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 4, "(5) peek-a-boo chaser", CREATE_BRUSH_WRAPPER( SDLK_5, &drawAI, ai_peekaboo, 		NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 5, "(6) weeping angel", 	CREATE_BRUSH_WRAPPER( SDLK_6, &drawAI, ai_weepingAngel, 	NO_CHILDREN)),
+						}, 6
+					))),
 				}, 2
 			))),
-			CREATE_LIST_BUTTON( 3, "4. object", CREATE_BRUSH_WRAPPER( SDLK_4, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
-					CREATE_LIST_BUTTON( 0, "(1) player", 			CREATE_BRUSH_WRAPPER( SDLK_1, &drawObject, go_player, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "(2) left turner", 		CREATE_BRUSH_WRAPPER( SDLK_2, &drawObject, go_leftTurner, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 2, "(3) apple", 			CREATE_BRUSH_WRAPPER( SDLK_3, &drawObject, go_apple, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 3, "(4) flower", 			CREATE_BRUSH_WRAPPER( SDLK_4, &drawObject, go_flower, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 4, "(5) creeper plant", 	CREATE_BRUSH_WRAPPER( SDLK_5, &drawObject, go_creeperPlant, NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 5, "(6) peekaboo monster", 	CREATE_BRUSH_WRAPPER( SDLK_6, &drawObject, go_peekaboo, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 6, "(7) weeping angel", 	CREATE_BRUSH_WRAPPER( SDLK_7, &drawObject, ai_weepingAngel, NO_CHILDREN)),
-				}, 7
-			))),
-			CREATE_LIST_BUTTON( 4, "5. ai", CREATE_BRUSH_WRAPPER( SDLK_5, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
-					CREATE_LIST_BUTTON( 0, "(1) left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &drawAI, ai_leftTurner, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "(2) hungry left turner",CREATE_BRUSH_WRAPPER( SDLK_2, &drawAI, ai_hungryLeftTurner, NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 2, "(3) simple flower", 	CREATE_BRUSH_WRAPPER( SDLK_3, &drawAI, ai_simpleFlower, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 3, "(4) creeper plant", 	CREATE_BRUSH_WRAPPER( SDLK_4, &drawAI, ai_creeperPlant, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 4, "(5) peek-a-boo chaser", CREATE_BRUSH_WRAPPER( SDLK_5, &drawAI, ai_peekaboo, 		NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 5, "(6) weeping angel", 	CREATE_BRUSH_WRAPPER( SDLK_6, &drawAI, ai_weepingAngel, 	NO_CHILDREN)),
-				}, 6
-			))),
-		}, 5
+		}, 3
 	);
 	SDLGUI_Set_Panel_Elements( brushContainer, brushList, true);
-	
+
+	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 725, -1, 25, NULL, "Selected Obj:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 12, 16, 0, NULL));
+	struct SDLGUI_Element *selectedObjContainer = SDLGUI_Create_Panel( 10, 750, GUI_LEFTPANEL_WIDTH - 2*10, 100, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
+	SDLGUI_List_Add( bodyItems, selectedObjContainer);
+	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
+
+	textbox_health = 	SDLGUI_Create_Textbox( 	120, 10, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
+	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 30, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
+
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  10, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  30, -1, 16, NULL, "Max-Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, textbox_maxHealth);
+	SDLGUI_List_Add( selectedObjElements, textbox_health);
 }
 #undef CREATE_LIST_BUTTON
 #undef NO_VAR
@@ -535,48 +622,22 @@ int main( int argc, char *args[]) {
 	myMap = 0;
 	char *mapPath = 0;
 
-	//Handle cmd-line arguments
-	int argi = 1;
-	while(argi < argc) {
-		if( args[argi][0] == '-') {
-			char c = args[argi][1];
-			switch (c) {
-				case 'm':
-					mapPath = args[argi+1];
-					argi++;
-					break;
-				case 'n':
-					myMap = createNewMap( (unsigned int)atoi(args[argi+1]), (unsigned int)atoi(args[argi+2]));
-					myMap->filePath = mapPath;
-					argi+=2;
-					break;
-				default:
-					argi = argc; //break out from the loop
-					break;
-			};
-			argi++;
-		}
-		else {
-			fprintf(stderr, "Unrecognized argument at index %d: \"%s\"", argi, args[argi]);
-			exit(1);
-		}
-	}
-
-	if(myMap == 0) {
-		if(mapPath == 0) {
-			fprintf( stderr, "There is no map. Open a map with '-m map-path' or create new map with '-m map-path -n map-width map-height'\n");
-			exit(0);
-		}
-		log0( "reading map file %s\n", mapPath);
-		myMap = readMapFile( mapPath);
-	}
-
 	init();
-
     log0("loading textures\n");
 	textures = loadAllTextures( renderer);
-
 	initGui();
+
+	if( argc > 0) {
+		myMap = readMapFile( args[0]); //TODO what happens if the file is corrupt
+		//TODO what happens if the map is of an older version
+	}
+	else {
+		/*TODO create a dialog
+			get width, height, map-name
+		*/
+		myMap = createNewMap( width, height);
+		myMap->filePath = map-name;
+	}
 
 	log0("All set and ready\nStarting...\n");
 
