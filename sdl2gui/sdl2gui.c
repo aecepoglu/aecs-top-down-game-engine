@@ -34,6 +34,7 @@ void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font) {
 	guiCore.mouseDownElement = 0;
 	guiCore.messageBox = 0;
 	guiCore.tooltip = 0;
+	guiCore.focusedElement = 0;
 
 	SDLGUI_List_Init( &guiCore.elements, 4);
 }
@@ -45,7 +46,6 @@ void SDLGUI_Destroy() {
 
 	if( guiCore.messageBox) {
 		SDLGUI_Destroy_Element( guiCore.messageBox);
-		guiCore.messageBox = 0;
 	}
 }
 
@@ -372,6 +372,8 @@ struct SDLGUI_Text_Data {
 void SDLGUI_Destroy_Textbox( struct SDLGUI_Element *textbox) {
 	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
 	SDL_DestroyTexture( data->bg);
+	SDL_DestroyTexture( data->fg);
+	free( data->text);
 	free( data);
 	free( textbox);
 }
@@ -410,6 +412,7 @@ struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int maxLen, in
 	data->textColor[2] = textColor[2];
 	data->textColor[3] = textColor[3];
 	data->text = (char*)calloc( maxLen+1, sizeof(char));
+	data->fg = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
 	data->textChanged = textChanged;
 
 	return SDLGUI_Create_Element( xPos, yPos, width, height, data, &SDLGUI_Focused_Textbox, &SDLGUI_Destroy_Textbox, &SDLGUI_Draw_Textbox, NULL, 0);
@@ -425,7 +428,7 @@ void SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, char *text) {
 	if( data->fg)
 		SDL_DestroyTexture( data->fg);
 
-	data->fg = getTextTexture( guiCore.renderer, guiCore.font, text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
+	data->fg = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
 }
 			
 void SDLGUI_ChangeText_Textbox( struct SDLGUI_Element *textbox, char c, int backspace) {
@@ -464,4 +467,9 @@ void SDLGUI_ClearText_Textbox( struct SDLGUI_Element *textbox) {
 		sprintf( data->text, "%s", ""); //Writing it this way is necessary to avoid the zero-length warning
 		data->fg = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
 	}
+}
+
+const char* SDLGUI_GetText_Textbox( struct SDLGUI_Element *textbox) {
+	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
+	return data->text;
 }

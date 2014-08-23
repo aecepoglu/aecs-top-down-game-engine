@@ -40,6 +40,7 @@ enum SDLGUI_Message_Type {
 
 void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font);
 void SDLGUI_Add_Element( struct SDLGUI_Element *element);
+void SDLGUI_Remove_Element( struct SDLGUI_Element *element);
 void SDLGUI_Draw();
 void SDLGUI_Destroy();
 int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e);
@@ -69,4 +70,5 @@ void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text);
 struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int textCap, int bgColor[4], int textColor[4], int fontWidth, int fontHeight, SDLGUI_TextChanged *textChanged);
 void SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, char *text);
 void SDLGUI_ClearText_Textbox( struct SDLGUI_Element *textbox);
+const char* SDLGUI_GetText_Textbox( struct SDLGUI_Element *textbox);
 #endif /*SDL2GUI_H*/

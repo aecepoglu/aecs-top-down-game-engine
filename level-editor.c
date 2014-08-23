@@ -41,6 +41,11 @@ struct SDLGUI_Element *textbox_health;
 struct SDLGUI_Element *textbox_maxHealth;
 struct object *selectedObj = NULL;
 
+struct {
+	struct SDLGUI_Element *panel, *textbox_width, *textbox_height;
+	bool running;
+} createMapDialogData;
+
 
 /* ---------------------------
 	Brush Functions
@@ -232,7 +237,7 @@ void selectBrushWithKeysym( SDL_Keycode key) {
 */
 
 void buttonQuit_clicked( struct SDLGUI_Element *from) {
-	running =0;
+	running =false;
 }
 
 void buttonSave_clicked( struct SDLGUI_Element *from) {
@@ -363,49 +368,103 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	return ( brush != NULL && x < myMap->width && y < myMap->height && brush( x, y, brushVariant) );
 }
 
+void handleWindowEvent( SDL_WindowEvent *e) {
+	switch( e->event) {
+		case SDL_WINDOWEVENT_SHOWN:
+		    log1("Window %d shown\n", e->windowID);
+		    break;
+		case SDL_WINDOWEVENT_HIDDEN:
+		    log1("Window %d hidden\n", e->windowID);
+		    break;
+		case SDL_WINDOWEVENT_EXPOSED:
+		    //log1("Window %d exposed\n", e->windowID);
+		    break;
+		case SDL_WINDOWEVENT_RESIZED:
+		    log1("Window %d resized to %dx%d\n",
+		            e->windowID, e->data1,
+		            e->data2);
+			resizeView( GUI_LEFTPANEL_WIDTH, e->data1, e->data2);
+			bodyContainer->rect.h = e->data2;
+			drawBackground();
+		    break;
+		case SDL_WINDOWEVENT_MINIMIZED:
+		    log1("Window %d minimized\n", e->windowID);
+		    break;
+		case SDL_WINDOWEVENT_MAXIMIZED:
+		    log1("Window %d maximized\n", e->windowID);
+		    break;
+		case SDL_WINDOWEVENT_RESTORED:
+		    log1("Window %d restored\n", e->windowID);
+		    break;
+		case SDL_WINDOWEVENT_CLOSE:
+		    log1("Window %d closed\n", e->windowID);
+		    break;
+	};
+}
+
+void run0() {
+	SDL_RenderClear( renderer);
+	SDLGUI_Draw();
+	SDL_RenderPresent( renderer);
+
+	SDL_Event e;
+	while( createMapDialogData.running) {
+		SDL_WaitEvent( &e);
+		switch (e.type) {
+			case SDL_WINDOWEVENT:
+				handleWindowEvent( &e.window);
+				break;
+			case SDL_QUIT:
+				createMapDialogData.running = false;
+				buttonQuit_clicked( NULL);
+				break;
+			case SDL_KEYDOWN:
+				if( isMessageBoxOn) {
+					SDLGUI_Hide_Message();
+					isMessageBoxOn =false;
+				}
+				else if ( SDLGUI_Handle_TextInput( (SDL_KeyboardEvent*)&e) != true) {
+					if( ((SDL_KeyboardEvent*)&e)->keysym.sym == SDLK_q) {
+						createMapDialogData.running = false;
+						buttonQuit_clicked( NULL);
+					}
+				}
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				if( isMessageBoxOn) {
+					SDLGUI_Hide_Message();
+					isMessageBoxOn =false;
+					break;
+				}
+				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
+					mouseDownInGui = true;
+				}
+				continue;
+			case SDL_MOUSEBUTTONUP:
+				if( isMessageBoxOn) {
+					SDLGUI_Hide_Message();
+					isMessageBoxOn =false;
+				}
+				else if( mouseDownInGui) {
+					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
+				}
+				break;
+		};
+		SDL_RenderClear( renderer);
+		SDLGUI_Draw();
+		SDL_RenderPresent( renderer);
+	}
+}
 
 void run() {
-    drawBackground();
+	drawBackground();
 	draw();
 	SDL_Event e;
 	while( running) {
 		SDL_WaitEvent( &e);
 		switch (e.type) {
 			case SDL_WINDOWEVENT:
-				switch( e.window.event) {
-					case SDL_WINDOWEVENT_SHOWN:
-					    log1("Window %d shown\n", e.window.windowID);
-					    break;
-					case SDL_WINDOWEVENT_HIDDEN:
-					    log1("Window %d hidden\n", e.window.windowID);
-					    break;
-					case SDL_WINDOWEVENT_EXPOSED:
-					    //log1("Window %d exposed\n", e.window.windowID);
-					    break;
-					case SDL_WINDOWEVENT_RESIZED:
-					    log1("Window %d resized to %dx%d\n",
-					            e.window.windowID, e.window.data1,
-					            e.window.data2);
-						resizeView( GUI_LEFTPANEL_WIDTH, e.window.data1, e.window.data2);
-						bodyContainer->rect.h = e.window.data2;
-						drawBackground();
-					    break;
-					case SDL_WINDOWEVENT_MINIMIZED:
-					    log1("Window %d minimized\n", e.window.windowID);
-					    break;
-					case SDL_WINDOWEVENT_MAXIMIZED:
-					    log1("Window %d maximized\n", e.window.windowID);
-					    break;
-					case SDL_WINDOWEVENT_RESTORED:
-					    log1("Window %d restored\n", e.window.windowID);
-					    break;
-					case SDL_WINDOWEVENT_CLOSE:
-					    log1("Window %d closed\n", e.window.windowID);
-					    break;
-					default:
-						//unhandled window event
-						continue;
-				};
+				handleWindowEvent( &e.window);
 				break;
 			case SDL_QUIT:
 				quit("Quitting");
@@ -444,10 +503,8 @@ void run() {
 				if( isMessageBoxOn) {
 					SDLGUI_Hide_Message();
 					isMessageBoxOn =false;
-					break;
 				}
-				if( mouseDownInGui) {
-					log2("mouse up gui\n");
+				else if( mouseDownInGui) {
 					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
 				}
 				break;
@@ -510,15 +567,13 @@ void drawObjects() {
 void draw() {
 	log3("draw\n");
 	SDL_RenderClear( renderer);
-	//render background
+	
 	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, 0, viewSize.i*TILELEN, viewSize.j*TILELEN);
-	//render objects
 	drawObjects( );
 
 	SDLGUI_Draw();
 
 	SDL_RenderPresent( renderer);
-
 }
 
 
@@ -537,7 +592,6 @@ struct brushWrapper* CREATE_BRUSH_WRAPPER( SDL_Keycode key, brushFun *brush, int
 #define NO_FUN NULL
 #define CREATE_LIST_BUTTON( i, text, data) SDLGUI_Create_Text( 5, 5 + 35*i, 160, 30, &brushListItem_clicked, text, (int[4]){255,255,255,255}, (int[4]){0,0,0,255}, 6, 9, 1, data)
 void initGui() {
-	SDLGUI_Init( renderer, textures->font);
 	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, (int[4]){170,180,190,255}, (int[4]){100,100,100,255}, 4);
 	SDLGUI_Add_Element( bodyContainer);
 	
@@ -617,32 +671,70 @@ void initGui() {
 #undef NO_CHILDREN
 #undef NO_FUN
 
+void startEditor() {
+}
+
+void editor_createMap_clicked( struct SDLGUI_Element *from) {
+	int width = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_width  ) );
+	int height = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_height) );
+	if( width <= 0 || height <= 0) {
+		isMessageBoxOn = true;
+		SDLGUI_Show_Message(0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Width & height must be >= 0");
+	}
+	else {
+		createMapDialogData.running = false;
+		//TODO I could just dynamically allocate createMapDialogData, then deallocate it here aswell
+
+		myMap = createNewMap( width, height);
+		myMap->filePath = "test-map.yz01.map";
+	
+		startEditor();
+	}
+}
+
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
-	char *mapPath = 0;
 
 	init();
     log0("loading textures\n");
 	textures = loadAllTextures( renderer);
-	initGui();
+	SDLGUI_Init( renderer, textures->font);
+	
+	running = true;
+	createMapDialogData.running = true;
 
-	if( argc > 0) {
-		myMap = readMapFile( args[0]); //TODO what happens if the file is corrupt
+	if( argc > 1) {
+		myMap = readMapFile( args[1]);
+		//TODO what happens if the file is corrupt
 		//TODO what happens if the map is of an older version
 	}
 	else {
+		createMapDialogData.panel = SDLGUI_Create_Panel( 0, 0, windowW, windowH, (int[4]){0,0,0,255}, (int[4]){0,0,0,0}, 0);
+		SDLGUI_Add_Element( createMapDialogData.panel);
+
+		struct SDLGUI_List *panelElems = SDLGUI_Get_Panel_Elements( createMapDialogData.panel);
+		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( 0, 100, windowW, 100, NULL, "Creating New Map\n----------------", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 0, NULL));
+		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 200, -1, 32, NULL, " width", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 0, NULL));
+		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 230, -1, 32, NULL, "height", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 0, NULL));
+		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 300, 200, 100, &editor_createMap_clicked, "create", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 2, NULL));
+
+		createMapDialogData.textbox_width  = SDLGUI_Create_Textbox( windowW/2, 200, 2, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
+		createMapDialogData.textbox_height = SDLGUI_Create_Textbox( windowW/2, 230, 2, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
+		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_width );
+		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_height);
 		/*TODO create a dialog
 			get width, height, map-name
 		*/
-		myMap = createNewMap( width, height);
-		myMap->filePath = map-name;
+		run0();
+		SDLGUI_Destroy();
+		SDLGUI_Init( renderer, textures->font);
 	}
+	initGui();
+	run();
 
 	log0("All set and ready\nStarting...\n");
 
-	running = 1;
-	run();
 
 	log0("Program over\nPeace\n");
 	SDLGUI_Destroy();

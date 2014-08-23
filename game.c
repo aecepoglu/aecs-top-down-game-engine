@@ -291,47 +291,17 @@ void setDefaults() {
 
 
 int main( int argc, char *args[]) {
-	//Default values
-	myMap = 0;
-	char *mapPath = 0;
-
-	//Handle cmd-line arguments
-	int argi = 1;
-	while(argi < argc) {
-		if( args[argi][0] == '-') {
-			char c = args[argi][1];
-			switch (c) {
-				case 'm':
-					mapPath = args[argi+1];
-					argi++;
-					break;
-				default:
-					argi = argc; //break out from the while-loop
-					break;
-			};
-			argi++;
-		}
-		else {
-			fprintf(stderr, "Unrecognized argument at index %d: \"%s\"", argi, args[argi]);
-			exit(1);
-		}
+	
+	if( argc != 2) {
+		fprintf( stderr, "Usage: %s map-file", args[0]);
+		exit(0);
 	}
-
-	if(myMap == 0) {
-		if(mapPath == 0) {
-			fprintf( stderr, "There is no map. Open a map with '-m map-path'\n");
-			exit(0);
-		}
-		else
-			myMap = readMapFile( mapPath);
+	else {
+		myMap = readMapFile( args[1]);
 	}
 
 	setDefaults();
 	init();
-
-	//FIXME temporary placement here. need their default values set somewhere better, maybe
-	//vectorAdd( &playerMoveAreaStart, &viewPos, &PLAYER_PADDING_VECTOR );
-	//vectorSub( &playerMoveAreaEnd, &viewEnd, &PLAYER_PADDING_VECTOR );
 
 	textures = loadAllTextures( renderer);
 
