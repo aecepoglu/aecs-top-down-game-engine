@@ -358,8 +358,9 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	else {
 		if( ! e2->state) //if no buttons are pressed
 			return 0;
-		x = e2->x / TILELEN;
+		x = (e2->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
 		y = e2->y / TILELEN;
+		log0("checking %d, %d\n", x, y);
 	}
 
 	x += viewPos.i;
@@ -509,14 +510,13 @@ void run() {
 				}
 				break;
 			case SDL_MOUSEMOTION:
-				//TODO get this working again
-				//if( handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
-				//	drawBackground();
-				//	break;
-				//}
-				//else
-				//	continue;
-				continue;
+				if( mouseDownInGui != true && handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
+					log0("motion\n");
+					drawBackground();
+					break;
+				}
+				else
+					continue;
 			case SDL_KEYUP:
 				/*don't do anything for those events*/
 				continue;
@@ -706,8 +706,6 @@ int main( int argc, char *args[]) {
 
 	if( argc > 1) {
 		myMap = readMapFile( args[1]);
-		//TODO what happens if the file is corrupt
-		//TODO what happens if the map is of an older version
 	}
 	else {
 		createMapDialogData.panel = SDLGUI_Create_Panel( 0, 0, windowW, windowH, (int[4]){0,0,0,255}, (int[4]){0,0,0,0}, 0);
