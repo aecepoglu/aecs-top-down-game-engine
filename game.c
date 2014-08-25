@@ -21,10 +21,16 @@ int objsSeenCount;
 
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 
+struct {
+	SDL_Rect container;
+	SDL_Rect fov;
+} guiMeasurements;
+
 void gameOver() {
 	log0("game over...\n");
 	running=false;
 }
+
 
 /* Moves forward only if that spot is empty */
 bool moveBackward( struct Map *map, struct object* obj) {
@@ -91,7 +97,6 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 		playerMoved = true;
 		moveFunction( myMap, player);
 		CALL_FOV_FCN();
-		
 	}
 }
 
@@ -129,24 +134,30 @@ Uint32 timerCallback( Uint32 interval, void *param) {
 
 void draw() {
 	log3("draw here\n");
+	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255);
 	SDL_RenderClear( renderer);
 
-	drawTexture( renderer, textures->trn[TEXTURE_TRN_NONE], 0, 0, windowW, windowH);
+	int pad = viewSize.i/2 - VIEW_RANGE;
 
-	unsigned int i,j;
-	for( i=0; i<PLAYER_FOV_TILES_LIM; i++ )
-		for( j=0; j<PLAYER_FOV_TILES_LIM; j++)
-			drawTexture( renderer, textures->trn[ playerVisibleTiles[ i][ j]], 
-				i*TILELEN, j*TILELEN, TILELEN, TILELEN
-			);
-	
+	int i, vi, j, vj;
+	for( i=0,vi=pad; i<PLAYER_FOV_TILES_LIM; i++, vi++ )
+		for( j=0,vj=pad; j<PLAYER_FOV_TILES_LIM; j++, vj++) {
+			if( playerVisibleTiles[ i][ j] != terrain_dark) {
+				drawTexture( renderer, textures->trn[ playerVisibleTiles[ i][ j]], vi*TILELEN, vj*TILELEN, TILELEN, TILELEN);
+			}
+		}
+				
+
 	struct ViewObject *vo;
 	for( i=0; i<objsSeenCount; i++) {
 		vo = &objsSeen[ i];
-		if( vo->isFullySeen)
-			drawTexture( renderer, textures->obj[ vo->obj->type ]->textures[ vo->obj->visualState][ vo->obj->dir], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
-		else
-			drawTexture( renderer, textures->obj[ go_apple ]->textures[ 0][ 0], vo->pos.i*TILELEN, vo->pos.j*TILELEN, TILELEN, TILELEN);
+
+		drawTexture( renderer, 
+			vo->isFullySeen
+				? textures->obj[ vo->obj->type ]->textures[ vo->obj->visualState][ vo->obj->dir]
+				: textures->obj[ go_apple]->textures[ 0][ 0], 
+			(pad + vo->pos.i)*TILELEN, (pad + vo->pos.j)*TILELEN, TILELEN, TILELEN
+		);
 		
 		if( vo->obj->ai)
 			AI_SEEN( vo->obj->ai);
@@ -221,6 +232,11 @@ void run() {
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
 						resizeView( 0, e.window.data1, e.window.data2);
+						
+						guiMeasurements.container.w = e.window.data1;
+						guiMeasurements.container.h = e.window.data2;
+						guiMeasurements.fov.x = (guiMeasurements.container.w - guiMeasurements.fov.w)/2;
+						guiMeasurements.fov.y = (guiMeasurements.container.h - guiMeasurements.fov.h)/2;
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:
 					    log1("Window %d minimized\n", e.window.windowID);
@@ -287,6 +303,9 @@ void setDefaults() {
 		playerVisibleTiles[i] = (enum terrainType*) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType));
 
 	init_fovBase( VIEW_RANGE);
+
+	guiMeasurements.fov = (SDL_Rect){.w = PLAYER_FOV_TILES_LIM * TILELEN, .h = PLAYER_FOV_TILES_LIM * TILELEN};
+	guiMeasurements.container = (SDL_Rect){.x = 0, .y=0};
 }
 
 

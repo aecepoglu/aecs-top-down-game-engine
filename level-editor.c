@@ -310,8 +310,30 @@ void textbox_maxHealth_changed( struct SDLGUI_Element *textbox, const char *text
 }
 
 void handleKey( SDL_KeyboardEvent *e) {
-	log2("is repeat: %d\n", e->repeat);
-	if( e->repeat) {
+	bool matched = e->repeat != true;
+	if( e->repeat != true) {
+		switch (e->keysym.sym) {
+			case SDLK_s:
+				buttonSave_clicked(NULL);
+				break;
+			case SDLK_q:
+				buttonQuit_clicked(NULL);
+				break;
+			case SDLK_TAB:
+				brushBack_clicked( NULL);
+				break;
+			default:
+				if( e->keysym.sym >= SDLK_0 && e->keysym.sym <= SDLK_9) {
+					matched = true;
+					selectBrushWithKeysym( e->keysym.sym);
+				}
+                else
+				    matched = false;
+				break;
+		};
+	}
+
+	if( matched != true) {
 		switch( e->keysym.sym) {
 			case SDLK_UP:
 				scrollScreen( dir_up);
@@ -324,23 +346,6 @@ void handleKey( SDL_KeyboardEvent *e) {
 				break;
 			case SDLK_LEFT:
 				scrollScreen( dir_left);
-				break;
-		};
-	}
-	else {
-		switch (e->keysym.sym) {
-			case SDLK_s:
-				buttonSave_clicked(NULL);
-				break;
-			case SDLK_q:
-				buttonQuit_clicked(NULL);
-				break;
-			case SDLK_TAB:
-				brushBack_clicked( NULL);
-				break;
-			default:
-				if( e->keysym.sym >= SDLK_0 && e->keysym.sym <= SDLK_9)
-					selectBrushWithKeysym( e->keysym.sym);
 				break;
 		};
 	}
@@ -412,9 +417,12 @@ void run0() {
 	while( createMapDialogData.running) {
 		SDL_WaitEvent( &e);
 		switch (e.type) {
-			case SDL_WINDOWEVENT:
-				handleWindowEvent( &e.window);
+			case SDL_WINDOWEVENT: {
+				SDL_WindowEvent *e2 = &e.window;
+				if( e2->event == SDL_WINDOWEVENT_RESIZED)
+					resizeView( GUI_LEFTPANEL_WIDTH, e2->data1, e2->data2);
 				break;
+			}
 			case SDL_QUIT:
 				createMapDialogData.running = false;
 				buttonQuit_clicked( NULL);
@@ -430,12 +438,12 @@ void run0() {
 						buttonQuit_clicked( NULL);
 					}
 				}
-				break;
+				continue;
 			case SDL_MOUSEBUTTONDOWN:
 				if( isMessageBoxOn) {
 					SDLGUI_Hide_Message();
 					isMessageBoxOn =false;
-					break;
+					continue;
 				}
 				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
 					mouseDownInGui = true;
@@ -451,6 +459,7 @@ void run0() {
 				}
 				break;
 		};
+		SDL_SetRenderDrawColor( renderer, 0,0,0,255);
 		SDL_RenderClear( renderer);
 		SDLGUI_Draw();
 		SDL_RenderPresent( renderer);
@@ -673,9 +682,6 @@ void initGui() {
 #undef NO_CHILDREN
 #undef NO_FUN
 
-void startEditor() {
-}
-
 void editor_createMap_clicked( struct SDLGUI_Element *from) {
 	int width = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_width  ) );
 	int height = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_height) );
@@ -690,7 +696,7 @@ void editor_createMap_clicked( struct SDLGUI_Element *from) {
 		myMap = createNewMap( width, height);
 		myMap->filePath = "test-map.yz01.map";
 	
-		startEditor();
+		running = true;
 	}
 }
 
@@ -703,11 +709,13 @@ int main( int argc, char *args[]) {
 	textures = loadAllTextures( renderer);
 	SDLGUI_Init( renderer, textures->font);
 	
-	running = true;
+	running = false;
 	createMapDialogData.running = true;
 
 	if( argc > 1) {
 		myMap = readMapFile( args[1]);
+		myMap->filePath = args[1];
+		running = true;
 	}
 	else {
 		createMapDialogData.panel = SDLGUI_Create_Panel( 0, 0, windowW, windowH, (int[4]){0,0,0,255}, (int[4]){0,0,0,0}, 0);
@@ -725,11 +733,14 @@ int main( int argc, char *args[]) {
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_height);
 		
 		run0();
+	}
+
+	if( running) {
 		SDLGUI_Destroy();
 		SDLGUI_Init( renderer, textures->font);
+		initGui();
+		run();
 	}
-	initGui();
-	run();
 
 	log0("Program over\nPeace\n");
 	SDLGUI_Destroy();

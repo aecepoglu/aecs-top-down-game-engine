@@ -169,6 +169,8 @@ void freeTextures( struct GameTextures* textures) {
 	}
 	free( textures->font);
 
+	SDL_DestroyTexture( textures->highlitObjIndicator);
+
 	free( textures);
 }
 
