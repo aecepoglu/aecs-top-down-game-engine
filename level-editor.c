@@ -108,10 +108,11 @@ bool editor_changeObjType( unsigned int x, unsigned int y, int type) {
 }
 
 bool editor_selectObj( unsigned int x, unsigned int y, int type) {
-	if( myMap->objs[x][y] == NULL)
-		return false;
 	
 	selectedObj = myMap->objs[x][y];
+	
+	if( selectedObj == NULL)
+		return false;
 
 	char tmp[4];
 
@@ -360,7 +361,6 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 			return 0;
 		x = (e2->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
 		y = e2->y / TILELEN;
-		log0("checking %d, %d\n", x, y);
 	}
 
 	x += viewPos.i;
@@ -511,7 +511,6 @@ void run() {
 				break;
 			case SDL_MOUSEMOTION:
 				if( mouseDownInGui != true && handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
-					log0("motion\n");
 					drawBackground();
 					break;
 				}
@@ -550,10 +549,12 @@ void drawObjects() {
 
 			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
 			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
-				log3("drawing object %d\n", i);
 				drawTexture( renderer, 
 					textures->obj[obj->type]->textures[ obj->visualState][obj->dir], 
 					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN, TILELEN, TILELEN );
+				if( obj == selectedObj) {
+					drawTexture( renderer, textures->highlitObjIndicator, screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN, TILELEN, TILELEN);
+				}
 			}
 		}
 	}
@@ -561,6 +562,7 @@ void drawObjects() {
 	free( myMap->objList);
 	myMap->objList = newObjList;
 	myMap->objListCount = newCount;
+
 }
 
 
@@ -721,18 +723,13 @@ int main( int argc, char *args[]) {
 		createMapDialogData.textbox_height = SDLGUI_Create_Textbox( windowW/2, 230, 2, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_width );
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_height);
-		/*TODO create a dialog
-			get width, height, map-name
-		*/
+		
 		run0();
 		SDLGUI_Destroy();
 		SDLGUI_Init( renderer, textures->font);
 	}
 	initGui();
 	run();
-
-	log0("All set and ready\nStarting...\n");
-
 
 	log0("Program over\nPeace\n");
 	SDLGUI_Destroy();

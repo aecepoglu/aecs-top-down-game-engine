@@ -130,6 +130,8 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_weepingAngel] = loadObjTextures( ren, "res/weepingAngel.png");
 
 	result->font = loadFontSheet( ren, "res/font-sheet.png");
+
+	result->highlitObjIndicator = loadTexture( ren, "res/selection_green.png");
 	
 	return result;
 }
