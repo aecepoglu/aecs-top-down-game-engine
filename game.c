@@ -137,31 +137,57 @@ void draw() {
 	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255);
 	SDL_RenderClear( renderer);
 
-	int pad = viewSize.i/2 - VIEW_RANGE;
+	int i, j; //index of tile in map
+	int vi, vj; //where to draw tile in view
+	
+	#ifdef GOD_VISION //TODO try to optimize the calculations in here
 
-	int i, vi, j, vj;
-	for( i=0,vi=pad; i<PLAYER_FOV_TILES_LIM; i++, vi++ )
-		for( j=0,vj=pad; j<PLAYER_FOV_TILES_LIM; j++, vj++) {
+	vi = MAX(player->pos.i-viewSize.i/2, 0);
+	int vjStart = MAX(player->pos.j-viewSize.j/2, 0);
+
+	for( i=vi - player->pos.i + viewSize.i/2; vi<=MIN(myMap->width-1,player->pos.i+viewSize.i/2); i++, vi++) {
+		for( vj=vjStart, j=vj - player->pos.j + viewSize.j/2; vj<=MIN(myMap->height-1,player->pos.j+viewSize.j/2); j++, vj++) {
+			drawTexture( renderer, textures->trn[ myMap->tiles[ vi][ vj]], i*TILELEN, j*TILELEN, TILELEN, TILELEN);
+			if( myMap->objs[ vi][ vj]) {
+				struct object *o = myMap->objs[ vi][ vj];
+				drawTexture( renderer, textures->obj[ o->type]->textures[ o->visualState][ o->dir], i*TILELEN, j*TILELEN, TILELEN, TILELEN);
+			}
+		}
+	}
+
+	#endif
+
+	int vi_padding = viewSize.i/2 - VIEW_RANGE; //TODO can be defined elsewhere. They only change value when VIEW_RANGE changes or view is resized
+	int vj_padding = viewSize.j/2 - VIEW_RANGE; //TODO can be defined elsewhere. They only change value when VIEW_RANGE changes or view is resized
+
+	for( i=0, vi=vi_padding; i<PLAYER_FOV_TILES_LIM; i++, vi++ )
+		for( j=0, vj=vj_padding; j<PLAYER_FOV_TILES_LIM; j++, vj++) {
 			if( playerVisibleTiles[ i][ j] != terrain_dark) {
+				#ifdef GOD_VISION
+				drawTexture( renderer, textures->highlitObjIndicator, vi*TILELEN, vj*TILELEN, TILELEN, TILELEN);
+				#else
 				drawTexture( renderer, textures->trn[ playerVisibleTiles[ i][ j]], vi*TILELEN, vj*TILELEN, TILELEN, TILELEN);
+				#endif
 			}
 		}
 				
-
 	struct ViewObject *vo;
 	for( i=0; i<objsSeenCount; i++) {
 		vo = &objsSeen[ i];
 
+		#ifndef GOD_VISION
 		drawTexture( renderer, 
 			vo->isFullySeen
 				? textures->obj[ vo->obj->type ]->textures[ vo->obj->visualState][ vo->obj->dir]
 				: textures->obj[ go_apple]->textures[ 0][ 0], 
-			(pad + vo->pos.i)*TILELEN, (pad + vo->pos.j)*TILELEN, TILELEN, TILELEN
+			(vi_padding + vo->pos.i)*TILELEN, (vj_padding + vo->pos.j)*TILELEN, TILELEN, TILELEN
 		);
+		#endif
 		
 		if( vo->obj->ai)
 			AI_SEEN( vo->obj->ai);
 	}
+
 
 	SDL_RenderPresent( renderer);
 }
