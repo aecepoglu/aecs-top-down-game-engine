@@ -165,6 +165,16 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 	return m;
 }
 
+bool lookupMatches( const int *lookup, int from, int to) {
+	while(from != to) {
+		if(from == 0)
+			return false;
+		//log2("jump %d -> %d\n", from, lookup[from]);
+		from = lookup[from];
+	}
+	return true;
+}
+
 bool checkMapValidity( struct Map *map) {
 	log0("Validating map\n");
 	bool result = false;
@@ -222,6 +232,7 @@ bool checkMapValidity( struct Map *map) {
 						groupLookupSize *= 2;
 						groupLookup = realloc( groupLookup, sizeof(int) * groupLookupSize);
 					}
+					groupLookup[ currentGroupIndex] = 0;
 					connectedTiles[x][y] = currentGroupIndex;
 				}
 
@@ -231,16 +242,13 @@ bool checkMapValidity( struct Map *map) {
 				if(connectedTiles[x][y+1] == 0)
 					connectedTiles[x][y+1] = connectedTiles[x][y];
 				else if(connectedTiles[x][y+1] != -1){
-					int k = connectedTiles[x][y+1];
-					while(k != connectedTiles[x][y]) {
-						if(groupLookup[k] == 0){
-							connectedGroupsCount --;
-							groupLookup[ connectedTiles[x][y+1] ] = connectedTiles[x][y];
-							log2("\t\tsetting lookup %d to %d\n", connectedTiles[x][y+1], connectedTiles[x][y]);
-							break;
-						}
-						else
-							k = groupLookup[k];
+					if( lookupMatches( groupLookup, connectedTiles[x][y+1], connectedTiles[x][y]) != true
+						&& lookupMatches( groupLookup, connectedTiles[x][y], connectedTiles[x][y+1]) != true
+						&& groupLookup[ connectedTiles[x][y+1]] == 0)
+					{
+						log2("\t\tsetting lookup of %d to %d, at pos %d,%d and %d,%d\n", connectedTiles[x][y+1], connectedTiles[x][y], x, y, x, y+1);
+						connectedGroupsCount --;
+						groupLookup[ connectedTiles[x][y+1]] = connectedTiles[x][y];
 					}
 				}
 			}
