@@ -7,6 +7,8 @@ find_package(SDL2_image REQUIRED)
 
 set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel)
 set(MY_FOV_SOURCES fov-util fov-raycast fov-line)
+set(MY_PF_SOURCES roughAStar roughAStar_depthLimited)
+
 
 foreach(x ${MY_AI_SOURCES})
 	list(APPEND _tmp "ai/${x}.c")
@@ -19,13 +21,20 @@ foreach(x ${MY_FOV_SOURCES})
 endforeach(x ${MY_FOV_SOURCES})
 set(MY_FOV_SOURCES ${_tmp})
 
-set(MY_SOURCE_FILES engine.c texture.c map.c map.h object.c vector.c linkedList.c pf/roughAStar.c text.c)
+unset(_tmp)
+foreach(x ${MY_PF_SOURCES})
+	list(APPEND _tmp "pf/${x}.c")
+endforeach(x ${MY_PF_SOURCES})
+set(MY_PF_SOURCES ${_tmp})
+
+
+set(MY_SOURCE_FILES engine.c texture.c map.c map.h object.c vector.c linkedList.c text.c)
 
 set(SDLGUI_SOURCE_FILES sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c)
 
 
 set(ALL_SOURCE_FILES ${MY_SOURCE_FILES})
-list(APPEND ALL_SOURCE_FILES ${MY_AI_SOURCES})
+list(APPEND ALL_SOURCE_FILES ${MY_AI_SOURCES} ${MY_PF_SOURCES})
 
 
 
@@ -36,10 +45,6 @@ include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 add_executable(aec-game game.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
-
-add_executable(gui-test log.h texture.h texture.c text.h text.c sdl2gui/gui-test.c ${SDLGUI_SOURCE_FILES})
-target_link_libraries(gui-test ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
-include_directories(gui-test ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 target_link_libraries(level-editor m)
 target_link_libraries(aec-game m)

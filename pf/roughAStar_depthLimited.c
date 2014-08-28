@@ -1,54 +1,56 @@
-#include <stdlib.h>
-#include "roughAStar.h"
+#include "roughAStar_depthLimited.h"
+#include "../log.h"
+#include "../stack.h"
 
-#include "../aiFun.h"
+#define HEURISTICS( pos1, pos2) ( abs( (pos1).i - pos2->i) + abs( (pos1).j - pos2->j) + ((pos1).i != pos2->i) + ((pos1).j != pos2->j) )
 
+void roughAStar_dl_constructPath( struct RoughPfNode ***map, struct RoughPfNode *first, struct RoughPfNode *last, moveFun** result, int *resultCount) {
+	log2("constructPath from %d,%d dir %d, to %d,%d dir %d\n", first->base->pos.i, first->base->pos.j, first->cameDir, last->base->pos.i, last->base->pos.j, last->cameDir);
+	int count = 0;
+	
+	struct Vector pos = last->base->neighbours[ DIR_REVERSE( last->cameDir)]->pos;
+	struct RoughPfNode *cur = map[ pos.i][ pos.j];
+	struct RoughPfNode *next = last;
 
-#define HEURISTICS( pos1, pos2) ( abs( pos1.i - pos2->i) + abs( pos1.j - pos2->j) + (pos1.i != pos2->i) + (pos1.j != pos2->j) )
+	while(true) {
+		log2("\t(%d,%d (%d))\n", pos.i, pos.j, cur->cameDir);
 
-void roughAStarData_free( struct RoughAStarData *data) {
-	int x,y;
-	int xLen = sizeof(data->map) / sizeof(struct RoughPfNode*);
-	int yLen;
-	for( x=0; x<xLen; x++){
-		yLen = sizeof(data->map[x]) / sizeof(struct RoughPfNode*);
-		for( y=0; y<yLen; y++) {
-			free( data->map[x][y]);
-		}
+		STACK_PUSH( result, moveForward, count);
+
+		int diff = (cur->cameDir - next->cameDir) %4;
+		log2("\t\tdiff: %d\n", diff);
+		switch( diff) {
+			case 1:
+				STACK_PUSH( result, turnLeft, count);
+				break;
+			case 2:
+				STACK_PUSH( result, turnLeft, count);
+				STACK_PUSH( result, turnLeft, count);
+				break;
+			case 3:
+				STACK_PUSH( result, turnRight, count);
+				break;
+		};
+		
+		if( cur == first)
+			break;
+
+		pos = cur->base->neighbours[ DIR_REVERSE(cur->cameDir)]->pos;
+		next = cur;
+		cur = map[ pos.i][ pos.j];
 	}
-
-	linkedList_free( data->openSet);
-	linkedList_free( data->closedSet);
+	
+	log2("found path is %d long\n", count);
+	*resultCount = count;
 }
 
-struct RoughAStarData* roughAStar_initData( struct Map *map) {
-	struct RoughAStarData *result = (struct RoughAStarData*)malloc( sizeof( struct RoughAStarData));
-
-	result->openSet = NULL;
-	result->closedSet = NULL;
-
-	int x,y;
-	struct RoughPfNode ***m = (struct RoughPfNode***)calloc( map->width, sizeof( struct RoughPfNode**));
-	for( x=0; x<map->width; x++) {
-		m[x] = (struct RoughPfNode**)calloc( map->width, sizeof( struct RoughPfNode*));
-		for(y=0; y<map->height; y++) {
-			struct RoughPfNode *n = (struct RoughPfNode*)malloc( sizeof( struct RoughPfNode));
-			n->base = map->pfBase[x][y];
-			m[x][y] = n;
-			//TODO set node defaults if any
-		}
-	}
-
-	result->map = m;
-
-	return result;
-}
-
-void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, enum direction fromDir, struct Vector *toPos) {
+bool roughAStar_dl_pathfind( struct RoughAStarData *data, struct Vector *fromPos, enum direction fromDir, struct Vector *toPos, int maxDepth, moveFun **result, int *resultCount) {
 	log1("rough A*, pathfind from %d,%d to %d,%d\n", fromPos->i, fromPos->j, toPos->i, toPos->j);
 
 	if( vectorEquals( fromPos, toPos))
-		return NULL;
+		return false;
+	else if ( HEURISTICS( *fromPos, toPos) > maxDepth)
+		return false;
 
 	//clear the open and closed nodes sets
 	struct LinkedListNode *setsToClear[2] = { data->openSet, data->closedSet};
@@ -57,10 +59,6 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 		struct LinkedListNode *listNode, *nextListNode;
 		listNode = setsToClear[i];
 		while( listNode) {
-			//struct RoughPfNode *node = (struct RoughPfNode*)listNode->data;
-			//node->gValue = 0;
-			//node->fValue = 0;
-			//node->cameFrom = NULL;
 			nextListNode = listNode->next;
 			free( listNode);
 			listNode = nextListNode;
@@ -75,13 +73,18 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 	struct RoughPfNode *node = data->map[fromPos->i][fromPos->j];
 	node->cameDir = fromDir;
 	node->gValue = 0;
-	node->fValue = HEURISTICS( node->base->pos, toPos);
+	node->fValue = HEURISTICS( *fromPos, toPos);
 
 	linkedList_push( &data->openSet, node);
 
 	bool isFirstIteration = true;
+	int openedCount=0;
 
 	while( data->openSet) {
+		openedCount ++;
+		if( openedCount >= maxDepth)
+			return false;
+
 		/* Find node with minimum fValue in data->openSet
             _node_ will be the RoughPfNode with min fValue
             _minListNode_ will be the LinkedListNode whose _data_ is _node_
@@ -109,7 +112,8 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 		if( vectorEquals( & node->base->pos, toPos)) {
 			//Create a path from fromPos to toPos and return it
 			log2("\t\tFound goal. Create the path and return it\n");
-			return roughAStar_constructPath( data->map, data->map[ fromPos->i][ fromPos->j], node);
+			roughAStar_dl_constructPath( data->map, data->map[ fromPos->i][ fromPos->j], node, result, resultCount);
+			return true;
 		}
 
 		linkedList_remove( &data->openSet, minListNode);
@@ -152,46 +156,6 @@ void* roughAStar_pathfind( struct RoughAStarData *data, struct Vector *fromPos, 
 
 		isFirstIteration = false;
 	}
-	return NULL;
+	return false;
 }
-
-void* roughAStar_constructPath( struct RoughPfNode ***map, struct RoughPfNode *first, struct RoughPfNode *last) {
-	log2("constructPath from %d,%d dir %d, to %d,%d dir %d\n", first->base->pos.i, first->base->pos.j, first->cameDir, last->base->pos.i, last->base->pos.j, last->cameDir);
-	struct LinkedListNode *result = NULL;
-	
-	struct Vector pos = last->base->neighbours[ DIR_REVERSE( last->cameDir)]->pos;
-	struct RoughPfNode *cur = map[ pos.i][ pos.j];
-	struct RoughPfNode *next = last;
-
-	while(true) {
-		log2("\t(%d,%d (%d))\n", pos.i, pos.j, cur->cameDir);
-
-		linkedList_push( &result, moveForward);
-
-		int diff = (cur->cameDir - next->cameDir) %4;
-		log2("\t\tdiff: %d\n", diff);
-		switch( diff) {
-			case 1:
-				linkedList_push( &result, turnLeft);
-				break;
-			case 2:
-				linkedList_push( &result, turnLeft);
-				linkedList_push( &result, turnLeft);
-				break;
-			case 3:
-				linkedList_push( &result, turnRight);
-				break;
-		};
-		
-		if( cur == first)
-			break;
-
-		pos = cur->base->neighbours[ DIR_REVERSE(cur->cameDir)]->pos;
-		next = cur;
-		cur = map[ pos.i][ pos.j];
-	}
-
-	return result;
-}
-
 #undef HEURISTICS

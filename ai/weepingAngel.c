@@ -1,5 +1,7 @@
+#include <stdlib.h>
 #include "weepingAngel.h"
-#include "../pf/roughAStar.h"
+#include "../pf/roughAStar_depthLimited.h"
+#include "../stack.h"
 
 #define TURNSPERMOVE 2
 
@@ -7,6 +9,9 @@
 #define STATE_FAR 1
 #define STATE_CLOSE 2
 #define STATE_NEAR 3
+
+#define PF_MAX_DEPTH 20
+#define PF_MAX_DEPTH_DIV_3 7 //PF_MAX_DEPTH divided by this should result in values of visual states (except STATE_DEAD)
 
 struct WeepingAngelData {
 	struct RoughAStarData *pfData;
@@ -62,27 +67,30 @@ void weepingAngel_update( struct Map *map, struct object *obj, void *data) {
 	}
 	else if( aiData->seen) {
 		aiData->seen = false;
-		obj->timerCounter = 10;
+		obj->timerCounter = rand()%10 + 1;
+		log1("weeping angel will wake up in %d\n", obj->timerCounter);
 		return;
 	}
 	/* at every update, re-calculates the path and takes one step on it
 		TODO needs optimizing
 	*/
-	struct LinkedListNode *path = roughAStar_pathfind( aiData->pfData, &obj->pos, obj->dir, &aiData->targetObj->pos);
-	if( path) {
-		moveFun *fun = (moveFun*)path->data;
+	moveFun *path[PF_MAX_DEPTH];
+	int pathLen;
+	if( roughAStar_dl_pathfind( aiData->pfData, &obj->pos, obj->dir, &aiData->targetObj->pos, PF_MAX_DEPTH, path, &pathLen)) {
+		moveFun *fun;
+		STACK_POP( path, fun, pathLen);
 		fun( map, obj);
 
-		linkedList_free( path);
-
-		//TODO change visuals depending on how far the target object is
-		obj->visualState = STATE_NEAR;
+		int newVisual = pathLen / PF_MAX_DEPTH_DIV_3;
+		obj->visualState = 3 - (newVisual <= 3 ? newVisual : 2);
+	}
+	else {
+		obj->visualState = STATE_FAR;
 	}
 
 	obj->timerCounter = TURNSPERMOVE;
 }
 
 void weepingAngel_seen( struct AI *ai) {
-	log1("weeping angel is seen\n");
 	((struct WeepingAngelData*)ai->data)->seen = true;
 }
