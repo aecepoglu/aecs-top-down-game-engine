@@ -7,12 +7,6 @@
 
 #define LINEBUFSIZE 256
 
-static int test_fun_1( lua_State * L )
-{
-    printf( "t1 function fired\n" );
-    return 0;
-}
-
 int counter =  0;
 int triggerSet = 0;
 lua_CFunction trigger;
@@ -43,7 +37,7 @@ static int count( lua_State *l) {
 
 			if ( 0 != lua_pcall( l, 0, 0, 0 ) ) {
 				printf("Failed to call the callback!\n %s\n", lua_tostring( l, -1 ) );
-				return;
+				return 0;
 			}
 		}
 		else
@@ -73,11 +67,6 @@ static const struct luaL_Reg myLuaLib[] = {
 	{NULL, NULL}
 };
 
-int luaopen_aoeu( lua_State *l) {
-	luaL_setfuncs( l, myLuaLib, 0);
-	return 1;
-}
-
 
 
 int main ( void )
@@ -91,8 +80,6 @@ int main ( void )
     L = luaL_newstate();
     luaL_openlibs( L ); 
 
-    lua_register( L, "t1", test_fun_1 );
-
 	//sending a variable to lua code
 	lua_pushnumber( L, 1);
 	lua_setglobal( L, "PLAYER");
@@ -104,13 +91,10 @@ int main ( void )
 	lua_pushcfunction( L, tripler);
 	lua_setglobal( L, "timesThree");
 
-	//sharing functions as lib
-	//libImporter( L);
-
 	//simple package definition
 	lua_newtable( L);
 	luaL_setfuncs( L, myLuaLib, 0);
-	lua_setglobal( L, "tab");
+	lua_setglobal( L, "lib");
 
     while ( fgets( buff, LINEBUFSIZE, stdin ) != NULL)
     {
