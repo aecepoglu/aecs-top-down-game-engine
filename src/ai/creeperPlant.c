@@ -91,9 +91,9 @@ struct AI* creeperPlant_create() {
 	return creeperPlant_createDetailed(TYPE_ROOT, false, false, NULL);
 }
 
-void addNewSprout( struct AI* parentAi, enum direction dirFromParent, struct Map *map, int posX, int posY, enum direction sproutDir, bool leftClinges, bool rightClinges, unsigned int health) {
+void addNewSprout( unsigned int sproutId, struct AI* parentAi, enum direction dirFromParent, struct Map *map, int posX, int posY, enum direction sproutDir, bool leftClinges, bool rightClinges, unsigned int health) {
 	if(health > 0) {
-		struct object *newPlant = createObject(go_creeperPlant, posX, posY);
+		struct object *newPlant = createObject(go_creeperPlant, posX, posY, sproutId);
 		newPlant->dir = sproutDir;
 		newPlant->timerCounter = TURNS_PER_MOVE;
 		newPlant->health = health;
@@ -151,13 +151,13 @@ void creeperPlant_update( struct Map *map, struct object *obj, void *data) {
 			obj->ai->enabled = false;
 
 			if(goesLeft)
-				addNewSprout(obj->ai, dir_left, map, leftPos.i, leftPos.j, DIR_ROTATE_LEFT(obj->dir), !LW && LC, !FE && !LW, obj->health);
+				addNewSprout(obj->id, obj->ai, dir_left, map, leftPos.i, leftPos.j, DIR_ROTATE_LEFT(obj->dir), !LW && LC, !FE && !LW, obj->health);
 
 			if(goesRight)
-				addNewSprout(obj->ai, dir_right, map, rightPos.i, rightPos.j, DIR_ROTATE_RIGHT(obj->dir), !FE && !RW, !RW && RC, obj->health);
+				addNewSprout(obj->id, obj->ai, dir_right, map, rightPos.i, rightPos.j, DIR_ROTATE_RIGHT(obj->dir), !FE && !RW, !RW && RC, obj->health);
 
 			if(goesForward)
-				addNewSprout(obj->ai, dir_up, map, fwdPos.i, fwdPos.j, obj->dir, FE && LW, FE && RW, obj->health - ((LC || RC) ? 0 : 1) );
+				addNewSprout(obj->id, obj->ai, dir_up, map, fwdPos.i, fwdPos.j, obj->dir, FE && LW, FE && RW, obj->health - ((LC || RC) ? 0 : 1) );
 		}
 		else {
 			obj->health --;
@@ -177,7 +177,7 @@ void creeperPlant_update( struct Map *map, struct object *obj, void *data) {
 			vectorAdd( &newPos, dirVector, &obj->pos);
 
 			if( TILE_CLEAR( map, newPos.i, newPos.j) ){
-				addNewSprout( obj->ai, dir, map, newPos.i, newPos.j, (obj->dir + dir)%4, false, false, obj->health);
+				addNewSprout( obj->id, obj->ai, dir, map, newPos.i, newPos.j, (obj->dir + dir)%4, false, false, obj->health);
 			}
 			else
 				aiData->children[dir] = NULL;

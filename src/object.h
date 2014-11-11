@@ -10,11 +10,13 @@
 #include "ai.h"
 #include "basic.h"
 #include "vector.h"
+#include <lua.h>
 
 enum objType { go_player, go_leftTurner, go_apple, go_flower, go_creeperPlant, go_peekaboo, go_weepingAngel, go_NUM_ITEMS};
 
 /*struct AI defined in ai.h*/
 struct object {
+    unsigned int id;
 	struct Vector pos;
 	enum objType type;
 	enum direction dir;
@@ -24,17 +26,19 @@ struct object {
 	unsigned int timerCounter;
 	bool isDeleted;
 	unsigned int visualState;
+
+    int onInteract_luaRef;
 };
 
 
 
 
 /* Creates and returns an Object of given type */
-struct object* createObject( enum objType type, unsigned int x, unsigned int y);
+struct object* createObject( enum objType type, unsigned int x, unsigned int y, unsigned int id);
 struct object* readObject( FILE *fp);
 void writeObject( FILE *fp, struct object *obj);
 
-void objectUse( struct object *obj1, struct object *obj2);
+void objectInteract( struct object *obj1, struct object *obj2, lua_State *lua);
 void objectSwallow( struct object *obj1, struct object *obj2);
 bool objectHit( struct object *obj1, struct object *obj2);
 

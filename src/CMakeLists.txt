@@ -4,6 +4,7 @@ project( aecEngine)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules/")
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(Lua 5.2 REQUIRED)
 
 set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel)
 set(MY_FOV_SOURCES fov-util fov-raycast fov-line)
@@ -39,18 +40,18 @@ list(APPEND ALL_SOURCE_FILES ${MY_AI_SOURCES} ${MY_PF_SOURCES})
 
 
 add_executable(level-editor level-editor.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES})
-target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
+target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 add_executable(aec-game game.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
-target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
-include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
+target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
+include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 
 add_executable(lua-test dsl/c_code.c)
 
 target_link_libraries(level-editor m)
 target_link_libraries(aec-game m)
-target_link_libraries(lua-test lua)
+target_link_libraries(lua-test  ${LUA_LIBRARIES})
 
 add_definitions(-Wall)
 

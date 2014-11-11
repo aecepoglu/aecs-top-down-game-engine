@@ -3,10 +3,16 @@
 #include "aiTable.h"
 #include <stdlib.h>
 
-struct object* createObject( enum objType type, unsigned int x, unsigned int y) {
+#include <lua.h>
+#include <lauxlib.h>
+
+struct object* createObject( enum objType type, unsigned int x, unsigned int y, unsigned int id) {
 	struct object *obj = (struct object*)malloc(sizeof(struct object));
+    obj->id = id;
+
 	obj->pos.i = x;
 	obj->pos.j = y;
+
 	obj->type = type;
 	obj->dir = dir_up;
 	obj->ai = 0;
@@ -15,6 +21,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y) 
 	obj->timerCounter= 0;
 	obj->isDeleted=false;
 	obj->visualState = 1;
+    obj->onInteract_luaRef = LUA_NOREF;
 
 	return obj;
 }
@@ -25,6 +32,7 @@ void writeObject( FILE *fp, struct object *obj) {
 	fwrite( &obj->dir,  sizeof(enum direction), 1, fp);
 	enum aiType tmp = obj->ai == 0 ? ai_none : obj->ai->type;
 	fwrite( &tmp, 		sizeof(enum aiType),     1, fp);
+    fwrite( &obj->id, sizeof(int), 1, fp);
 }
 
 struct object* readObject( FILE *fp) {
@@ -36,11 +44,14 @@ struct object* readObject( FILE *fp) {
 	fread( &type,      sizeof(enum aiType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
 
+    fread( &obj->id, sizeof( int), 1, fp);
+
 	obj->health = 3;
 	obj->maxHealth = 3;
 	obj->timerCounter= 0;
 	obj->visualState = 1;
 	obj->isDeleted=false;
+    obj->onInteract_luaRef = LUA_NOREF;
 
 	return obj;
 }
@@ -49,9 +60,18 @@ struct object* readObject( FILE *fp) {
 	Some functions objects use to interract with each other
 */
 
-void objectUse( struct object *obj, struct object *obj2) {
-	/* Not used yet. Might even need to be implemented inside the object AI or sth. ]
-	*/
+void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
+	if( obj2->onInteract_luaRef != LUA_NOREF) {
+        //TODO remove this description
+		/* lua state should be created when the program starts. 
+		then I load a map and read its map script
+		*/
+		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->onInteract_luaRef);
+		if( lua_pcall( lua, 0, 0, 0) != 0) {
+			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));
+			return;
+		}
+	}
 }
 
 bool objectHit( struct object *obj1, struct object *obj2) {

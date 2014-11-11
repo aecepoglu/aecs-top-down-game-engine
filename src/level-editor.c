@@ -8,7 +8,8 @@
 
 #include "error.h"
 
-
+#define PLAYER_ID 0 //TODO 
+unsigned int objectCounter = 1;
 
 bool moveForward( struct Map *map, struct object* obj) { return false; }
 bool turnLeft( struct Map *map, struct object *obj) { return false; }
@@ -37,6 +38,7 @@ struct brushWrapper {
 brushFun *brush = NULL; //draws something on the given location
 int brushVariant;
 
+struct SDLGUI_Element *textbox_id;
 struct SDLGUI_Element *textbox_health;
 struct SDLGUI_Element *textbox_maxHealth;
 struct object *selectedObj = NULL;
@@ -92,7 +94,7 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 		return false;
 
 	//create and initialize a monster
-	struct object *obj = createObject( type, x, y);
+	struct object *obj = createObject( type, x, y, objectCounter++);
 
 	addObject( obj, myMap, x, y);
 
@@ -104,6 +106,9 @@ bool editor_changeObjType( unsigned int x, unsigned int y, int type) {
 		return false;
 	
 	myMap->objs[x][y]->type = type;
+    if( type == go_player) 
+        myMap->objs[x][y]->id = PLAYER_ID;
+
 	return true;
 }
 
@@ -115,6 +120,9 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 		return false;
 
 	char tmp[4];
+
+    sprintf(tmp, "%d", selectedObj->id);
+	SDLGUI_SetText_Textbox( textbox_id, strdup(tmp));
 
 	sprintf(tmp, "%d", selectedObj->health);
 	SDLGUI_SetText_Textbox( textbox_health, strdup(tmp));
@@ -669,11 +677,14 @@ void initGui() {
 	SDLGUI_List_Add( bodyItems, selectedObjContainer);
 	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
 
-	textbox_health = 	SDLGUI_Create_Textbox( 	120, 10, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
-	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 30, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
+    textbox_id =        SDLGUI_Create_Textbox( 	120, 10, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, NULL);
+	textbox_health = 	SDLGUI_Create_Textbox( 	120, 30, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
+	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 50, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
 
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  10, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  30, -1, 16, NULL, "Max-Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  10, -1, 16, NULL, "        ID :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  30, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  50, -1, 16, NULL, "Max-Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, textbox_id);
 	SDLGUI_List_Add( selectedObjElements, textbox_maxHealth);
 	SDLGUI_List_Add( selectedObjElements, textbox_health);
 }
@@ -694,7 +705,7 @@ void editor_createMap_clicked( struct SDLGUI_Element *from) {
 		//TODO I could just dynamically allocate createMapDialogData, then deallocate it here aswell
 
 		myMap = createNewMap( width, height);
-		myMap->filePath = "test-map.yz01.map";
+		myMap->filePath = "test-map.yz.map";
 	
 		running = true;
 	}

@@ -41,7 +41,7 @@ void simpleFlower_update( struct Map *map, struct object *obj, void *data) {
 			int yPos = obj->pos.j + rand()%yMod - yMod/2;
 
 			if( TILE_CLEAR(map, xPos, yPos) ) {
-				struct object *newFlower = createObject(go_flower, xPos, yPos);
+				struct object *newFlower = createObject(go_flower, xPos, yPos, obj->id);
 				newFlower->ai = simpleFlower_create();
 				addObject( newFlower, map, xPos, yPos);
 			}

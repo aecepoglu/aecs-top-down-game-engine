@@ -7,7 +7,7 @@
 #include "log.h"
 #include "error.h"
 
-#define MAP_VERSION 0
+#define MAP_VERSION 1
 
 /* -----------
  *	FUNCTIONS

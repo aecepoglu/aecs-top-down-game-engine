@@ -3,6 +3,10 @@
 #include "fov/fov.h"
 #include "definitions.h"
 
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
 
 SDL_Event timerPushEvent;
 Uint32 timerDelay;
@@ -12,12 +16,14 @@ struct object *player;
 /* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
 bool playerMoved = false;
 
-//FIXME The program will crash if the window is too small. Render window un-usable and show a notification message about it.
+//FIXME The program will crash if the window is too small (test if this is still happening). Render window un-usable and show a notification message about it.
 
 #define PLAYER_FOV_TILES_LIM VIEW_BOX_LENGTH
 enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
+
+lua_State *lua;
 
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 
@@ -31,6 +37,18 @@ void gameOver() {
 	running=false;
 }
 
+/* Uses the object in-front of player */
+bool interact( struct Map *map, struct object *obj) {
+	struct BasePfNode *nextNode = map->pfBase[ obj->pos.i][ obj->pos.j]->neighbours[ obj->dir];
+	struct Vector *pos = GET_PF_POS( nextNode);
+	
+	if( pos != NULL && map->objs[ pos->i][ pos->j]) {
+		objectInteract( player, map->objs[ pos->i][ pos->j], lua);
+		return true;
+	}
+	else
+		return false;
+}
 
 /* Moves forward only if that spot is empty */
 bool moveBackward( struct Map *map, struct object* obj) {
@@ -120,6 +138,9 @@ void handleKey( SDL_KeyboardEvent *e) {
 		case SDLK_e:
 			eat( myMap, player);
 			break;
+        case SDLK_u:
+            interact( myMap, player);
+            break;
 		default:
 			log0("Unhandled key\n");
 			break;
@@ -334,19 +355,68 @@ void setDefaults() {
 	guiMeasurements.container = (SDL_Rect){.x = 0, .y=0};
 }
 
+static int setTrigger( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	luaL_checktype( l, 2, LUA_TFUNCTION);
+
+    int objId = lua_tointeger( l, 1);
+
+	log1("Setting trigger for obj with id %d.\n", objId);
+
+    int i;
+    struct object *o;
+    int count=0;
+    for( i=0; i<myMap->objListCount; i++) {
+        o = myMap->objList[i];
+        if( o->id == objId) {
+            o->onInteract_luaRef = luaL_ref( l, LUA_REGISTRYINDEX);
+            count ++;
+        }
+    }
+
+    log0("Set interact-trigger for %d objects\n", count);
+
+	return 0;
+}
+
+lua_State* initLua( const char *file) {
+	lua_State * L;
+	
+	L = luaL_newstate();
+	luaL_openlibs( L ); 
+
+	lua_newtable( L);
+	luaL_setfuncs( L, (struct luaL_Reg[]) {
+		{"setTrigger", setTrigger},
+		{NULL, NULL}
+	}, 0);
+	lua_setglobal( L, "lib");
+
+    if (luaL_loadfile(L, file) || lua_pcall( L, 0, 0, 0)) {
+        fprintf(stderr, "Error loading script '%s'\n%s\n", file, lua_tostring(L, -1));
+        exit(1);
+	}
+
+	return L;
+}
 
 int main( int argc, char *args[]) {
 	
 	if( argc != 2) {
-		fprintf( stderr, "Usage: %s map-file", args[0]);
+		fprintf( stderr, "Usage: %s map-file (without .yz.* extensions)", args[0]);
 		exit(0);
 	}
-	else {
-		myMap = readMapFile( args[1]);
-	}
+	
+	char fileNameBuf[256]; //TODO do the arg handling elsewhere so I don't have to keep a 256 byte in memo the entire runtime
+	sprintf( fileNameBuf, "%s.yz.map", args[1]);
+	myMap = readMapFile( fileNameBuf);
+
+	sprintf( fileNameBuf, "%s.yz.lua", args[1]);
+	lua = initLua( fileNameBuf);
 
 	setDefaults();
 	init();
+
 
 	textures = loadAllTextures( renderer);
 
