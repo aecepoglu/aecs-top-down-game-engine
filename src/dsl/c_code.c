@@ -8,9 +8,7 @@
 #define LINEBUFSIZE 256
 
 int counter =  0;
-int triggerSet = 0;
-lua_CFunction trigger;
-int triggerInt;
+int triggerInt = LUA_NOREF;
 
 static int tripler( lua_State *l) {
 	printf("C: tripler()\n");
@@ -28,11 +26,8 @@ static int doubler( lua_State *l) {
 
 static int count( lua_State *l) {
 	counter ++;
-	printf("count: %d\n", counter);
 	if( counter == 3) {
-	
-		printf("\tpull the trigger\n");
-		if( triggerSet) {
+		if( triggerInt != 0) {
 			lua_rawgeti( l, LUA_REGISTRYINDEX, triggerInt);
 
 			if ( 0 != lua_pcall( l, 0, 0, 0 ) ) {
@@ -53,9 +48,14 @@ static int setTrigger( lua_State *l) {
 	luaL_checktype( l, 1, LUA_TFUNCTION);
 	printf("trigger set. call inc() to increment counter. trigger will be called when counter reaches 3.\n");
 	
-	triggerSet = 1;
 	triggerInt = luaL_ref( l, LUA_REGISTRYINDEX);
 
+	return 0;
+}
+
+static int consoleWrite( lua_State *l) {
+	luaL_checkstring( l, 1);
+	printf("CONSOLE: %s\n", lua_tostring( l, 1));
 	return 0;
 }
 
@@ -64,6 +64,7 @@ static const struct luaL_Reg myLuaLib[] = {
 	{"tripler", tripler},
 	{"inc", count},
 	{"setTrigger", setTrigger},
+	{"write", consoleWrite},
 	{NULL, NULL}
 };
 
