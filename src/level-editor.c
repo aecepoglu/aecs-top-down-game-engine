@@ -8,7 +8,6 @@
 
 #include "error.h"
 
-#define PLAYER_ID 0 //TODO 
 unsigned int objectCounter = 1;
 
 bool moveForward( struct Map *map, struct object* obj) { return false; }
@@ -106,8 +105,6 @@ bool editor_changeObjType( unsigned int x, unsigned int y, int type) {
 		return false;
 	
 	myMap->objs[x][y]->type = type;
-    if( type == go_player) 
-        myMap->objs[x][y]->id = PLAYER_ID;
 
 	return true;
 }
@@ -711,6 +708,18 @@ void editor_createMap_clicked( struct SDLGUI_Element *from) {
 	}
 }
 
+int setCounter() {
+	int maxId = 1;
+	int i;
+	for( i=0; i<myMap->objListCount; i++) {
+		if( myMap->objList[i]->id > maxId)
+			maxId = myMap->objList[i]->id;
+	}
+
+	return maxId;
+}
+
+
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
@@ -727,6 +736,10 @@ int main( int argc, char *args[]) {
 		myMap = readMapFile( args[1]);
 		myMap->filePath = args[1];
 		running = true;
+
+		if( myMap->objListCount > 0) {
+			objectCounter = myMap->objList[ myMap->objListCount-1 ]->id + 1;
+		}
 	}
 	else {
 		createMapDialogData.panel = SDLGUI_Create_Panel( 0, 0, windowW, windowH, (int[4]){0,0,0,255}, (int[4]){0,0,0,0}, 0);

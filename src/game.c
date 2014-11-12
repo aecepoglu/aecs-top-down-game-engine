@@ -355,7 +355,7 @@ void setDefaults() {
 	guiMeasurements.container = (SDL_Rect){.x = 0, .y=0};
 }
 
-static int setTrigger( lua_State *l) {
+static int dsl_setTrigger( lua_State *l) {
 	luaL_checkinteger( l, 1);
 	luaL_checktype( l, 2, LUA_TFUNCTION);
 
@@ -379,6 +379,11 @@ static int setTrigger( lua_State *l) {
 	return 0;
 }
 
+static int dsl_endLevel( lua_State *l) {
+	running = 0;
+	return 0;
+}
+
 lua_State* initLua( const char *file) {
 	lua_State * L;
 	
@@ -387,7 +392,8 @@ lua_State* initLua( const char *file) {
 
 	lua_newtable( L);
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
-		{"setTrigger", setTrigger},
+		{"setTrigger", dsl_setTrigger},
+		{"endLevel", dsl_endLevel},
 		{NULL, NULL}
 	}, 0);
 	lua_setglobal( L, "lib");

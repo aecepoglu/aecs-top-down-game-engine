@@ -60,7 +60,7 @@ if(MY_BUILD_TYPE STREQUAL "debug")
 	add_definitions(-D VERBOSE_3)
 	add_definitions(-g)
 else(MY_BUILD_TYPE strequal "debug")
-	add_definitions(-D VERBOSE_1)
+	add_definitions(-D VERBOSE_0)
 endif(MY_BUILD_TYPE STREQUAL "debug")
 
 #copy resources from source-dir to binary-dir
