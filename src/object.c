@@ -60,12 +60,12 @@ struct object* readObject( FILE *fp) {
 	Some functions objects use to interract with each other
 */
 
+void objectUse( struct object *o1) {
+	//TODO o1 used
+}
+
 void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 	if( obj2->onInteract_luaRef != LUA_NOREF) {
-        //TODO remove this description
-		/* lua state should be created when the program starts. 
-		then I load a map and read its map script
-		*/
 		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->onInteract_luaRef);
 		if( lua_pcall( lua, 0, 0, 0) != 0) {
 			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));

@@ -429,10 +429,7 @@ int dsl_useObject( lua_State *l) {
 	int i;
 	struct object *o;
 	FOREACH_OBJ_WITH_ID( usedObjId, i, o, {
-		printf(" found object with id %d\n", o->id);
-		//TODO
-		quit("not done yet\n");
-		break;
+		objectUse( o);
 	})
 	return 0;
 }
