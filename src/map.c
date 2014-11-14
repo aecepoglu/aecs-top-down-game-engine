@@ -80,21 +80,6 @@ struct Map* readMapFile( char *path) {
 	return m;
 }
 
-struct object* findPlayer( struct Map *m) {
-	log0( "Looking for player.\n");
-	unsigned int i;
-	for( i=0; i<m->objListCount; i++) {
-		if( m->objList[i]->type == go_player) {
-			log0 ( "Found player\n");
-			return m->objList[i];
-		}
-	}
-	log0 ( "Could not find player\n");
-	return 0;
-}
-
-
-
 void addObject( struct object* obj, struct Map *map, int x, int y) {
 	ARRAY_ADD( map->objList, obj, map->objListCount, map->objListSize, sizeof( struct object));
 	map->objs[x][y] = obj;
@@ -207,8 +192,8 @@ bool checkMapValidity( struct Map *map) {
 		}
 	}
 
-	if( playerCount != 1) {
-		ERROR("player count is %d. must be 1.\n", playerCount);
+	if( playerCount != 0) {
+		ERROR("player count is %d. must be 0.\n", playerCount);
 		goto freeConnectedTiles;
 	}
 	

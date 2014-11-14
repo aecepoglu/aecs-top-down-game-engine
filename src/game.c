@@ -13,8 +13,12 @@ Uint32 timerDelay;
 
 struct object *player;
 
-/* The player is allowed to play only once per tick. This variable shows whether the player has moved or not */
+/* The player is allowed to play only once per tick.
+	This variable shows whether the player has moved or not */
 bool playerMoved = false;
+/* when a level is read, player position needs to be set from within the level script.
+	until then, this variable stays false */
+bool isPlayerPosSet = false;
 
 //FIXME The program will crash if the window is too small (test if this is still happening). Render window un-usable and show a notification message about it.
 
@@ -257,6 +261,9 @@ void update() {
 }
 
 void run() {
+	if( isPlayerPosSet != true) {
+		quit( "player position should have been set from the level script.");
+	}
 	CALL_FOV_FCN();
 
 	SDL_AddTimer( timerDelay, timerCallback, 0);
@@ -339,10 +346,7 @@ void setDefaults() {
 	timerPushEvent.type = SDL_USEREVENT;
 	timerPushEvent.user = userEvent;
 
-	//find the player from the obj list
-	player = findPlayer( myMap);
-	if( ! player)
-		quit( "No player was detected. You need a player object in the map.");
+	player = createObject( go_player, 0, 0, 0);
 
 	playerVisibleTiles = (enum terrainType**) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType*));
 	int i;
@@ -358,33 +362,66 @@ void setDefaults() {
 static int dsl_setTrigger( lua_State *l) {
 	luaL_checkinteger( l, 1);
 	luaL_checktype( l, 2, LUA_TFUNCTION);
-
-    int objId = lua_tointeger( l, 1);
-
+	
+	int objId = lua_tointeger( l, 1);
+	
 	log1("Setting trigger for obj with id %d.\n", objId);
-
-    int i;
-    struct object *o;
-    int count=0;
-    for( i=0; i<myMap->objListCount; i++) {
-        o = myMap->objList[i];
-        if( o->id == objId) {
-            o->onInteract_luaRef = luaL_ref( l, LUA_REGISTRYINDEX);
-            count ++;
-        }
-    }
-
-    log0("Set interact-trigger for %d objects\n", count);
+	
+	int i;
+	struct object *o;
+	int count=0;
+	for( i=0; i<myMap->objListCount; i++) {
+		o = myMap->objList[i];
+		if( o->id == objId) {
+			o->onInteract_luaRef = luaL_ref( l, LUA_REGISTRYINDEX);
+			count ++;
+		}
+	}
+	
+	log0("Set interact-trigger for %d objects\n", count);
 
 	return 0;
 }
 
 static int dsl_endLevel( lua_State *l) {
+	isPlayerPosSet = false;
 	running = 0;
 	return 0;
 }
 
-lua_State* initLua( const char *file) {
+int dsl_setStartGate( lua_State *l) {
+	luaL_checkinteger( l, 1);
+
+	int gateId = lua_tointeger( l, 1);
+	
+	struct object *o;
+	int i;
+	for( i=0 ;i<myMap->objListCount; i++) {
+		o = myMap->objList[i];
+		if( o->id == gateId) {
+			struct BasePfNode *startBase = myMap->pfBase[ o->pos.i][ o->pos.j]->neighbours[ o->dir];
+			if( startBase == NULL) {
+				fprintf( stderr, "Cannot start from gate %d. It's looking at a non-ground tile", gateId);
+				exit( 1);
+			}
+			else if ( myMap->objs[ startBase->pos.i][ startBase->pos.j] != NULL) {
+				fprintf( stderr, "Cannot start from gate %d. The position is not empty", gateId);
+				exit( 1);
+			}
+			log0( "setting start position to %d, %d\n", startBase->pos.i, startBase->pos.j);
+			vectorClone( &player->pos, &startBase->pos);
+			player->dir = o->dir;
+			addObject( player, myMap, player->pos.i, player->pos.j);
+			isPlayerPosSet = true;
+			return 0;
+		}
+	}
+	fprintf( stderr, "Cannot start from gate %d. No object with such id is found", gateId);
+	exit( 1);
+	return 0;
+}
+
+lua_State* initLua() {
 	lua_State * L;
 	
 	L = luaL_newstate();
@@ -394,16 +431,34 @@ lua_State* initLua( const char *file) {
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
 		{"setTrigger", dsl_setTrigger},
 		{"endLevel", dsl_endLevel},
+		{"setStartGate", dsl_setStartGate},
 		{NULL, NULL}
 	}, 0);
 	lua_setglobal( L, "lib");
 
-    if (luaL_loadfile(L, file) || lua_pcall( L, 0, 0, 0)) {
-        fprintf(stderr, "Error loading script '%s'\n%s\n", file, lua_tostring(L, -1));
+	return L;
+}
+
+void loadLevel( const char* levelName, lua_State *L) {
+	char fileNameBuf[256];
+	sprintf( fileNameBuf, "%s.yz.map", levelName);
+	myMap = readMapFile( fileNameBuf);
+
+	sprintf( fileNameBuf, "%s.yz.lua", levelName);
+
+    if (luaL_loadfile(L, fileNameBuf) || lua_pcall( L, 0, 0, 0)) {
+        fprintf(stderr, "Error loading script '%s'\n%s\n", fileNameBuf, lua_tostring(L, -1));
         exit(1);
 	}
 
-	return L;
+	lua_getglobal( L, "init");
+	if( lua_isnil( L, -1) ) {
+		fprintf(stderr, "function init must be defined in the level script\n");
+		exit(1);
+	}
+    lua_pushinteger( L, 17 /*just a tmp number*/);
+    lua_pcall( L, 1, 0, 0 );
+	log1( "loadLevel end\n");
 }
 
 int main( int argc, char *args[]) {
@@ -412,17 +467,12 @@ int main( int argc, char *args[]) {
 		fprintf( stderr, "Usage: %s map-file (without .yz.* extensions)", args[0]);
 		exit(0);
 	}
-	
-	char fileNameBuf[256]; //TODO do the arg handling elsewhere so I don't have to keep a 256 byte in memo the entire runtime
-	sprintf( fileNameBuf, "%s.yz.map", args[1]);
-	myMap = readMapFile( fileNameBuf);
-
-	sprintf( fileNameBuf, "%s.yz.lua", args[1]);
-	lua = initLua( fileNameBuf);
-
+	lua = initLua();
 	setDefaults();
-	init();
+	
+    loadLevel( args[1], lua);
 
+	init();
 
 	textures = loadAllTextures( renderer);
 
@@ -441,3 +491,4 @@ int main( int argc, char *args[]) {
 	freeMap( myMap);
 	return 0;
 }
+  

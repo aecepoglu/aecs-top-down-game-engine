@@ -58,13 +58,9 @@ struct Map {
 */
 struct Map* readMapFile( char *path);
 
-/*	Finds the player object in the given map and returns it
-*/
-struct object* findPlayer( struct Map* m);
-
 /* Adds given object to given location.
 */
-void addObject( struct object*, struct Map *map, int, int);
+void addObject( struct object*, struct Map *map, int x, int y);
 
 /* 	Saves the map to disk
  */
