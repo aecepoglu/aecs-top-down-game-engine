@@ -7,6 +7,12 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
+#define FOREACH_OBJ_WITH_ID( objId, itI, itObj, closure) for( itI=0; itI<myMap->objListCount ;itI++) {\
+	if( myMap->objList[itI]->id == objId) {\
+		itObj = myMap->objList[itI];\
+		closure\
+	}\
+}
 
 SDL_Event timerPushEvent;
 Uint32 timerDelay;
@@ -370,13 +376,10 @@ static int dsl_setTrigger( lua_State *l) {
 	int i;
 	struct object *o;
 	int count=0;
-	for( i=0; i<myMap->objListCount; i++) {
-		o = myMap->objList[i];
-		if( o->id == objId) {
-			o->onInteract_luaRef = luaL_ref( l, LUA_REGISTRYINDEX);
-			count ++;
-		}
-	}
+	FOREACH_OBJ_WITH_ID( objId, i, o, {
+		o->onInteract_luaRef = luaL_ref( l, LUA_REGISTRYINDEX);
+		count ++;
+	})
 	
 	log0("Set interact-trigger for %d objects\n", count);
 
@@ -396,28 +399,41 @@ int dsl_setStartGate( lua_State *l) {
 	
 	struct object *o;
 	int i;
-	for( i=0 ;i<myMap->objListCount; i++) {
-		o = myMap->objList[i];
-		if( o->id == gateId) {
-			struct BasePfNode *startBase = myMap->pfBase[ o->pos.i][ o->pos.j]->neighbours[ o->dir];
-			if( startBase == NULL) {
-				fprintf( stderr, "Cannot start from gate %d. It's looking at a non-ground tile", gateId);
-				exit( 1);
-			}
-			else if ( myMap->objs[ startBase->pos.i][ startBase->pos.j] != NULL) {
-				fprintf( stderr, "Cannot start from gate %d. The position is not empty", gateId);
-				exit( 1);
-			}
-			log0( "setting start position to %d, %d\n", startBase->pos.i, startBase->pos.j);
-			vectorClone( &player->pos, &startBase->pos);
-			player->dir = o->dir;
-			addObject( player, myMap, player->pos.i, player->pos.j);
-			isPlayerPosSet = true;
-			return 0;
+	FOREACH_OBJ_WITH_ID( gateId, i, o, {
+		struct BasePfNode *startBase = myMap->pfBase[ o->pos.i][ o->pos.j]->neighbours[ o->dir];
+		if( startBase == NULL) {
+			fprintf( stderr, "Cannot start from gate %d. It's looking at a non-ground tile", gateId);
+			exit( 1);
 		}
-	}
+		else if ( myMap->objs[ startBase->pos.i][ startBase->pos.j] != NULL) {
+			fprintf( stderr, "Cannot start from gate %d. The position is not empty", gateId);
+			exit( 1);
+		}
+		log0( "setting start position to %d, %d\n", startBase->pos.i, startBase->pos.j);
+		vectorClone( &player->pos, &startBase->pos);
+		player->dir = o->dir;
+		addObject( player, myMap, player->pos.i, player->pos.j);
+		isPlayerPosSet = true;
+		return 0;
+		}
+	)
 	fprintf( stderr, "Cannot start from gate %d. No object with such id is found", gateId);
 	exit( 1);
+	return 0;
+}
+
+int dsl_useObject( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	int usedObjId = lua_tointeger( l, 1);
+
+	int i;
+	struct object *o;
+	FOREACH_OBJ_WITH_ID( usedObjId, i, o, {
+		printf(" found object with id %d\n", o->id);
+		//TODO
+		quit("not done yet\n");
+		break;
+	})
 	return 0;
 }
 
@@ -429,6 +445,7 @@ lua_State* initLua() {
 
 	lua_newtable( L);
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
+		{"use", dsl_useObject},
 		{"setTrigger", dsl_setTrigger},
 		{"endLevel", dsl_endLevel},
 		{"setStartGate", dsl_setStartGate},
