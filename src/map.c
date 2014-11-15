@@ -229,11 +229,11 @@ bool checkMapValidity( struct Map *map) {
 				else if(connectedTiles[x][y+1] != -1){
 					if( lookupMatches( groupLookup, connectedTiles[x][y+1], connectedTiles[x][y]) != true
 						&& lookupMatches( groupLookup, connectedTiles[x][y], connectedTiles[x][y+1]) != true
-						&& groupLookup[ connectedTiles[x][y+1]] == 0)
+						/*&& groupLookup[ connectedTiles[x][y+1]] == 0*/)
 					{
-						log2("\t\tsetting lookup of %d to %d, at pos %d,%d and %d,%d\n", connectedTiles[x][y+1], connectedTiles[x][y], x, y, x, y+1);
+						log2("\t\tsetting lookup of %d (at %d,%d) to %d (at %d,%d)\n", connectedTiles[x][y], x, y, connectedTiles[x][y+1], x, y+1);
 						connectedGroupsCount --;
-						groupLookup[ connectedTiles[x][y+1]] = connectedTiles[x][y];
+						groupLookup[ connectedTiles[x][y]] = connectedTiles[x][y+1];
 					}
 				}
 			}
