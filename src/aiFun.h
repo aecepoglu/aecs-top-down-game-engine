@@ -11,6 +11,7 @@ typedef void (aiUpdateFun)(struct Map*, struct object*, void*);
 typedef void (aiDestroyFun)(struct AI*);
 typedef struct AI* (aiCreateFun)();
 typedef void (aiSeenFun)(struct AI*);
+typedef void (aiUseFun)(struct Map*, struct object*, void*);
 
 typedef bool (moveFun)( struct Map *, struct object*);
 

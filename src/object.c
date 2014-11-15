@@ -60,9 +60,6 @@ struct object* readObject( FILE *fp) {
 	Some functions objects use to interract with each other
 */
 
-void objectUse( struct object *o1) {
-	//TODO o1 used
-}
 
 void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 	if( obj2->onInteract_luaRef != LUA_NOREF) {

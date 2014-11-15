@@ -243,7 +243,7 @@ void update() {
 			free( obj);
 		}
 
-		if( obj->ai && obj->ai->enabled ) {
+		if( obj->ai && obj->ai->enabled) {
 			
 			if( obj->timerCounter == 0) {
 				AI_UPDATE( myMap, obj );
@@ -429,7 +429,9 @@ int dsl_useObject( lua_State *l) {
 	int i;
 	struct object *o;
 	FOREACH_OBJ_WITH_ID( usedObjId, i, o, {
-		objectUse( o);
+		if( o->ai) {
+			AI_USE( myMap, o);
+		}
 	})
 	return 0;
 }
@@ -466,12 +468,10 @@ void loadLevel( const char* levelName, lua_State *L) {
 	}
 
 	lua_getglobal( L, "init");
-	if( lua_isnil( L, -1) ) {
-		fprintf(stderr, "function init must be defined in the level script\n");
-		exit(1);
+	if( lua_isnil( L, -1) != true) {
+		lua_pushinteger( L, 17 /*just a tmp number*/);
+		lua_pcall( L, 1, 0, 0 );
 	}
-    lua_pushinteger( L, 17 /*just a tmp number*/);
-    lua_pcall( L, 1, 0, 0 );
 	log1( "loadLevel end\n");
 }
 

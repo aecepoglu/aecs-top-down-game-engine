@@ -639,8 +639,9 @@ void initGui() {
 							CREATE_LIST_BUTTON( 3, "4. flower", 			CREATE_BRUSH_WRAPPER( SDLK_4, &editor_changeObjType, go_flower, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 4, "5. creeper plant", 		CREATE_BRUSH_WRAPPER( SDLK_5, &editor_changeObjType, go_creeperPlant, 	NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 5, "6. peekaboo monster", 	CREATE_BRUSH_WRAPPER( SDLK_6, &editor_changeObjType, go_peekaboo, 		NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 6, "7. weeping angel", 		CREATE_BRUSH_WRAPPER( SDLK_7, &editor_changeObjType, ai_weepingAngel, 	NO_CHILDREN)),
-						}, 7
+							CREATE_LIST_BUTTON( 6, "7. weeping angel", 		CREATE_BRUSH_WRAPPER( SDLK_7, &editor_changeObjType, go_weepingAngel, 	NO_CHILDREN)),
+							CREATE_LIST_BUTTON( 7, "8. wall/door",			CREATE_BRUSH_WRAPPER( SDLK_8, &editor_changeObjType, go_door,			NO_CHILDREN)),
+						}, 8
 					))),
 					CREATE_LIST_BUTTON( 3, "4. remove", CREATE_BRUSH_WRAPPER( SDLK_4, &eraseObject, NO_VAR, NO_CHILDREN)),
 					CREATE_LIST_BUTTON( 4, "5. rotate", CREATE_BRUSH_WRAPPER( SDLK_5, NO_FUN, NO_VAR, 		/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
@@ -661,7 +662,8 @@ void initGui() {
 							CREATE_LIST_BUTTON( 3, "(4) creeper plant", 	CREATE_BRUSH_WRAPPER( SDLK_4, &drawAI, ai_creeperPlant, 	NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 4, "(5) peek-a-boo chaser", CREATE_BRUSH_WRAPPER( SDLK_5, &drawAI, ai_peekaboo, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 5, "(6) weeping angel", 	CREATE_BRUSH_WRAPPER( SDLK_6, &drawAI, ai_weepingAngel, 	NO_CHILDREN)),
-						}, 6
+							CREATE_LIST_BUTTON( 6, "(7) slide door", 		CREATE_BRUSH_WRAPPER( SDLK_7, &drawAI, ai_door, 			NO_CHILDREN)),
+						}, 7
 					))),
 				}, 2
 			))),

@@ -124,6 +124,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_player] = loadObjTextures( ren, "res/player.png");
 	result->obj[ go_leftTurner] = loadObjTextures( ren, "res/left-turner.png");
 	result->obj[ go_apple] = loadObjTextures( ren, "res/apple.png");
+	result->obj[ go_door] = loadObjTextures( ren, "res/door.png");
 	result->obj[ go_flower] = loadObjTextures( ren, "res/flower.png");
 	result->obj[ go_creeperPlant] = loadObjTextures( ren, "res/creeper.png");
 	result->obj[ go_peekaboo] = loadObjTextures( ren, "res/peekaboo.png");

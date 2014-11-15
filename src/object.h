@@ -12,7 +12,17 @@
 #include "vector.h"
 #include <lua.h>
 
-enum objType { go_player, go_leftTurner, go_apple, go_flower, go_creeperPlant, go_peekaboo, go_weepingAngel, go_NUM_ITEMS};
+enum objType {
+	go_player,
+	go_leftTurner,
+	go_apple,
+	go_door,
+	go_flower,
+	go_creeperPlant,
+	go_peekaboo,
+	go_weepingAngel,
+	go_NUM_ITEMS
+};
 
 /*struct AI defined in ai.h*/
 struct object {
@@ -38,7 +48,6 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 struct object* readObject( FILE *fp);
 void writeObject( FILE *fp, struct object *obj);
 
-void objectUse( struct object *obj);
 void objectInteract( struct object *obj1, struct object *obj2, lua_State *lua);
 void objectSwallow( struct object *obj1, struct object *obj2);
 bool objectHit( struct object *obj1, struct object *obj2);
