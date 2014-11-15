@@ -47,6 +47,8 @@ struct {
 	bool running;
 } createMapDialogData;
 
+#define SHOW_TOOLTIP( x, y, text) SDLGUI_Show_Tooltip( x*TILELEN + GUI_LEFTPANEL_WIDTH, y*TILELEN, text)
+
 
 /* ---------------------------
 	Brush Functions
@@ -70,7 +72,7 @@ bool eraseAI( unsigned int x, unsigned int y, int type) {
 		AI_DESTROY( obj->ai);
 		obj->ai = NULL;
 		
-		SDLGUI_Show_Tooltip( x*TILELEN + GUI_LEFTPANEL_WIDTH, y*TILELEN, "AI removed");
+		SHOW_TOOLTIP( x, y, "AI removed");
 
 		return true;
 	}
@@ -125,8 +127,13 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 	//create and initialize a monster
 	struct object *obj = createObject( type, x, y, objectCounter++);
 
+
 	addObject( obj, myMap, x, y);
 	editor_selectObj( x, y, type);
+	
+	char tooltipText[8];
+	sprintf( tooltipText, "#%d", obj->id);
+	SHOW_TOOLTIP( x, y, tooltipText);
 
 	return true;
 }
@@ -140,7 +147,7 @@ bool drawAI( unsigned int x, unsigned int y, int type) {
 		struct AI *ai = AI_CREATE( type);
 		myMap->objs[x][y]->ai = ai;
 
-		SDLGUI_Show_Tooltip( x*TILELEN + GUI_LEFTPANEL_WIDTH, y*TILELEN, "AI put");
+		SHOW_TOOLTIP( x, y, "AI put");
 		return true;
 	}
 
