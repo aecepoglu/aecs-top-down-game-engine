@@ -87,19 +87,6 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 		return false;
 }
 
-bool editor_createObj( unsigned int x, unsigned int y, int type){
-	//add objects only if there is no object there
-	if( myMap->objs[x][y]!=NULL || myMap->tiles[x][y]!=terrain_gnd)
-		return false;
-
-	//create and initialize a monster
-	struct object *obj = createObject( type, x, y, objectCounter++);
-
-	addObject( obj, myMap, x, y);
-
-	return true;
-}
-
 bool editor_changeObjType( unsigned int x, unsigned int y, int type) {
 	if( myMap->objs[x][y]==NULL)
 		return false;
@@ -126,6 +113,20 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 
 	sprintf(tmp, "%d", selectedObj->maxHealth);
 	SDLGUI_SetText_Textbox( textbox_maxHealth, strdup(tmp));
+
+	return true;
+}
+
+bool editor_createObj( unsigned int x, unsigned int y, int type){
+	//add objects only if there is no object there
+	if( myMap->objs[x][y]!=NULL || myMap->tiles[x][y]!=terrain_gnd)
+		return false;
+
+	//create and initialize a monster
+	struct object *obj = createObject( type, x, y, objectCounter++);
+
+	addObject( obj, myMap, x, y);
+	editor_selectObj( x, y, type);
 
 	return true;
 }
