@@ -281,6 +281,19 @@ int parseText( const char *text) {
 		return atoi( text);
 }
 
+void textbox_id_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj && strlen(text) > 0) {
+		int newId = atoi( text);
+		if( newId >= 1) {
+			selectedObj->id = newId;
+		} 
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "You must give id >= 1");
+			isMessageBoxOn = true;
+		}
+	}
+}
+
 void textbox_health_changed( struct SDLGUI_Element *textbox, const char *text) {
 	if( selectedObj) {
 		int newHealth = parseText( text);
@@ -677,7 +690,7 @@ void initGui() {
 	SDLGUI_List_Add( bodyItems, selectedObjContainer);
 	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
 
-    textbox_id =        SDLGUI_Create_Textbox( 	120, 10, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, NULL);
+    textbox_id =        SDLGUI_Create_Textbox( 	120, 10, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
 	textbox_health = 	SDLGUI_Create_Textbox( 	120, 30, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
 	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 50, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
 
