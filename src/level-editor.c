@@ -40,6 +40,7 @@ int brushVariant;
 struct SDLGUI_Element *textbox_id;
 struct SDLGUI_Element *textbox_health;
 struct SDLGUI_Element *textbox_maxHealth;
+struct SDLGUI_Element *textbox_pos_x, *textbox_pos_y;
 struct object *selectedObj = NULL;
 
 struct {
@@ -102,19 +103,24 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 	
 	selectedObj = myMap->objs[x][y];
 	
-	if( selectedObj == NULL)
-		return false;
-
 	char tmp[4];
+	if( selectedObj != NULL) {
 
-    sprintf(tmp, "%d", selectedObj->id);
-	SDLGUI_SetText_Textbox( textbox_id, strdup(tmp));
+    	sprintf(tmp, "%d", selectedObj->id);
+		SDLGUI_SetText_Textbox( textbox_id, tmp);
 
-	sprintf(tmp, "%d", selectedObj->health);
-	SDLGUI_SetText_Textbox( textbox_health, strdup(tmp));
+		sprintf(tmp, "%d", selectedObj->health);
+		SDLGUI_SetText_Textbox( textbox_health, tmp);
 
-	sprintf(tmp, "%d", selectedObj->maxHealth);
-	SDLGUI_SetText_Textbox( textbox_maxHealth, strdup(tmp));
+		sprintf(tmp, "%d", selectedObj->maxHealth);
+		SDLGUI_SetText_Textbox( textbox_maxHealth, tmp);
+	}
+	
+	sprintf( tmp, "%d", x);
+	SDLGUI_SetText_Textbox( textbox_pos_x, tmp);
+	
+	sprintf( tmp, "%d", y);
+	SDLGUI_SetText_Textbox( textbox_pos_y, tmp);
 
 	return true;
 }
@@ -645,15 +651,15 @@ void initGui() {
 	/* Table readable with tab-width 4 */
 	brushList = SDLGUI_List_Create_From_Array(
 		(struct SDLGUI_Element*[]){
-			CREATE_LIST_BUTTON( 0, "1. terrain", CREATE_BRUSH_WRAPPER( SDLK_1, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+			CREATE_LIST_BUTTON( 0, "1. select", CREATE_BRUSH_WRAPPER( SDLK_1, &editor_selectObj, 	NO_VAR, 	NO_CHILDREN)),
+			CREATE_LIST_BUTTON( 1, "2. terrain", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 					CREATE_LIST_BUTTON( 0, "1. ground", 			CREATE_BRUSH_WRAPPER( SDLK_1, &drawTerrain, terrain_gnd, 	NO_CHILDREN)),
 					CREATE_LIST_BUTTON( 1, "2. wall", 	 			CREATE_BRUSH_WRAPPER( SDLK_2, &drawTerrain, terrain_wall, 	NO_CHILDREN)),
 				}, 2
 			))),
-			CREATE_LIST_BUTTON( 1, "2. object", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
-					CREATE_LIST_BUTTON( 0, "1. select", 	CREATE_BRUSH_WRAPPER( SDLK_1, &editor_selectObj, 	NO_VAR, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "2. create", 	CREATE_BRUSH_WRAPPER( SDLK_2, &editor_createObj,	go_apple, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 2, "3. change type",CREATE_BRUSH_WRAPPER( SDLK_3, NO_FUN, 				NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+			CREATE_LIST_BUTTON( 2, "3. object", CREATE_BRUSH_WRAPPER( SDLK_3, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 0, "1. create", 	CREATE_BRUSH_WRAPPER( SDLK_1, &editor_createObj,	go_apple, 	NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 1, "2. change type",CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 				NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 							CREATE_LIST_BUTTON( 0, "1. player", 			CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_player, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 1, "2. left turner", 		CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_leftTurner, 	NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 2, "3. apple", 				CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_apple, 			NO_CHILDREN)),
@@ -664,17 +670,17 @@ void initGui() {
 							CREATE_LIST_BUTTON( 7, "8. wall/door",			CREATE_BRUSH_WRAPPER( SDLK_8, &editor_changeObjType, go_door,			NO_CHILDREN)),
 						}, 8
 					))),
-					CREATE_LIST_BUTTON( 3, "4. remove", CREATE_BRUSH_WRAPPER( SDLK_4, &eraseObject, NO_VAR, NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 4, "5. rotate", CREATE_BRUSH_WRAPPER( SDLK_5, NO_FUN, NO_VAR, 		/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 2, "3. remove", CREATE_BRUSH_WRAPPER( SDLK_3, &eraseObject, NO_VAR, NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 3, "4. rotate", CREATE_BRUSH_WRAPPER( SDLK_4, NO_FUN, NO_VAR, 		/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 							CREATE_LIST_BUTTON( 0, "(1) \x80 up", 		CREATE_BRUSH_WRAPPER( SDLK_1, &setDirection, dir_up, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 1, "(2) \x81 right", 	CREATE_BRUSH_WRAPPER( SDLK_2, &setDirection, dir_right, 	NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 2, "(3) \x82 down", 	CREATE_BRUSH_WRAPPER( SDLK_3, &setDirection, dir_down,		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 3, "(4) \x83 left", 	CREATE_BRUSH_WRAPPER( SDLK_4, &setDirection, dir_left,		NO_CHILDREN)),
 						}, 4
 					))),
-				}, 5
+				}, 4
 			))),
-			CREATE_LIST_BUTTON( 2, "3. ai", CREATE_BRUSH_WRAPPER(/*key*/SDLK_3, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+			CREATE_LIST_BUTTON( 3, "4. ai", CREATE_BRUSH_WRAPPER(/*key*/SDLK_4, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 					CREATE_LIST_BUTTON( 0, "1. erase",	CREATE_BRUSH_WRAPPER( SDLK_1, &eraseAI, NO_VAR, 	NO_CHILDREN)),
 					CREATE_LIST_BUTTON( 1, "2. put", 	CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 	NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 							CREATE_LIST_BUTTON( 0, "(1) left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &drawAI, ai_leftTurner, 		NO_CHILDREN)),
@@ -688,7 +694,7 @@ void initGui() {
 					))),
 				}, 2
 			))),
-		}, 3
+		}, 4
 	);
 	SDLGUI_Set_Panel_Elements( brushContainer, brushList, true);
 
@@ -707,6 +713,17 @@ void initGui() {
 	SDLGUI_List_Add( selectedObjElements, textbox_id);
 	SDLGUI_List_Add( selectedObjElements, textbox_maxHealth);
 	SDLGUI_List_Add( selectedObjElements, textbox_health);
+	
+	//SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 900, -1, 25, NULL, "Pos:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	struct SDLGUI_Element *currentPosPanel = SDLGUI_Create_Panel( 10, 875, GUI_LEFTPANEL_WIDTH - 2*10, 25, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
+	SDLGUI_List_Add( bodyItems, currentPosPanel);
+	struct SDLGUI_List *currentPosElements = SDLGUI_Get_Panel_Elements( currentPosPanel);
+	textbox_pos_x = SDLGUI_Create_Textbox( 	100, 5, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
+	textbox_pos_y = SDLGUI_Create_Textbox( 	130, 5, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
+	
+	SDLGUI_List_Add( currentPosElements, SDLGUI_Create_Text( 70, 10, -1, 8, NULL, "pos:", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( currentPosElements, textbox_pos_x);
+	SDLGUI_List_Add( currentPosElements, textbox_pos_y);
 }
 #undef CREATE_LIST_BUTTON
 #undef NO_VAR

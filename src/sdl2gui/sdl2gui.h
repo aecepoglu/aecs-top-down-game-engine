@@ -7,6 +7,7 @@
 
 /*
 */
+#define TEXTBOX_INPUT_NONE 0
 #define TEXTBOX_INPUT_NUMERIC 1
 #define TEXTBOX_INPUT_ALPHABET 2
 
