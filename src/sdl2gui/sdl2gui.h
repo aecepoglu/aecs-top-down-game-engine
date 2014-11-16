@@ -5,6 +5,10 @@
 
 #include "sdl2gui-list.h"
 
+/*
+*/
+#define TEXTBOX_INPUT_NUMERIC 1
+#define TEXTBOX_INPUT_ALPHABET 2
 
 struct SDLGUI_Element;
 
@@ -67,7 +71,7 @@ void SDLGUI_Hide_Message();
 
 void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text);
 
-struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int textCap, int bgColor[4], int textColor[4], int fontWidth, int fontHeight, SDLGUI_TextChanged *textChanged);
+struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int textCap, int allowedChars, int bgColor[4], int textColor[4], int fontWidth, int fontHeight, SDLGUI_TextChanged *textChanged);
 void SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, char *text);
 void SDLGUI_ClearText_Textbox( struct SDLGUI_Element *textbox);
 const char* SDLGUI_GetText_Textbox( struct SDLGUI_Element *textbox);

@@ -102,14 +102,10 @@ int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e) {
 		char c = 0;
 		int backspace = 0;
 		log0("%d\n", e->keysym.sym);
-		if( sym >= SDLK_0 && sym <= SDLK_9) {
-			c = '0' + sym - SDLK_0;
+		
+		if( sym >= SDLK_0 && sym <= SDLK_z) {
+			c = sym;
 		}
-		/* Can uncomment this if I want text-boxes to work with ascii letters
-		else if ( sym >= SDLK_a && sym <= SDLK_z) {
-			c = 'A' + sym - SDLK_a;
-		}
-		*/
 		else if( sym == SDLK_BACKSPACE) {
 			backspace = 1;
 		}
@@ -367,6 +363,7 @@ struct SDLGUI_Text_Data {
 	int fontWidth, fontHeight;
 	int textColor[4];
 	SDLGUI_TextChanged *textChanged;
+	int acceptsNumbers, acceptsAlphabet;
 };
 
 void SDLGUI_Destroy_Textbox( struct SDLGUI_Element *textbox) {
@@ -396,7 +393,7 @@ void SDLGUI_Focused_Textbox( struct SDLGUI_Element *textbox) {
 	guiCore.focusedElement = textbox;
 }
 
-struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int maxLen, int bgColor[4], int textColor[4], int fontWidth, int fontHeight, SDLGUI_TextChanged *textChanged) {
+struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int maxLen, int allowedChars, int bgColor[4], int textColor[4], int fontWidth, int fontHeight, SDLGUI_TextChanged *textChanged) {
 	if( maxLen >= 64)
 		return 0;
 	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)malloc( sizeof( struct SDLGUI_Text_Data));
@@ -414,6 +411,8 @@ struct SDLGUI_Element* SDLGUI_Create_Textbox( int xPos, int yPos, int maxLen, in
 	data->text = (char*)calloc( maxLen+1, sizeof(char));
 	data->fg = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
 	data->textChanged = textChanged;
+	data->acceptsAlphabet = allowedChars & TEXTBOX_INPUT_ALPHABET;
+	data->acceptsNumbers = allowedChars & TEXTBOX_INPUT_NUMERIC;
 
 	return SDLGUI_Create_Element( xPos, yPos, width, height, data, &SDLGUI_Focused_Textbox, &SDLGUI_Destroy_Textbox, &SDLGUI_Draw_Textbox, NULL, 0);
 }
@@ -443,7 +442,7 @@ void SDLGUI_ChangeText_Textbox( struct SDLGUI_Element *textbox, char c, int back
 			changed = 1;
 		}
 	}
-	else {
+	else if ( (data->acceptsNumbers && c >= '0' && c <= '9') || (data->acceptsAlphabet && c >= 'a' && c <= 'z') ){
 		if( curLen < data->maxLen) {
 			data->text[ curLen] = c;
 			data->text[ curLen + 1] = '\0';

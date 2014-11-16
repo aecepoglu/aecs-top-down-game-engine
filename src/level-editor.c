@@ -43,7 +43,7 @@ struct SDLGUI_Element *textbox_maxHealth;
 struct object *selectedObj = NULL;
 
 struct {
-	struct SDLGUI_Element *panel, *textbox_width, *textbox_height;
+	struct SDLGUI_Element *panel, *textbox_width, *textbox_height, *textbox_name;
 	bool running;
 } createMapDialogData;
 
@@ -697,9 +697,9 @@ void initGui() {
 	SDLGUI_List_Add( bodyItems, selectedObjContainer);
 	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
 
-    textbox_id =        SDLGUI_Create_Textbox( 	120, 10, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
-	textbox_health = 	SDLGUI_Create_Textbox( 	120, 30, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
-	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 50, 5, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
+    textbox_id =        SDLGUI_Create_Textbox( 	120, 10, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
+	textbox_health = 	SDLGUI_Create_Textbox( 	120, 30, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
+	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 50, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
 
 	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  10, -1, 16, NULL, "        ID :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
 	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  30, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
@@ -716,16 +716,23 @@ void initGui() {
 void editor_createMap_clicked( struct SDLGUI_Element *from) {
 	int width = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_width  ) );
 	int height = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_height) );
+	const char *text = SDLGUI_GetText_Textbox( createMapDialogData.textbox_name);
 	if( width <= 0 || height <= 0) {
 		isMessageBoxOn = true;
 		SDLGUI_Show_Message(0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Width & height must be >= 0");
+	}
+	else if (strlen(text) < 1) {
+		isMessageBoxOn = true;
+		SDLGUI_Show_Message(0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Need a longer map name");
 	}
 	else {
 		createMapDialogData.running = false;
 		//TODO I could just dynamically allocate createMapDialogData, then deallocate it here aswell
 
 		myMap = createNewMap( width, height);
-		myMap->filePath = "test-map.yz.map";
+		char fileNameBuf[20];
+		sprintf( fileNameBuf, "%s.yz.map", text);
+		myMap->filePath = strdup( fileNameBuf);
 	
 		running = true;
 	}
@@ -772,12 +779,15 @@ int main( int argc, char *args[]) {
 		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( 0, 100, windowW, 100, NULL, "Creating New Map\n----------------", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 0, NULL));
 		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 200, -1, 32, NULL, " width", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 0, NULL));
 		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 230, -1, 32, NULL, "height", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 0, NULL));
-		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 300, 200, 100, &editor_createMap_clicked, "create", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 2, NULL));
+		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 270, -1, 32, NULL, "  name", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 0, NULL));
+		SDLGUI_List_Add( panelElems, SDLGUI_Create_Text( windowW/2 - 100, 350, 200, 100, &editor_createMap_clicked, "create", (int[4]){0,0,0,0}, (int[4]){255,255,255,255}, 12, 16, 2, NULL));
 
-		createMapDialogData.textbox_width  = SDLGUI_Create_Textbox( windowW/2, 200, 2, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
-		createMapDialogData.textbox_height = SDLGUI_Create_Textbox( windowW/2, 230, 2, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
+		createMapDialogData.textbox_width  = SDLGUI_Create_Textbox( windowW/2, 200, 2, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
+		createMapDialogData.textbox_height = SDLGUI_Create_Textbox( windowW/2, 230, 2, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
+		createMapDialogData.textbox_name   = SDLGUI_Create_Textbox( windowW/2, 270, 16, TEXTBOX_INPUT_NUMERIC | TEXTBOX_INPUT_ALPHABET, (int[4]){255,255,255,50}, (int[4]){255,255,255,255}, 12, 16, NULL);
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_width );
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_height);
+		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_name);
 		
 		run0();
 	}
