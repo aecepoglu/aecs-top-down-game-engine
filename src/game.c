@@ -291,7 +291,7 @@ void run() {
 						break;
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
-						resizeView( 0, e.window.data1, e.window.data2);
+						resizeView( 0, 0, e.window.data1, e.window.data2);
 						
 						guiMeasurements.container.w = e.window.data1;
 						guiMeasurements.container.h = e.window.data2;

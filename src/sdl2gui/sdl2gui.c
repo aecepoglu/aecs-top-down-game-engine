@@ -436,7 +436,7 @@ void SDLGUI_ChangeText_Textbox( struct SDLGUI_Element *textbox, char c, int back
 	int curLen = strlen(data->text);
 	int changed = 0;
 
-	if( backspace) {
+	if( backspace && (data->acceptsNumbers || data->acceptsAlphabet)) {
 		if( curLen > 0) {
 			data->text[ curLen-1] = '\0';
 			changed = 1;

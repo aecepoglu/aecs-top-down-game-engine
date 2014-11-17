@@ -16,7 +16,11 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 
 /* GUI Elements */
 #define GUI_LEFTPANEL_WIDTH 192
+#define GUI_TOPBAR_HEIGHT 32
+#define GUI_UGLY_BGCOLOR (int[4]){170,180,190,255}
+#define GUI_UGLY_BORDERCOLOR (int[4]){100,100,100,255}
 struct SDLGUI_Element *bodyContainer;
+struct SDLGUI_Element *topbar;
 struct SDLGUI_Element *brushContainer;
 struct SDLGUI_List *brushList;
 bool mouseDownInGui;
@@ -391,13 +395,13 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	unsigned int x,y;
 	if( e) {
 		x = (e->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
-		y = e->y / TILELEN;
+		y = (e->y -  GUI_TOPBAR_HEIGHT) / TILELEN;
 	}
 	else {
 		if( ! e2->state) //if no buttons are pressed
 			return 0;
 		x = (e2->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
-		y = e2->y / TILELEN;
+		y = (e2->y - GUI_TOPBAR_HEIGHT)/ TILELEN;
 	}
 
 	x += viewPos.i;
@@ -421,8 +425,9 @@ void handleWindowEvent( SDL_WindowEvent *e) {
 		    log1("Window %d resized to %dx%d\n",
 		            e->windowID, e->data1,
 		            e->data2);
-			resizeView( GUI_LEFTPANEL_WIDTH, e->data1, e->data2);
+			resizeView( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, e->data1, e->data2);
 			bodyContainer->rect.h = e->data2;
+			topbar->rect.w = e->data1 - GUI_LEFTPANEL_WIDTH;
 			drawBackground();
 		    break;
 		case SDL_WINDOWEVENT_MINIMIZED:
@@ -452,7 +457,7 @@ void run0() {
 			case SDL_WINDOWEVENT: {
 				SDL_WindowEvent *e2 = &e.window;
 				if( e2->event == SDL_WINDOWEVENT_RESIZED)
-					resizeView( GUI_LEFTPANEL_WIDTH, e2->data1, e2->data2);
+					resizeView( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, e2->data1, e2->data2);
 				break;
 			}
 			case SDL_QUIT:
@@ -592,7 +597,7 @@ void drawObjects() {
 			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
 				drawTexture( renderer, 
 					textures->obj[obj->type]->textures[ obj->visualState][obj->dir], 
-					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN, TILELEN, TILELEN );
+					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN );
 				if( obj == selectedObj) {
 					drawTexture( renderer, textures->highlitObjIndicator, screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN, TILELEN, TILELEN);
 				}
@@ -611,7 +616,7 @@ void draw() {
 	log3("draw\n");
 	SDL_RenderClear( renderer);
 	
-	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, 0, viewSize.i*TILELEN, viewSize.j*TILELEN);
+	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, viewSize.i*TILELEN, viewSize.j*TILELEN);
 	drawObjects( );
 
 	SDLGUI_Draw();
@@ -633,9 +638,11 @@ struct brushWrapper* CREATE_BRUSH_WRAPPER( SDL_Keycode key, brushFun *brush, int
 #define NO_VAR 0
 #define NO_CHILDREN NULL
 #define NO_FUN NULL
+#define NO_CLICK_HANDLER NULL
 #define CREATE_LIST_BUTTON( i, text, data) SDLGUI_Create_Text( 5, 5 + 35*i, 160, 30, &brushListItem_clicked, text, (int[4]){255,255,255,255}, (int[4]){0,0,0,255}, 6, 9, 1, data)
 void initGui() {
-	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, (int[4]){170,180,190,255}, (int[4]){100,100,100,255}, 4);
+    /* The left panel */
+	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
 	SDLGUI_Add_Element( bodyContainer);
 	
 	struct SDLGUI_List *bodyItems = SDLGUI_Get_Panel_Elements( bodyContainer);
@@ -724,7 +731,20 @@ void initGui() {
 	SDLGUI_List_Add( currentPosElements, SDLGUI_Create_Text( 70, 10, -1, 8, NULL, "pos:", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 6, 8, 0, NULL));
 	SDLGUI_List_Add( currentPosElements, textbox_pos_x);
 	SDLGUI_List_Add( currentPosElements, textbox_pos_y);
+	
+	/* top bar */
+	topbar = SDLGUI_Create_Panel( GUI_LEFTPANEL_WIDTH, 0, 1280, GUI_TOPBAR_HEIGHT, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
+	SDLGUI_Add_Element( topbar);
+	struct SDLGUI_List *topbarItems = SDLGUI_Get_Panel_Elements( topbar);
+
+	struct SDLGUI_Element *label_mapName = SDLGUI_Create_Text( 10,  0, -1, GUI_TOPBAR_HEIGHT, NO_CLICK_HANDLER, "map:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL);
+	struct SDLGUI_Element *textbox_mapName = SDLGUI_Create_Textbox( 40, 8, 23, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
+	SDLGUI_SetText_Textbox( textbox_mapName, myMap->filePath);
+
+	SDLGUI_List_Add( topbarItems, label_mapName);
+	SDLGUI_List_Add( topbarItems, textbox_mapName);
 }
+#undef NO_CLICK_HANDLER
 #undef CREATE_LIST_BUTTON
 #undef NO_VAR
 #undef NO_CHILDREN

@@ -69,6 +69,6 @@ bool scrollScreen( enum direction);
 
 /* Resizez current viewPort to match the newly resized window
 */
-void resizeView( int posX, int width, int height);
+void resizeView( int posX, int posY, int width, int height);
 
 #endif //ENGINE_H
