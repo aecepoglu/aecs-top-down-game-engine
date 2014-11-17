@@ -648,7 +648,6 @@ struct brushWrapper* CREATE_BRUSH_WRAPPER( SDL_Keycode key, brushFun *brush, int
 void initGui() {
     /* The left panel */
 	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
-	SDLGUI_Add_Element( bodyContainer);
 	
 	struct SDLGUI_List *bodyItems = SDLGUI_Get_Panel_Elements( bodyContainer);
 	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 10, GUI_LEFTPANEL_WIDTH - 2*10, 70, &buttonSave_clicked, "YZ-01\nLevel Editor\n------------", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 0, NULL));
@@ -714,13 +713,12 @@ void initGui() {
     */
 	selectedObjContainer = SDLGUI_Create_Panel( 10, 720, GUI_LEFTPANEL_WIDTH - 2*10, 130, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
     selectedObjContainer->isVisible = false;
-	SDLGUI_List_Add( bodyItems, selectedObjContainer);
-	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
 
     textbox_id =        SDLGUI_Create_Textbox( 	120, 40, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
 	textbox_health = 	SDLGUI_Create_Textbox( 	120, 60, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
 	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 80, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
 
+	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
 	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 10,  10, -1, 25, NULL, "Selected Obj:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 12, 16, 0, NULL));
 	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  40, -1, 16, NULL, "        ID :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
 	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  60, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
@@ -729,28 +727,32 @@ void initGui() {
 	SDLGUI_List_Add( selectedObjElements, textbox_maxHealth);
 	SDLGUI_List_Add( selectedObjElements, textbox_health);
 	
-	//SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 900, -1, 25, NULL, "Pos:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
-	struct SDLGUI_Element *currentPosPanel = SDLGUI_Create_Panel( 10, 875, GUI_LEFTPANEL_WIDTH - 2*10, 25, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
-	SDLGUI_List_Add( bodyItems, currentPosPanel);
-	struct SDLGUI_List *currentPosElements = SDLGUI_Get_Panel_Elements( currentPosPanel);
-	textbox_pos_x = SDLGUI_Create_Textbox( 	100, 5, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
-	textbox_pos_y = SDLGUI_Create_Textbox( 	130, 5, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
-	
-	SDLGUI_List_Add( currentPosElements, SDLGUI_Create_Text( 70, 10, -1, 8, NULL, "pos:", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 6, 8, 0, NULL));
-	SDLGUI_List_Add( currentPosElements, textbox_pos_x);
-	SDLGUI_List_Add( currentPosElements, textbox_pos_y);
+	SDLGUI_List_Add( bodyItems, selectedObjContainer);
 	
 	/* top bar */
 	topbar = SDLGUI_Create_Panel( GUI_LEFTPANEL_WIDTH, 0, 1280, GUI_TOPBAR_HEIGHT, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
-	SDLGUI_Add_Element( topbar);
-	struct SDLGUI_List *topbarItems = SDLGUI_Get_Panel_Elements( topbar);
 
 	struct SDLGUI_Element *label_mapName = SDLGUI_Create_Text( 10,  0, -1, GUI_TOPBAR_HEIGHT, NO_CLICK_HANDLER, "map:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL);
 	struct SDLGUI_Element *textbox_mapName = SDLGUI_Create_Textbox( 40, 8, 23, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
 	SDLGUI_SetText_Textbox( textbox_mapName, myMap->filePath);
+	struct SDLGUI_Element *label_curPos = SDLGUI_Create_Text( 200,  0, -1, GUI_TOPBAR_HEIGHT, NO_CLICK_HANDLER, "pos:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL);
+	
+	struct SDLGUI_Element *currentPosPanel = SDLGUI_Create_Panel( 230, 0, 80, GUI_TOPBAR_HEIGHT, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 0);
+	textbox_pos_x = SDLGUI_Create_Textbox( 	00, 8, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
+	textbox_pos_y = SDLGUI_Create_Textbox( 	40, 8, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
+	
+	struct SDLGUI_List *currentPosElements = SDLGUI_Get_Panel_Elements( currentPosPanel);
+	SDLGUI_List_Add( currentPosElements, textbox_pos_x);
+	SDLGUI_List_Add( currentPosElements, textbox_pos_y);
 
+	struct SDLGUI_List *topbarItems = SDLGUI_Get_Panel_Elements( topbar);
 	SDLGUI_List_Add( topbarItems, label_mapName);
 	SDLGUI_List_Add( topbarItems, textbox_mapName);
+	SDLGUI_List_Add( topbarItems, label_curPos);
+	SDLGUI_List_Add( topbarItems, currentPosPanel);
+	
+	SDLGUI_Add_Element( bodyContainer);
+	SDLGUI_Add_Element( topbar);
 }
 #undef NO_CLICK_HANDLER
 #undef CREATE_LIST_BUTTON

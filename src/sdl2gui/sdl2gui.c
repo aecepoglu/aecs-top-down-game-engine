@@ -237,7 +237,7 @@ void SDLGUI_Draw_Panel( struct SDLGUI_Element *element, int offsetX, int offsetY
     for( i=0; i<data->elements->count; i++) {
         struct SDLGUI_Element *e = data->elements->list[i];
         if( e->drawFun != 0)
-            e->drawFun( e, element->rect.x, element->rect.y);
+            e->drawFun( e, offsetX + element->rect.x, offsetY + element->rect.y);
     }
 }
 
