@@ -29,6 +29,8 @@ struct SDLGUI_Element {
 	SDLGUI_DrawFun *drawFun;
 	SDLGUI_MouseDownHandler *mouseDownHandler;
 	void *userData;
+
+	int isVisible;
 };
 
 struct SDLGUI_Panel_Data {

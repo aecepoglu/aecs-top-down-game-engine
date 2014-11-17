@@ -22,6 +22,7 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 struct SDLGUI_Element *bodyContainer;
 struct SDLGUI_Element *topbar;
 struct SDLGUI_Element *brushContainer;
+struct SDLGUI_Element *selectedObjContainer;
 struct SDLGUI_List *brushList;
 bool mouseDownInGui;
 bool isMessageBoxOn = false;
@@ -109,6 +110,7 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 	
 	char tmp[4];
 	if( selectedObj != NULL) {
+		selectedObjContainer->isVisible = true;
 
     	sprintf(tmp, "%d", selectedObj->id);
 		SDLGUI_SetText_Textbox( textbox_id, tmp);
@@ -118,6 +120,9 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 
 		sprintf(tmp, "%d", selectedObj->maxHealth);
 		SDLGUI_SetText_Textbox( textbox_maxHealth, tmp);
+	}
+	else {
+		selectedObjContainer->isVisible = false;
 	}
 	
 	sprintf( tmp, "%d", x);
@@ -705,18 +710,21 @@ void initGui() {
 	);
 	SDLGUI_Set_Panel_Elements( brushContainer, brushList, true);
 
-	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 725, -1, 25, NULL, "Selected Obj:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 12, 16, 0, NULL));
-	struct SDLGUI_Element *selectedObjContainer = SDLGUI_Create_Panel( 10, 750, GUI_LEFTPANEL_WIDTH - 2*10, 100, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
+    /* Selected Object Panel
+    */
+	selectedObjContainer = SDLGUI_Create_Panel( 10, 720, GUI_LEFTPANEL_WIDTH - 2*10, 130, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
+    selectedObjContainer->isVisible = false;
 	SDLGUI_List_Add( bodyItems, selectedObjContainer);
 	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
 
-    textbox_id =        SDLGUI_Create_Textbox( 	120, 10, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
-	textbox_health = 	SDLGUI_Create_Textbox( 	120, 30, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
-	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 50, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
+    textbox_id =        SDLGUI_Create_Textbox( 	120, 40, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
+	textbox_health = 	SDLGUI_Create_Textbox( 	120, 60, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
+	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 80, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
 
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  10, -1, 16, NULL, "        ID :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  30, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  50, -1, 16, NULL, "Max-Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 10,  10, -1, 25, NULL, "Selected Obj:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 12, 16, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  40, -1, 16, NULL, "        ID :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  60, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  80, -1, 16, NULL, "Max-Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
 	SDLGUI_List_Add( selectedObjElements, textbox_id);
 	SDLGUI_List_Add( selectedObjElements, textbox_maxHealth);
 	SDLGUI_List_Add( selectedObjElements, textbox_health);

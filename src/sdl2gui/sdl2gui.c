@@ -127,7 +127,6 @@ void SDLGUI_Remove_Element( struct SDLGUI_Element *element) {
 	SDLGUI_List_Remove( &guiCore.elements, element);
 }
 
-
 /* ------------------
 	SDLGUI Elements
 */
@@ -175,6 +174,8 @@ struct SDLGUI_Element* SDLGUI_Create_Element( int xPos, int yPos, int width, int
 	e->mouseDownHandler = mouseDownHandler;
 	e->userData = userData;
 
+	e->isVisible = 1;
+
 	return e;
 }
 
@@ -182,10 +183,12 @@ struct SDLGUI_Element* SDLGUI_Create_Element( int xPos, int yPos, int width, int
 */
 
 void SDLGUI_Draw_Texture( struct SDLGUI_Element *element, int offsetX, int offsetY){
-	SDL_Rect rect = {element->rect.x, element->rect.y, element->rect.w, element->rect.h};
-	rect.x += offsetX;
-	rect.y += offsetY;
-	SDL_RenderCopy( guiCore.renderer, (SDL_Texture*)element->data, NULL, &rect);
+	if( element->isVisible) {
+		SDL_Rect rect = {element->rect.x, element->rect.y, element->rect.w, element->rect.h};
+		rect.x += offsetX;
+		rect.y += offsetY;
+		SDL_RenderCopy( guiCore.renderer, (SDL_Texture*)element->data, NULL, &rect);
+	}
 }
 
 struct SDLGUI_Element* SDLGUI_Create_Texture( int xPos, int yPos, int width, int height, SDL_Texture *texture, SDLGUI_Clicked *clicked, void *userData) {
@@ -221,6 +224,9 @@ struct SDLGUI_Element* SDLGUI_Create_Text( int xPos, int yPos, int width, int he
 */
 
 void SDLGUI_Draw_Panel( struct SDLGUI_Element *element, int offsetX, int offsetY) {
+	if( ! element->isVisible) 
+		return;
+
     struct SDLGUI_Panel_Data *data = (struct SDLGUI_Panel_Data*)element->data;
 
 	SDL_Rect rect = {element->rect.x + offsetX, element->rect.y + offsetY, element->rect.w, element->rect.h};
@@ -378,6 +384,8 @@ void SDLGUI_Destroy_Textbox( struct SDLGUI_Element *textbox) {
 }
 
 void SDLGUI_Draw_Textbox( struct SDLGUI_Element *textbox, int x0, int y0) {
+	if( ! textbox->isVisible)
+		return;
 	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
 
 	SDL_Rect rect = { textbox->rect.x + x0, textbox->rect.y + y0, textbox->rect.w, textbox->rect.h};
