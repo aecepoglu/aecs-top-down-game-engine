@@ -436,6 +436,15 @@ int dsl_useObject( lua_State *l) {
 	return 0;
 }
 
+int dsl_writeConsole( lua_State *l) {
+	luaL_checkstring( l, 1);
+	const char *str = lua_tostring( l, 1);
+	
+	//TODO write to in-game console instead
+	printf( "TMP CONSOLE: %s\n", str);
+	return 0;
+}
+
 lua_State* initLua() {
 	lua_State * L;
 	
@@ -448,6 +457,7 @@ lua_State* initLua() {
 		{"setTrigger", dsl_setTrigger},
 		{"endLevel", dsl_endLevel},
 		{"setStartGate", dsl_setStartGate},
+		{"write", dsl_writeConsole},
 		{NULL, NULL}
 	}, 0);
 	lua_setglobal( L, "lib");
