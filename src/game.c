@@ -2,6 +2,7 @@
 #include "aiTable.h"
 #include "fov/fov.h"
 #include "definitions.h"
+#include "textConsole.h"
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -34,6 +35,7 @@ struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
 
 lua_State *lua;
+SDL_Texture *textConsole_texture;
 
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 
@@ -41,6 +43,8 @@ struct {
 	SDL_Rect container;
 	SDL_Rect fov;
 } guiMeasurements;
+
+
 
 void gameOver() {
 	log0("game over...\n");
@@ -219,6 +223,7 @@ void draw() {
 			AI_SEEN( vo->obj->ai);
 	}
 
+	drawTexture( renderer, textConsole_texture, 20, 20, CONSOLE_WIDTH, CONSOLE_HEIGHT);
 
 	SDL_RenderPresent( renderer);
 }
@@ -440,8 +445,17 @@ int dsl_writeConsole( lua_State *l) {
 	luaL_checkstring( l, 1);
 	const char *str = lua_tostring( l, 1);
 	
-	//TODO write to in-game console instead
-	printf( "TMP CONSOLE: %s\n", str);
+	textConsole_add( str);
+	textConsole_write( renderer, textures->font, textConsole_texture);
+	return 0;
+}
+
+int dsl_clearConsole( lua_State *l) {
+	int i;
+	for( i=0; i<CONSOLE_NUM_ROWS; i++) {
+		textConsole_add("");
+	}
+	textConsole_write( renderer, textures->font, textConsole_texture);
 	return 0;
 }
 
@@ -458,6 +472,7 @@ lua_State* initLua() {
 		{"endLevel", dsl_endLevel},
 		{"setStartGate", dsl_setStartGate},
 		{"write", dsl_writeConsole},
+		{"clear", dsl_clearConsole},
 		{NULL, NULL}
 	}, 0);
 	lua_setglobal( L, "lib");
@@ -494,11 +509,12 @@ int main( int argc, char *args[]) {
 	lua = initLua();
 	setDefaults();
 	
-    loadLevel( args[1], lua);
-
 	init();
-
 	textures = loadAllTextures( renderer);
+	textConsole_texture = textConsole_init( renderer);
+    
+	loadLevel( args[1], lua);
+
 
 	log0("All set and ready\nStarting...\n");
 

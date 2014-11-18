@@ -29,7 +29,7 @@ endforeach(x ${MY_PF_SOURCES})
 set(MY_PF_SOURCES ${_tmp})
 
 
-set(MY_SOURCE_FILES engine.c texture.c map.c map.h object.c vector.c linkedList.c text.c)
+set(MY_SOURCE_FILES engine.c texture.c map.c map.h object.c vector.c linkedList.c text.c textConsole.c)
 
 set(SDLGUI_SOURCE_FILES sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c)
 
