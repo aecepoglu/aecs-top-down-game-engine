@@ -21,6 +21,8 @@ enum objType {
 	go_creeperPlant,
 	go_peekaboo,
 	go_weepingAngel,
+	go_button,
+	go_switch,
 	go_NUM_ITEMS
 };
 

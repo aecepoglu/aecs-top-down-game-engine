@@ -27,19 +27,16 @@ struct AI* door_create() {
 }
 
 void door_use( struct Map *map, struct object *obj, void *data) {
-	printf("door being used\n");
 	struct doorData *aiData = (struct doorData*)data;
 
 	switch( aiData->state) {
 		case INVISIBLE: 
-			printf("door was invisible\n");
 			aiData->state = VISIBLE;
 			map->objs[ obj->pos.i][ obj->pos.j] = obj;
 
 			break;
 
 		case VISIBLE: 
-			printf("door was visible\n");
 			map->objs[ obj->pos.i][ obj->pos.j] = NULL;
 			aiData->state = INVISIBLE;
 

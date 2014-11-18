@@ -121,14 +121,17 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 
 	result->obj = calloc( go_NUM_ITEMS, sizeof(struct TextureSheet*));
 
-	result->obj[ go_player] = loadObjTextures( ren, "res/player.png");
-	result->obj[ go_leftTurner] = loadObjTextures( ren, "res/left-turner.png");
-	result->obj[ go_apple] = loadObjTextures( ren, "res/apple.png");
-	result->obj[ go_door] = loadObjTextures( ren, "res/door.png");
-	result->obj[ go_flower] = loadObjTextures( ren, "res/flower.png");
-	result->obj[ go_creeperPlant] = loadObjTextures( ren, "res/creeper.png");
-	result->obj[ go_peekaboo] = loadObjTextures( ren, "res/peekaboo.png");
-	result->obj[ go_weepingAngel] = loadObjTextures( ren, "res/weepingAngel.png");
+	result->obj[ go_player] 		= loadObjTextures( ren, "res/player.png");
+	result->obj[ go_leftTurner] 	= loadObjTextures( ren, "res/left-turner.png");
+	result->obj[ go_flower] 		= loadObjTextures( ren, "res/flower.png");
+	result->obj[ go_creeperPlant] 	= loadObjTextures( ren, "res/creeper.png");
+	result->obj[ go_peekaboo] 		= loadObjTextures( ren, "res/peekaboo.png");
+	result->obj[ go_weepingAngel] 	= loadObjTextures( ren, "res/weepingAngel.png");
+
+	result->obj[ go_apple] 			= loadObjTextures( ren, "res/apple.png");
+	result->obj[ go_door] 			= loadObjTextures( ren, "res/door.png");
+	result->obj[ go_button] 		= loadObjTextures( ren, "res/but.png");
+	result->obj[ go_switch] 		= loadObjTextures( ren, "res/sw.png");
 
 	result->font = loadFontSheet( ren, "res/font-sheet.png");
 

@@ -414,7 +414,6 @@ int dsl_setStartGate( lua_State *l) {
 			fprintf( stderr, "Cannot start from gate %d. The position is not empty", gateId);
 			exit( 1);
 		}
-		log0( "setting start position to %d, %d\n", startBase->pos.i, startBase->pos.j);
 		vectorClone( &player->pos, &startBase->pos);
 		player->dir = o->dir;
 		addObject( player, myMap, player->pos.i, player->pos.j);
