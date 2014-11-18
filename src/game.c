@@ -381,8 +381,9 @@ static int dsl_setTrigger( lua_State *l) {
 	int i;
 	struct object *o;
 	int count=0;
+	int ref = luaL_ref( l, LUA_REGISTRYINDEX);
 	FOREACH_OBJ_WITH_ID( objId, i, o, {
-		o->onInteract_luaRef = luaL_ref( l, LUA_REGISTRYINDEX);
+		o->onInteract_luaRef = ref;
 		count ++;
 	})
 	
