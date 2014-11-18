@@ -22,12 +22,12 @@ void init() {
 	vectorAdd( &viewEnd, &viewPos, &viewSize  );
 
 	assert( SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER) >= 0);
-	window = SDL_CreateWindow("sdl-window", 0, 0, viewSize.i*TILELEN, viewSize.j*TILELEN, 0);
+	window = SDL_CreateWindow("sdl-window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, viewSize.i*TILELEN, viewSize.j*TILELEN, 0);
 	assert( window);
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	assert( renderer);
-	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, viewSize.i*TILELEN, viewSize.j*TILELEN);
 
+	bgroundTexture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, viewSize.i*TILELEN, viewSize.j*TILELEN);
 }
 
 /*
