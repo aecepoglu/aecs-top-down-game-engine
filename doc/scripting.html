@@ -1,0 +1,135 @@
+<h1>Scripting</h1>
+
+<p>YZ-01 uses <em>lua</em> scripting language, <em>version 5.2</em>. <br />
+To learn more about <em>lua</em>, please visit <a href="http://lua.org/manual/5.2">lua manual</a></p>
+
+<p>On top of lua, a set of functions are available to command the engine. These are:</p>
+
+<ul>
+<li><a href="#use">use( object-id)</a></li>
+<li><a href="#onInteract">setTrigger( object-id, callback-function)</a></li>
+<li><a href="startLevel">startLevel( map-file-path, script-file-path, start-option): integer</a></li>
+<li><a href="#endLevel">endLevel( level-return-value)</a></li>
+<li><a href="#setStartGate">setStartGate( object-id)</a></li>
+<li><a href="#write">write( string)</a></li>
+<li><a href="#clear">clear()</a></li>
+<li><a href="#printStack">printStack()</a></li>
+</ul>
+
+<p>You must prefix with <strong>lib.</strong> to call these functions. For example:</p>
+
+<pre><code>lib.write("Hello World!")
+</code></pre>
+
+<hr />
+
+<h2>use( object-id) <a id="use"></a></h2>
+
+<ul>
+<li>object-id: id of the object(s) to use</li>
+</ul>
+
+<p>Uses the object with given id.  </p>
+
+<p>To use an object, it must have an AI set that has a use function. <br />
+AIs with use functions are these:</p>
+
+<ul>
+<li>door: toggles visibility</li>
+</ul>
+
+<hr />
+
+<h2>setTrigger( object-id, callback-function) <a id="onInteract"></a></h2>
+
+<ul>
+<li>object-id: integer: id object(s) whose interaction callbacks will be set</li>
+<li>callback-function: function: the function which will be called on interaction. This function takes a boolean as a parameter, that has the value of whether the object was interacted with from the front side</li>
+</ul>
+
+<p>When object with given id is interacted with, the given callback function is called.</p>
+
+<pre><code>function callbackFunction( isInFront)
+    if isInFront
+        print("object interaction from the front")
+    else
+        print("object interaction, not from the front")
+    end
+end
+lib.setTriger( 5, callbackFunction)
+</code></pre>
+
+<hr />
+
+<h2>startLevel( map-file-path, script-file-path, start-option) : integer <a id="startLevel"></a></h2>
+
+<ul>
+<li>map-file-path: string: path of the level map file</li>
+<li>script-file-path: string: path of the level script file</li>
+<li>start-option: integer: values to pass to the <em>init function</em> of the script-file. A level script file can optionally have a function named "init", that takes a single integer parameter.</li>
+</ul>
+
+<p>Loads the map at given path, and the loads the script at given path. <br />
+If the script has a function named "init" in it, then that function is called with the parameter <em>start-option</em></p>
+
+<h3>Return Value</h3>
+
+<p>This function returns the value of parameter given to <a href="#endLevel">endLevel function</a></p>
+
+<pre><code>-- this is the scenario script file
+levelResult = lib.startLevel( "test-map.yz.map", "test-map.yz.lua", 17)
+-- levelResult will be 32
+
+-- this is the map script file
+function init( startOption)
+    -- startOption will have the value 17
+    print("map init function called with option value " .. startOption)
+end
+...
+lib.endLevel( 32)
+</code></pre>
+
+<hr />
+
+<h2>endLevel( level-end-value) <a id="endLevel"></a></h2>
+
+<ul>
+<li>level-end-value: integer: value returned to <a href="#startLevel">startLevel function</a></li>
+</ul>
+
+<p>This function ends the current level. <br />
+Value of level-end-value is going to be returned as the result of <em>startLevel</em> function</p>
+
+<hr />
+
+<h2>setStartGate( object-id) <a id="setStartGate"></a></h2>
+
+<ul>
+<li>object-id: integer: id of starting gate</li>
+</ul>
+
+<p>When starting the level, player will start from infront of the object with given id</p>
+
+<hr />
+
+<h2>write( string) <a id="write"></a></h2>
+
+<ul>
+<li>string: string: the string that will be written</li>
+</ul>
+
+<p>Writes the given string to the in-game console</p>
+
+<p>The console is 5 rows high and 40 columns wide. It is placed on the top-left corner of the game screen.</p>
+
+<hr />
+
+<h2>clear() <a id="clear"></a></h2>
+
+<p>Clears the console</p>
+
+<hr />
+
+<h2>printStack() <a id="printStack"></a></h2>
+
+<p>This is temporarily available, used for debugging purposes</p>
