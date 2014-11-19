@@ -261,7 +261,7 @@ void draw() {
 		drawTexture( renderer, 
 			vo->isFullySeen
 				? textures->obj[ vo->obj->type ]->textures[ vo->obj->visualState][ vo->obj->dir]
-				: textures->obj[ go_apple]->textures[ 0][ 0], 
+				: textures->unidentifiedObj, 
 			(vi_padding + vo->pos.i)*TILELEN, (vj_padding + vo->pos.j)*TILELEN, TILELEN, TILELEN
 		);
 		#endif

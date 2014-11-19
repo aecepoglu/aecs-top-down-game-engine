@@ -136,6 +136,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->font = loadFontSheet( ren, "res/font-sheet.png");
 
 	result->highlitObjIndicator = loadTexture( ren, "res/selection_green.png");
+	result->unidentifiedObj = loadTexture( ren, "res/qmark.png");
 	
 	return result;
 }
