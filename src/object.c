@@ -64,7 +64,8 @@ struct object* readObject( FILE *fp) {
 void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 	if( obj2->onInteract_luaRef != LUA_NOREF) {
 		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->onInteract_luaRef);
-		if( lua_pcall( lua, 0, 0, 0) != 0) {
+		lua_pushboolean( lua, obj->dir == DIR_REVERSE(obj2->dir));
+		if( lua_pcall( lua, 1, 0, 0) != 0) {
 			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));
 			return;
 		}
