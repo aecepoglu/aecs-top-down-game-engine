@@ -77,7 +77,7 @@ struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const char *path) {
 	int numRotations = img->w / SPRITE_TILE_LEN;
 	int numStates = img->h / SPRITE_TILE_LEN;
 	assert(numStates >= 2);
-	log0( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
+	log1( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 
 	struct TextureSheet *result = (struct TextureSheet*)malloc( sizeof( struct TextureSheet));
 	
@@ -109,7 +109,7 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 
 
 struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
-	log0("Loading textures\n");
+	log1("Loading textures\n");
 	
 	struct GameTextures *result = malloc( sizeof(struct GameTextures));
 	

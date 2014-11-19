@@ -56,7 +56,7 @@ struct Map {
 /*	Reads the map file at 'path'.
 	Returns the map read
 */
-struct Map* readMapFile( char *path);
+struct Map* readMapFile( const char *path);
 
 /* Adds given object to given location.
 */

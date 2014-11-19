@@ -38,7 +38,7 @@ void resizeView( int posX, int posY, int winW, int winH) {
 	windowH = winH;
 	viewSize.i = (winW-1-posX) / TILELEN;
 	viewSize.j = (winH-1-posY) / TILELEN;
-	log0("size is %dx%d\n", viewSize.i, viewSize.j);
+	log1("size is %dx%d\n", viewSize.i, viewSize.j);
 	vectorAdd( &viewEnd, &viewPos, &viewSize );
 }
 

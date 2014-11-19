@@ -8,6 +8,7 @@
 
 #include "error.h"
 
+bool running;
 unsigned int objectCounter = 1;
 
 bool moveForward( struct Map *map, struct object* obj) { return false; }

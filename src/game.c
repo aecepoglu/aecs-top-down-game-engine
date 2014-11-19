@@ -15,8 +15,13 @@
 	}\
 }
 
-SDL_Event timerPushEvent;
-Uint32 timerDelay;
+#define CUSTOM_EVENT_UPDATE 	0
+#define CUSTOM_EVENT_ENDLEVEL	1
+
+SDL_Event timerPushEvent = {
+	.type= SDL_USEREVENT,
+};
+const Uint32 timerDelay = 100 /*miliseconds*/;
 
 struct object *player;
 
@@ -45,10 +50,52 @@ struct {
 } guiMeasurements;
 
 
+/* this is available for debug reasons only */
+int luaStackDump(lua_State* l)
+{
+    int i;
+    int top = lua_gettop(l);
+ 
+    printf("----total in stack %d----\n",top);
+ 
+    for (i = 1; i <= top; i++)
+    {  /* repeat for each level */
+        printf("%d. ", i);
+        int t = lua_type(l, i);
+        switch (t) {
+            case LUA_TSTRING:  /* strings */
+                printf("string: '%s'", lua_tostring(l, i));
+                break;
+            case LUA_TBOOLEAN:  /* booleans */
+                printf("boolean %s",lua_toboolean(l, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:  /* numbers */
+                printf("number: %g", lua_tonumber(l, i));
+                break;
+            default:  /* other values */
+                printf("%s", lua_typename(l, t));
+                break;
+        }
+        printf("\n");
+    }
+    printf("-----------------------\n");  /* end the listing */
+    return 0;
+}
 
-void gameOver() {
-	log0("game over...\n");
-	running=false;
+void gameOver( int levelEndValue) {
+	isPlayerPosSet = false;
+
+	SDL_Event event = {
+		.type = SDL_USEREVENT,
+	};
+	event.user.code = 1;
+
+	int *iPtr = (int*)malloc( sizeof(int));
+	*iPtr = levelEndValue;
+
+	event.user.data1 = iPtr;
+
+	SDL_PushEvent( &event);
 }
 
 /* Uses the object in-front of player */
@@ -93,7 +140,7 @@ bool moveForward( struct Map *map, struct object* obj) {
 		}
 		else {
 			if (objectHit( obj, objAtPos) && objAtPos == player && objAtPos->health == 0 ) {
-				gameOver();
+				gameOver( 0);
 			}
 			return false;
 		}
@@ -135,7 +182,7 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
 		case SDLK_q:
-			running = 0;
+            quit("pressed 'q'. Quitting");
 			break;
 		case SDLK_UP:
 			movePlayer( moveForward);
@@ -271,7 +318,7 @@ void update() {
 	playerMoved = false;
 }
 
-void run() {
+int run() {
 	if( isPlayerPosSet != true) {
 		quit( "player position should have been set from the level script.");
 	}
@@ -280,7 +327,7 @@ void run() {
 	SDL_AddTimer( timerDelay, timerCallback, 0);
 
 	SDL_Event e;
-	while( running) {
+	while( true) {
 		SDL_WaitEvent( &e);
 		switch (e.type) {
 			case SDL_WINDOWEVENT:
@@ -313,7 +360,7 @@ void run() {
 					    log1("Window %d restored\n", e.window.windowID);
 					    break;
 					case SDL_WINDOWEVENT_CLOSE:
-					    log1("Window %d closed\n", e.window.windowID);
+					    log0("Window %d closed\n", e.window.windowID);
 					    break;
 					default:
 						//unhandled window event
@@ -321,11 +368,17 @@ void run() {
 				};
 				break;
 			case SDL_USEREVENT:
-				update();
+                if( e.user.code == CUSTOM_EVENT_UPDATE) 
+                    update();
+                else {
+                    int *iPtr = (int*)(e.user.data1);
+					int i = *iPtr;
+					free( iPtr);
+					return i;
+				}
 				break;
 			case SDL_QUIT:
 				quit("Quitting");
-				running =0;
 				break;
 			case SDL_KEYDOWN:
 				log1("key down\n");
@@ -343,20 +396,16 @@ void run() {
 		};
 		draw();
 	}
+	
+	return 0 /*TODO rename to DEFAULT_ENDLEVEL_VALUE*/;
 }
 
 
 void setDefaults() {
-	log0("setting defaults\n");
-	
-	timerDelay = 100;
-	
+	log1("setting defaults\n");
 
-	SDL_UserEvent userEvent;
-	userEvent.type = SDL_USEREVENT;
-	timerPushEvent.type = SDL_USEREVENT;
-	timerPushEvent.user = userEvent;
-
+	timerPushEvent.user.code = CUSTOM_EVENT_UPDATE;
+	
 	player = createObject( go_player, 0, 0, 0);
 
 	playerVisibleTiles = (enum terrainType**) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType*));
@@ -387,14 +436,50 @@ static int dsl_setTrigger( lua_State *l) {
 		count ++;
 	})
 	
-	log0("Set interact-trigger for %d objects\n", count);
+	log1("Set interact-trigger for %d objects\n", count);
 
 	return 0;
 }
 
+int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua_State *L) {
+	if( myMap != NULL && strcmp( mapPath, myMap->filePath) != 0) {
+		freeMap( myMap);
+		myMap = NULL;
+	}
+	myMap = readMapFile( mapPath);
+
+    if (luaL_loadfile(L, scriptPath) || lua_pcall( L, 0, 0, 0)) {
+        fprintf(stderr, "Error loading script '%s'\n%s\n", scriptPath, lua_tostring(L, -1));
+        exit(1);
+	}
+
+	lua_getglobal( L, "init");
+	if( lua_isnil( L, -1) != true) {
+		lua_pushinteger( L, levelOption);
+		lua_pcall( L, 1, 0, 0 );
+	}
+    return run();
+}
+
+int dsl_startLevel( lua_State *l) {
+    luaL_checkstring( l, 1);
+    luaL_checkstring( l, 2);
+    luaL_checkinteger( l, 3);
+
+    const char *mapPath = lua_tostring( l, 1);
+    const char *scriptPath = lua_tostring( l, 2);
+    int mapStartOption = lua_tointeger( l, 3);
+
+    lua_pushinteger( l, loadLevel( mapPath, scriptPath, mapStartOption, l) );
+	
+    return 1;
+}
+
 static int dsl_endLevel( lua_State *l) {
-	isPlayerPosSet = false;
-	running = 0;
+	luaL_checkinteger( l, 1);
+
+	int levelEndValue = lua_tointeger( l, 1);
+	gameOver( levelEndValue);
 	return 0;
 }
 
@@ -469,10 +554,12 @@ lua_State* initLua() {
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
 		{"use", dsl_useObject},
 		{"setTrigger", dsl_setTrigger},
+		{"startLevel", dsl_startLevel},
 		{"endLevel", dsl_endLevel},
 		{"setStartGate", dsl_setStartGate},
 		{"write", dsl_writeConsole},
 		{"clear", dsl_clearConsole},
+        {"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);
 	lua_setglobal( L, "lib");
@@ -480,31 +567,11 @@ lua_State* initLua() {
 	return L;
 }
 
-void loadLevel( const char* levelName, lua_State *L) {
-	char fileNameBuf[256];
-	sprintf( fileNameBuf, "%s.yz.map", levelName);
-	myMap = readMapFile( fileNameBuf);
-
-	sprintf( fileNameBuf, "%s.yz.lua", levelName);
-
-    if (luaL_loadfile(L, fileNameBuf) || lua_pcall( L, 0, 0, 0)) {
-        fprintf(stderr, "Error loading script '%s'\n%s\n", fileNameBuf, lua_tostring(L, -1));
-        exit(1);
-	}
-
-	lua_getglobal( L, "init");
-	if( lua_isnil( L, -1) != true) {
-		lua_pushinteger( L, 17 /*just a tmp number*/);
-		lua_pcall( L, 1, 0, 0 );
-	}
-	log1( "loadLevel end\n");
-}
-
 int main( int argc, char *args[]) {
 	
 	if( argc != 2) {
 		fprintf( stderr, "Usage: %s map-file (without .yz.* extensions)", args[0]);
-		exit(0);
+        return 0;
 	}
 	lua = initLua();
 	setDefaults();
@@ -513,14 +580,10 @@ int main( int argc, char *args[]) {
 	textures = loadAllTextures( renderer);
 	textConsole_texture = textConsole_init( renderer);
     
-	loadLevel( args[1], lua);
-
-
-	log0("All set and ready\nStarting...\n");
-
-	running = 1;
-	run();
-
+    if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {
+        fprintf(stderr, "Error loading script '%s'\n%s\n", args[1], lua_tostring(lua, -1));
+        return 0;
+	}
 	
 	log0("Program over\nDeallocating because I'm just OCD like that\n");
 	freeTextures( textures);

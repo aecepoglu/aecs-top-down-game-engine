@@ -17,7 +17,7 @@
 /*	Reads the map file at 'path'.
 	Returns the map read
 */
-struct Map* readMapFile( char *path) {
+struct Map* readMapFile( const char *path) {
 	log1( "readMapFile( %s)\n", path);
 	struct Map *m = (struct Map*)malloc( sizeof(struct Map) );
 	FILE *fp = fopen( path, "rb");
@@ -76,7 +76,7 @@ struct Map* readMapFile( char *path) {
 	m->pfBase = createPfBase( m->tiles, m->width, m->height);
 
 	log1("map \"%s\" has been read\n%dx%d\n", path, m->width, m->height);
-	m->filePath = path;
+	m->filePath = strdup( path);
 	return m;
 }
 
@@ -321,6 +321,7 @@ void freeMap( struct Map *map) {
 		objectFree( map->objList[i]);
 	}
 	free( map->objList);
+    free( map->filePath);
 
 	free(map);
 }
