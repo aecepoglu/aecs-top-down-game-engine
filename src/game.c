@@ -467,8 +467,6 @@ void setDefaults() {
 	log1("setting defaults\n");
 
 	timerPushEvent.user.code = CUSTOM_EVENT_UPDATE;
-	
-	player = createObject( go_player, 0, 0, 0);
 
 	playerVisibleTiles = (enum terrainType**) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType*));
 	int i;
@@ -510,7 +508,9 @@ int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua
 		freeMap( myMap);
 		myMap = NULL;
 	}
+	
 	myMap = readMapFile( mapPath);
+	player = createObject( go_player, 0, 0, 0);
 
     if (luaL_loadfile(L, scriptPath) || lua_pcall( L, 0, 0, 0)) {
         fprintf(stderr, "Error loading script '%s'\n%s\n", scriptPath, lua_tostring(L, -1));
@@ -522,6 +522,7 @@ int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua
 		lua_pushinteger( L, levelOption);
 		lua_pcall( L, 1, 0, 0 );
 	}
+
     return run();
 }
 

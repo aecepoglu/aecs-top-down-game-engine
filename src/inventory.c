@@ -41,6 +41,7 @@ struct object* inventory_remove( int index, lua_State *lua) {
 	struct object *result = NULL;
 	if( index >= 0 && index < INVENTORY_SIZE) {
 		result =inventory[ index];
+		inventory[ index] = NULL;
 	}
 
 	if( result != NULL && inventoryCallbacks.onRemove != LUA_NOREF) {
