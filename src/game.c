@@ -3,6 +3,8 @@
 #include "fov/fov.h"
 #include "definitions.h"
 #include "textConsole.h"
+#include "inventory.h"
+#include "array.h"
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -111,6 +113,38 @@ bool interact( struct Map *map, struct object *obj) {
 		return false;
 }
 
+/* picks up the object in front of object*/
+bool pickUp( struct Map *map, struct object *obj) {
+	struct BasePfNode *nextNode = map->pfBase[ obj->pos.i][ obj->pos.j]->neighbours[ obj->dir];
+	struct Vector *pos = GET_PF_POS( nextNode);
+	
+	struct object *pickedObj = map->objs[ pos->i][ pos->j];
+	if( pos != NULL && pickedObj != NULL && inventory_add( pickedObj, lua) ) {
+		
+		ARRAY_REMOVE( myMap->objList, pickedObj, myMap->objListCount);
+		myMap->objs[ pos->i][ pos->j] = NULL;
+		return true;
+    }
+	else
+		return false;
+}
+
+bool dropItem( struct Map *map, struct object *droppingObj, int inventoryIndex) {
+	struct BasePfNode *nextNode = map->pfBase[ droppingObj->pos.i][ droppingObj->pos.j]->neighbours[ droppingObj->dir];
+	struct Vector *pos = GET_PF_POS( nextNode);
+	
+	if( pos != NULL && map->objs[ pos->i][ pos->j] == NULL) {
+		struct object *droppedObj = inventory_remove( inventoryIndex, lua);
+		if( droppedObj != NULL) {
+			droppedObj->dir = DIR_REVERSE( player->dir);
+			vectorClone( &droppedObj->pos, pos);
+			addObject( droppedObj, map, pos->i, pos->j);
+			return true;
+		}
+	}
+	return false;
+}
+
 /* Moves forward only if that spot is empty */
 bool moveBackward( struct Map *map, struct object* obj) {
 	struct BasePfNode *nextPfNode = map->pfBase[ obj->pos.i][ obj->pos.j]->neighbours[ DIR_REVERSE( obj->dir)];
@@ -202,6 +236,27 @@ void handleKey( SDL_KeyboardEvent *e) {
         case SDLK_u:
             interact( myMap, player);
             break;
+		case SDLK_p:
+			pickUp( myMap, player);
+			break;
+		case SDLK_1:
+			dropItem( myMap, player, 0);
+			break;
+		case SDLK_2:
+			dropItem( myMap, player, 1);
+			break;
+		case SDLK_3:
+			dropItem( myMap, player, 2);
+			break;
+		case SDLK_4:
+			dropItem( myMap, player, 3);
+			break;
+		case SDLK_5:
+			dropItem( myMap, player, 4);
+			break;
+		case SDLK_6:
+			dropItem( myMap, player, 5);
+			break;
 		default:
 			log0("Unhandled key\n");
 			break;
@@ -271,6 +326,13 @@ void draw() {
 	}
 
 	drawTexture( renderer, textConsole_texture, 20, 20, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+	for( i=0; i<INVENTORY_SIZE; i++) {
+		drawTexture( renderer, 
+			inventory[i] != NULL
+				? textures->obj[ inventory[i]->type]->textures[ 1][0]
+				: textures->highlitObjIndicator,
+			0, 20 + CONSOLE_HEIGHT + i*TILELEN, TILELEN, TILELEN);
+	}
 
 	SDL_RenderPresent( renderer);
 }
@@ -417,6 +479,8 @@ void setDefaults() {
 
 	guiMeasurements.fov = (SDL_Rect){.w = PLAYER_FOV_TILES_LIM * TILELEN, .h = PLAYER_FOV_TILES_LIM * TILELEN};
 	guiMeasurements.container = (SDL_Rect){.x = 0, .y=0};
+
+	inventory_reset( false);
 }
 
 static int dsl_setTrigger( lua_State *l) {
@@ -544,6 +608,34 @@ int dsl_clearConsole( lua_State *l) {
 	return 0;
 }
 
+int dsl_listInventory( lua_State *l) {
+	lua_createtable( l, INVENTORY_SIZE, 0);
+	
+	int i;
+	for( i=0; i<INVENTORY_SIZE; i++) {
+		lua_pushinteger( l, inventory[i] != NULL ? inventory[i]->id : 0);
+		lua_rawseti( l, 1, i);
+	}
+
+	return 1;
+}
+
+int dsl_onInventoryAdd( lua_State *l) {
+	luaL_checktype( l, 1, LUA_TFUNCTION);
+	
+	inventoryCallbacks.onAdd = luaL_ref( l, LUA_REGISTRYINDEX);
+
+	return 0;
+}
+
+int dsl_onInventoryRemove( lua_State *l) {
+	luaL_checktype( l, 1, LUA_TFUNCTION);
+
+	inventoryCallbacks.onRemove = luaL_ref( l, LUA_REGISTRYINDEX);
+
+	return 0;
+}
+
 lua_State* initLua() {
 	lua_State * L;
 	
@@ -559,7 +651,10 @@ lua_State* initLua() {
 		{"setStartGate", dsl_setStartGate},
 		{"write", dsl_writeConsole},
 		{"clear", dsl_clearConsole},
-        {"printStack", luaStackDump},
+		{"listInventory", dsl_listInventory},
+		{"onInventoryAdd", dsl_onInventoryAdd},
+		{"onInventoryRemove", dsl_onInventoryRemove},
+		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);
 	lua_setglobal( L, "lib");
@@ -594,4 +689,3 @@ int main( int argc, char *args[]) {
 	freeMap( myMap);
 	return 0;
 }
-  

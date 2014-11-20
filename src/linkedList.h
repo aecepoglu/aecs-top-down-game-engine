@@ -17,4 +17,6 @@ struct LinkedListNode* linkedList_find( struct LinkedListNode *head, void *data)
 
 void linkedList_free( struct LinkedListNode *head);
 
-#endif
+#define LINKED_LIST_FOREACH( itNode, head, closure) for( itNode=head; itNode!=NULL; itNode=itObj->next) closure
+
+#endif /*LINKED_LIST_H*/
