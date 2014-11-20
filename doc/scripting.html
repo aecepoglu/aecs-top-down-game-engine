@@ -7,12 +7,15 @@ To learn more about <em>lua</em>, please visit <a href="http://lua.org/manual/5.
 
 <ul>
 <li><a href="#use">use( object-id)</a></li>
-<li><a href="#onInteract">setTrigger( object-id, callback-function)</a></li>
-<li><a href="startLevel">startLevel( map-file-path, script-file-path, start-option): integer</a></li>
+<li><a href="#onInteract">onInteract( object-id, callback-function)</a></li>
+<li><a href="#startLevel">startLevel( map-file-path, script-file-path, start-option): integer</a></li>
 <li><a href="#endLevel">endLevel( level-return-value)</a></li>
 <li><a href="#setStartGate">setStartGate( object-id)</a></li>
 <li><a href="#write">write( string)</a></li>
 <li><a href="#clear">clear()</a></li>
+<li><a href="#listInventory">listInventory(): array</a></li>
+<li><a href="#onInventoryAdd">onInventoryAdd( callback-function )</a></li>
+<li><a href="#onInventoryRemove">onInventoryRemove( callback-function)</a></li>
 <li><a href="#printStack">printStack()</a></li>
 </ul>
 
@@ -40,7 +43,7 @@ AIs with use functions are these:</p>
 
 <hr />
 
-<h2>setTrigger( object-id, callback-function) <a id="onInteract"></a></h2>
+<h2>onInteract( object-id, callback-function) <a id="onInteract"></a></h2>
 
 <ul>
 <li>object-id: integer: id object(s) whose interaction callbacks will be set</li>
@@ -127,6 +130,48 @@ Value of level-end-value is going to be returned as the result of <em>startLevel
 <h2>clear() <a id="clear"></a></h2>
 
 <p>Clears the console</p>
+
+<hr />
+
+<h2>listInventory() : array <a id="listInventory"></a></h2>
+
+<p>Lists player's inventory.</p>
+
+<p>This returns an array of size 6, consisting of ids of objects inventory</p>
+
+<h2>onInventoryAdd( callback ) <a id="onInventoryAdd"></a></h2>
+
+<ul>
+<li>callback: function: the callback function. Takes two parameters:
+<ol>
+<li>id of item picked</li>
+<li>index of where the item is put in the inventory</li>
+</ol></li>
+</ul>
+
+<p>sets the callback function that will be called when player adds an item to inventory.</p>
+
+<pre><code>lib.onInventoryAdd( function( itemId, index)
+    print("Picked item with id " .. itemId .. " and put it at position " .. index .. " in the inventory")
+end)
+</code></pre>
+
+<h2>onInventoryRemove( callback ) <a id="onInventoryRemove"></a></h2>
+
+<ul>
+<li>callback: function: the ballback function. Takes two parameters:
+<ol>
+<li>id of item dropped</li>
+<li>index of where the item was in the inventory</li>
+</ol></li>
+</ul>
+
+<p>sets the callback function that will be called when player drops an item from his inventory.</p>
+
+<pre><code>lib.onInventoryRemove( function( itemId, index)
+    print("Dropped item with id " .. itemId .. "and from position " .. index .. " of inventory")
+end)
+</code></pre>
 
 <hr />
 

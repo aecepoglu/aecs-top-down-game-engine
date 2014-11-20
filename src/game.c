@@ -483,7 +483,7 @@ void setDefaults() {
 	inventory_reset( false);
 }
 
-static int dsl_setTrigger( lua_State *l) {
+static int dsl_onInteract( lua_State *l) {
 	luaL_checkinteger( l, 1);
 	luaL_checktype( l, 2, LUA_TFUNCTION);
 	
@@ -645,7 +645,7 @@ lua_State* initLua() {
 	lua_newtable( L);
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
 		{"use", dsl_useObject},
-		{"setTrigger", dsl_setTrigger},
+		{"onInteract", dsl_onInteract},
 		{"startLevel", dsl_startLevel},
 		{"endLevel", dsl_endLevel},
 		{"setStartGate", dsl_setStartGate},
