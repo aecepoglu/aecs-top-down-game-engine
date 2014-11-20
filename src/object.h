@@ -39,7 +39,9 @@ struct object {
 	bool isDeleted;
 	unsigned int visualState;
 
-    int onInteract_luaRef;
+    struct {
+		int onInteract;
+	} callbacks;
 };
 
 

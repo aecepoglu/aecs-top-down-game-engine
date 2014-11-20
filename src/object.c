@@ -21,7 +21,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 	obj->timerCounter= 0;
 	obj->isDeleted=false;
 	obj->visualState = 1;
-    obj->onInteract_luaRef = LUA_NOREF;
+    obj->callbacks.onInteract = LUA_NOREF;
 
 	return obj;
 }
@@ -51,7 +51,7 @@ struct object* readObject( FILE *fp) {
 	obj->timerCounter= 0;
 	obj->visualState = 1;
 	obj->isDeleted=false;
-    obj->onInteract_luaRef = LUA_NOREF;
+    obj->callbacks.onInteract = LUA_NOREF;
 
 	return obj;
 }
@@ -62,8 +62,8 @@ struct object* readObject( FILE *fp) {
 
 
 void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
-	if( obj2->onInteract_luaRef != LUA_NOREF) {
-		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->onInteract_luaRef);
+	if( obj2->callbacks.onInteract != LUA_NOREF) {
+		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->callbacks.onInteract);
 		lua_pushboolean( lua, obj->dir == DIR_REVERSE(obj2->dir));
 		if( lua_pcall( lua, 1, 0, 0) != 0) {
 			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));

@@ -496,7 +496,7 @@ static int dsl_onInteract( lua_State *l) {
 	int count=0;
 	int ref = luaL_ref( l, LUA_REGISTRYINDEX);
 	FOREACH_OBJ_WITH_ID( objId, i, o, {
-		o->onInteract_luaRef = ref;
+		o->callbacks.onInteract = ref;
 		count ++;
 	})
 	
