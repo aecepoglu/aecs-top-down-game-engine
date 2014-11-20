@@ -6,4 +6,6 @@ This is a very simple and rough top-down tile-based game engine that I am develo
 
 It uses libSDL and is licensed under GPLv3.
 
+[Info on scripting can be found here](doc/scripting.markdown)
+
 Feel free to contact me for any questions or comments you might have.
