@@ -49,8 +49,6 @@ bool roughAStar_dl_pathfind( struct RoughAStarData *data, struct Vector *fromPos
 
 	if( vectorEquals( fromPos, toPos))
 		return false;
-	else if ( HEURISTICS( *fromPos, toPos) > maxDepth)
-		return false;
 
 	//clear the open and closed nodes sets
 	struct LinkedListNode *setsToClear[2] = { data->openSet, data->closedSet};
@@ -82,8 +80,6 @@ bool roughAStar_dl_pathfind( struct RoughAStarData *data, struct Vector *fromPos
 
 	while( data->openSet) {
 		openedCount ++;
-		if( openedCount >= maxDepth)
-			return false;
 
 		/* Find node with minimum fValue in data->openSet
             _node_ will be the RoughPfNode with min fValue
@@ -109,7 +105,7 @@ bool roughAStar_dl_pathfind( struct RoughAStarData *data, struct Vector *fromPos
 
 		log2("\tExpanding node %d,%d. fValue=%d\n", node->base->pos.i, node->base->pos.j, node->fValue);
 
-		if( vectorEquals( & node->base->pos, toPos)) {
+		if( vectorEquals( & node->base->pos, toPos) || openedCount > maxDepth) {
 			//Create a path from fromPos to toPos and return it
 			log2("\t\tFound goal. Create the path and return it\n");
 			roughAStar_dl_constructPath( data->map, data->map[ fromPos->i][ fromPos->j], node, result, resultCount);

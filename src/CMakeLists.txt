@@ -47,11 +47,8 @@ add_executable(aec-game game.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 
-add_executable(lua-test dsl/c_code.c)
-
 target_link_libraries(level-editor m)
 target_link_libraries(aec-game m)
-target_link_libraries(lua-test  ${LUA_LIBRARIES})
 
 add_definitions(-Wall)
 
