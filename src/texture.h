@@ -32,6 +32,9 @@ struct GameTextures {
 */
 SDL_Texture* loadTexture( SDL_Renderer *ren, const char *path);
 
+/* loads texture sheet at given path and returns it */
+struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const char *path);
+
 /* Draws given texture 'tex' inside the given rectangle
 */
 void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int h);
@@ -39,6 +42,8 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 /* Loads all the textures
 */
 struct GameTextures* loadAllTextures( SDL_Renderer *ren);
+
+void texture_freeTextureSheet( struct TextureSheet *sheet);
 void freeTextures( struct GameTextures* textures);
 
 #endif //TEXTURE_H

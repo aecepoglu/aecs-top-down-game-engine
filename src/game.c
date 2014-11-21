@@ -48,38 +48,6 @@ struct {
 } guiMeasurements;
 
 
-/* this is available for debug reasons only */
-int luaStackDump(lua_State* l)
-{
-    int i;
-    int top = lua_gettop(l);
- 
-    printf("----total in stack %d----\n",top);
- 
-    for (i = 1; i <= top; i++)
-    {  /* repeat for each level */
-        printf("%d. ", i);
-        int t = lua_type(l, i);
-        switch (t) {
-            case LUA_TSTRING:  /* strings */
-                printf("string: '%s'", lua_tostring(l, i));
-                break;
-            case LUA_TBOOLEAN:  /* booleans */
-                printf("boolean %s",lua_toboolean(l, i) ? "true" : "false");
-                break;
-            case LUA_TNUMBER:  /* numbers */
-                printf("number: %g", lua_tonumber(l, i));
-                break;
-            default:  /* other values */
-                printf("%s", lua_typename(l, t));
-                break;
-        }
-        printf("\n");
-    }
-    printf("-----------------------\n");  /* end the listing */
-    return 0;
-}
-
 void gameOver( int levelEndValue) {
 	isPlayerPosSet = false;
 
@@ -522,116 +490,7 @@ int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua
     return run();
 }
 
-int dsl_startLevel( lua_State *l) {
-    luaL_checkstring( l, 1);
-    luaL_checkstring( l, 2);
-    luaL_checkinteger( l, 3);
-
-    const char *mapPath = lua_tostring( l, 1);
-    const char *scriptPath = lua_tostring( l, 2);
-    int mapStartOption = lua_tointeger( l, 3);
-
-    lua_pushinteger( l, loadLevel( mapPath, scriptPath, mapStartOption, l) );
-	
-    return 1;
-}
-
-static int dsl_endLevel( lua_State *l) {
-	luaL_checkinteger( l, 1);
-
-	int levelEndValue = lua_tointeger( l, 1);
-	gameOver( levelEndValue);
-	return 0;
-}
-
-int dsl_setStartGate( lua_State *l) {
-	luaL_checkinteger( l, 1);
-
-	int gateId = lua_tointeger( l, 1);
-	
-	struct object *o;
-	int i;
-	FOREACH_OBJ_WITH_ID( gateId, i, o, {
-		struct BasePfNode *startBase = myMap->pfBase[ o->pos.i][ o->pos.j]->neighbours[ o->dir];
-		if( startBase == NULL) {
-			fprintf( stderr, "Cannot start from gate %d. It's looking at a non-ground tile", gateId);
-			exit( 1);
-		}
-		else if ( myMap->objs[ startBase->pos.i][ startBase->pos.j] != NULL) {
-			fprintf( stderr, "Cannot start from gate %d. The position is not empty", gateId);
-			exit( 1);
-		}
-		vectorClone( &player->pos, &startBase->pos);
-		player->dir = o->dir;
-		addObject( player, myMap, player->pos.i, player->pos.j);
-		isPlayerPosSet = true;
-		return 0;
-		}
-	)
-	fprintf( stderr, "Cannot start from gate %d. No object with such id is found", gateId);
-	exit( 1);
-	return 0;
-}
-
-int dsl_useObject( lua_State *l) {
-	luaL_checkinteger( l, 1);
-	int usedObjId = lua_tointeger( l, 1);
-
-	int i;
-	struct object *o;
-	FOREACH_OBJ_WITH_ID( usedObjId, i, o, {
-		if( o->ai) {
-			AI_USE( myMap, o);
-		}
-	})
-	return 0;
-}
-
-int dsl_writeConsole( lua_State *l) {
-	luaL_checkstring( l, 1);
-	const char *str = lua_tostring( l, 1);
-	
-	textConsole_add( str);
-	textConsole_write( renderer, textures->font, textConsole_texture);
-	return 0;
-}
-
-int dsl_clearConsole( lua_State *l) {
-	int i;
-	for( i=0; i<CONSOLE_NUM_ROWS; i++) {
-		textConsole_add("");
-	}
-	textConsole_write( renderer, textures->font, textConsole_texture);
-	return 0;
-}
-
-int dsl_listInventory( lua_State *l) {
-	lua_createtable( l, INVENTORY_SIZE, 0);
-	
-	int i;
-	for( i=0; i<INVENTORY_SIZE; i++) {
-		lua_pushinteger( l, inventory[i] != NULL ? inventory[i]->id : 0);
-		lua_rawseti( l, 1, i);
-	}
-
-	return 1;
-}
-
-int dsl_onInventoryAdd( lua_State *l) {
-	luaL_checktype( l, 1, LUA_TFUNCTION);
-	
-	inventoryCallbacks.onAdd = luaL_ref( l, LUA_REGISTRYINDEX);
-
-	return 0;
-}
-
-int dsl_onInventoryRemove( lua_State *l) {
-	luaL_checktype( l, 1, LUA_TFUNCTION);
-
-	inventoryCallbacks.onRemove = luaL_ref( l, LUA_REGISTRYINDEX);
-
-	return 0;
-}
+#include "dsl.c"
 
 lua_State* initLua() {
 	lua_State * L;
@@ -651,6 +510,8 @@ lua_State* initLua() {
 		{"listInventory", dsl_listInventory},
 		{"onInventoryAdd", dsl_onInventoryAdd},
 		{"onInventoryRemove", dsl_onInventoryRemove},
+		{"setObjTextures", dsl_setObjTextures},
+		{"setTileTextures", dsl_setTileTextures},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

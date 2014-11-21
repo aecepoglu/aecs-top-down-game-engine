@@ -108,6 +108,7 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 }
 
 
+
 struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	log1("Loading textures\n");
 	
@@ -121,18 +122,24 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 
 	result->obj = calloc( go_NUM_ITEMS, sizeof(struct TextureSheet*));
 
-	result->obj[ go_player] 		= loadObjTextures( ren, "res/player.png");
-	result->obj[ go_leftTurner] 	= loadObjTextures( ren, "res/left-turner.png");
-	result->obj[ go_flower] 		= loadObjTextures( ren, "res/flower.png");
-	result->obj[ go_creeperPlant] 	= loadObjTextures( ren, "res/creeper.png");
-	result->obj[ go_peekaboo] 		= loadObjTextures( ren, "res/peekaboo.png");
-	result->obj[ go_weepingAngel] 	= loadObjTextures( ren, "res/weepingAngel.png");
+	char *resPaths[go_NUM_ITEMS] = {
+		[ go_player] 		= "res/player.png",
+		[ go_leftTurner] 	= "res/left-turner.png",
+		[ go_flower] 		= "res/flower.png",
+		[ go_creeperPlant] 	= "res/creeper.png",
+		[ go_peekaboo] 		= "res/peekaboo.png",
+		[ go_weepingAngel] 	= "res/weepingAngel.png",
+		[ go_apple] 		= "res/apple.png",
+		[ go_door] 			= "res/door.png",
+		[ go_button] 		= "res/but.png",
+		[ go_switch] 		= "res/sw.png",
+		[ go_lineSensor] 	= "res/lineSensor.png"
+	};
 
-	result->obj[ go_apple] 			= loadObjTextures( ren, "res/apple.png");
-	result->obj[ go_door] 			= loadObjTextures( ren, "res/door.png");
-	result->obj[ go_button] 		= loadObjTextures( ren, "res/but.png");
-	result->obj[ go_switch] 		= loadObjTextures( ren, "res/sw.png");
-	result->obj[ go_lineSensor] 	= loadObjTextures( ren, "res/lineSensor.png");
+	int i;
+	for( i=0; i<go_NUM_ITEMS; i++) {
+		result->obj[ i] = loadObjTextures( ren, resPaths[ i]);
+	}
 
 	result->font = loadFontSheet( ren, "res/font-sheet.png");
 
@@ -142,26 +149,31 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	return result;
 }
 
-void freeTextures( struct GameTextures* textures) {
-	int i,j,k,tmpK;
-	for( i=0; i<go_NUM_ITEMS; i++) {
-		for( j=0; j<textures->obj[i]->numStates; j++) {
-			for( k=0; k<4; k++) {
-				if( textures->obj[i]->textures[j][k] != NULL) {
-					SDL_DestroyTexture( textures->obj[i]->textures[j][k]);
+void texture_freeTextureSheet( struct TextureSheet *sheet) {
+	int j, k, tmpK;
+	for( j=0; j<sheet->numStates; j++) {
+		for( k=0; k<4; k++) {
+			if( sheet->textures[j][k] != NULL) {
+				SDL_DestroyTexture( sheet->textures[j][k]);
 
-					/* in those rotations, there can be multiple elements pointing to the same texture.
-						mark those that point to the same texture with NULL
-					*/
-					for( tmpK=k+1; tmpK<4; tmpK++)
-						if( textures->obj[i]->textures[j][tmpK] == textures->obj[i]->textures[j][k])
-							textures->obj[i]->textures[j][tmpK] = NULL;
-				}
+				/* in those rotations, there can be multiple elements pointing to the same texture.
+					mark those that point to the same texture with NULL
+				*/
+				for( tmpK=k+1; tmpK<4; tmpK++)
+					if( sheet->textures[j][tmpK] == sheet->textures[j][k])
+						sheet->textures[j][tmpK] = NULL;
 			}
-			free( textures->obj[i]->textures[j]);
 		}
-		free( textures->obj[i]->textures);
-		free( textures->obj[i]);
+		free( sheet->textures[j]);
+	}
+	free( sheet->textures);
+	free( sheet);
+}
+
+void freeTextures( struct GameTextures* textures) {
+	int i;
+	for( i=0; i<go_NUM_ITEMS; i++) {
+		texture_freeTextureSheet( textures->obj[i]);
 	}
 	free( textures->obj);
 

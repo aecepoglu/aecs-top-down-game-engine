@@ -17,6 +17,8 @@ On top of lua, a set of functions are available to command the engine. These are
 * [listInventory(): array](#listInventory)
 * [onInventoryAdd( callback-function )](#onInventoryAdd)
 * [onInventoryRemove( callback-function)](#onInventoryRemove)
+* [setObjTextures( table )](#setObjTextures)
+* [setTileTextures( table )](#setTileTextures)
 * [printStack()](#printStack)
 
 You must prefix with **lib.** to call these functions. For example:
@@ -145,6 +147,25 @@ sets the callback function that will be called when player drops an item from hi
     lib.onInventoryRemove( function( itemId, index)
         print("Dropped item with id " .. itemId .. "and from position " .. index .. " of inventory")
     end)
+
+------------
+
+## setObjTextures( table ) <a id="setObjTextures"></a>
+
+* table: a table consist of integer-string pairs. The integer is the type of object whose texture will be set, and string is the path of texture-sheet.
+
+Overwrites textures of given objects with texture-sheets read from the given paths.  
+The new sheets must have as-many states( rows) as the older sheets, else it will print an error and move on.
+
+    lib.setObjTextures( {0="newPlayer.png", 1="newMonster.png"})
+
+## setTileTextures( table ) <a id="setTileTextures"></a>
+
+* table: a table consist of integer-string pairs.
+
+Works exactly the same as [setObjTextures](#setObjTextures), but for terrain textures.
+
+    lib.setTileTextures( {1="newTile.png", 2="newWall.png"})
 
 ------------
 

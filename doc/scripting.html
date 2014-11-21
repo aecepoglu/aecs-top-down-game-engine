@@ -16,6 +16,8 @@ To learn more about <em>lua</em>, please visit <a href="http://lua.org/manual/5.
 <li><a href="#listInventory">listInventory(): array</a></li>
 <li><a href="#onInventoryAdd">onInventoryAdd( callback-function )</a></li>
 <li><a href="#onInventoryRemove">onInventoryRemove( callback-function)</a></li>
+<li><a href="#setObjTextures">setObjTextures( table )</a></li>
+<li><a href="#setTileTextures">setTileTextures( table )</a></li>
 <li><a href="#printStack">printStack()</a></li>
 </ul>
 
@@ -171,6 +173,31 @@ end)
 <pre><code>lib.onInventoryRemove( function( itemId, index)
     print("Dropped item with id " .. itemId .. "and from position " .. index .. " of inventory")
 end)
+</code></pre>
+
+<hr />
+
+<h2>setObjTextures( table ) <a id="setObjTextures"></a></h2>
+
+<ul>
+<li>table: a table consist of integer-string pairs. The integer is the type of object whose texture will be set, and string is the path of texture-sheet.</li>
+</ul>
+
+<p>Overwrites textures of given objects with texture-sheets read from the given paths. <br />
+The new sheets must have as-many states( rows) as the older sheets, else it will print an error and move on.</p>
+
+<pre><code>lib.setObjTextures( {0="newPlayer.png", 1="newMonster.png"})
+</code></pre>
+
+<h2>setTileTextures( table ) <a id="setTileTextures"></a></h2>
+
+<ul>
+<li>table: a table consist of integer-string pairs.</li>
+</ul>
+
+<p>Works exactly the same as <a href="#setObjTextures">setObjTextures</a>, but for terrain textures.</p>
+
+<pre><code>lib.setTileTextures( {1="newTile.png", 2="newWall.png"})
 </code></pre>
 
 <hr />
