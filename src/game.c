@@ -512,6 +512,7 @@ lua_State* initLua() {
 		{"onInventoryRemove", dsl_onInventoryRemove},
 		{"setObjTextures", dsl_setObjTextures},
 		{"setTileTextures", dsl_setTileTextures},
+		{"changeAIStatus", dsl_changeAIStatus},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

@@ -19,6 +19,7 @@ On top of lua, a set of functions are available to command the engine. These are
 * [onInventoryRemove( callback-function)](#onInventoryRemove)
 * [setObjTextures( table )](#setObjTextures)
 * [setTileTextures( table )](#setTileTextures)
+* [changeAIStatus( object-id, isEnabled )](#changeAIStatus)
 * [printStack()](#printStack)
 
 You must prefix with **lib.** to call these functions. For example:
@@ -166,6 +167,16 @@ The new sheets must have as-many states( rows) as the older sheets, else it will
 Works exactly the same as [setObjTextures](#setObjTextures), but for terrain textures.
 
     lib.setTileTextures( {1="newTile.png", 2="newWall.png"})
+
+------------
+
+## changeAIStatus( object-id, isEnabled) <a id="changeAIStatus"></a>
+
+* object-id: integer: id of object(s)
+* isEnabled: boolean: new enabled value of the ai
+
+Sets the *enabled* value of AIs of objects with given id.  
+If the object doesn't have an AI or if it is a passive AI (an AI with no update function) then no change occurs.
 
 ------------
 

@@ -181,3 +181,21 @@ int dsl_setTileTextures( lua_State *l) {
 	}
 	return 0;
 }
+
+int dsl_changeAIStatus( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	luaL_checktype( l, 2, LUA_TBOOLEAN);
+
+	int objId = lua_tointeger( l, 1);
+	bool newEnabledValue = lua_toboolean( l, 2);
+
+	int i;
+	struct object *o;
+	FOREACH_OBJ_WITH_ID( objId, i, o, {
+		if( o->ai != NULL && aiTable[ o->ai->type].updateFun != NULL) {
+			o->ai->enabled = newEnabledValue;
+		}
+	});
+
+	return 0;
+}

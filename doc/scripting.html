@@ -18,6 +18,7 @@ To learn more about <em>lua</em>, please visit <a href="http://lua.org/manual/5.
 <li><a href="#onInventoryRemove">onInventoryRemove( callback-function)</a></li>
 <li><a href="#setObjTextures">setObjTextures( table )</a></li>
 <li><a href="#setTileTextures">setTileTextures( table )</a></li>
+<li><a href="#changeAIStatus">changeAIStatus( object-id, isEnabled )</a></li>
 <li><a href="#printStack">printStack()</a></li>
 </ul>
 
@@ -199,6 +200,18 @@ The new sheets must have as-many states( rows) as the older sheets, else it will
 
 <pre><code>lib.setTileTextures( {1="newTile.png", 2="newWall.png"})
 </code></pre>
+
+<hr />
+
+<h2>changeAIStatus( object-id, isEnabled) <a id="changeAIStatus"></a></h2>
+
+<ul>
+<li>object-id: integer: id of object(s)</li>
+<li>isEnabled: boolean: new enabled value of the ai</li>
+</ul>
+
+<p>Sets the <em>enabled</em> value of AIs of objects with given id. <br />
+If the object doesn't have an AI or if it is a passive AI (an AI with no update function) then no change occurs.</p>
 
 <hr />
 
