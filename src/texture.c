@@ -132,6 +132,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->obj[ go_door] 			= loadObjTextures( ren, "res/door.png");
 	result->obj[ go_button] 		= loadObjTextures( ren, "res/but.png");
 	result->obj[ go_switch] 		= loadObjTextures( ren, "res/sw.png");
+	result->obj[ go_lineSensor] 	= loadObjTextures( ren, "res/lineSensor.png");
 
 	result->font = loadFontSheet( ren, "res/font-sheet.png");
 

@@ -23,6 +23,7 @@ enum objType {
 	go_weepingAngel,
 	go_button,
 	go_switch,
+	go_lineSensor,
 	go_NUM_ITEMS
 };
 

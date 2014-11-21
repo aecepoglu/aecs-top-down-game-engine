@@ -678,7 +678,11 @@ void initGui() {
 									CREATE_LIST_BUTTON( 1, "2. wall/door",		CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_door,			NO_CHILDREN)),
 									CREATE_LIST_BUTTON( 2, "3. button",			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_button,			NO_CHILDREN)),
 									CREATE_LIST_BUTTON( 3, "4. switch",			CREATE_BRUSH_WRAPPER( SDLK_4, &editor_changeObjType, go_switch,			NO_CHILDREN)),
-								}, 4
+									CREATE_LIST_BUTTON( 4, "5. sensors",		CREATE_BRUSH_WRAPPER( SDLK_5, &editor_changeObjType, go_lineSensor,		SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
+											CREATE_LIST_BUTTON( 0, "1. line",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_lineSensor,		NO_CHILDREN)),
+										}, 1
+									))),
+								}, 5
 							))),
 							CREATE_LIST_BUTTON( 2, "3. animate", 			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_leftTurner, 	SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 									CREATE_LIST_BUTTON( 0, "1. left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_leftTurner, 	NO_CHILDREN)),
@@ -710,7 +714,8 @@ void initGui() {
 							CREATE_LIST_BUTTON( 4, "(5) peek-a-boo chaser", CREATE_BRUSH_WRAPPER( SDLK_5, &drawAI, ai_peekaboo, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 5, "(6) weeping angel", 	CREATE_BRUSH_WRAPPER( SDLK_6, &drawAI, ai_weepingAngel, 	NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 6, "(7) slide door", 		CREATE_BRUSH_WRAPPER( SDLK_7, &drawAI, ai_door, 			NO_CHILDREN)),
-						}, 7
+							CREATE_LIST_BUTTON( 7, "(8) line sensor", 		CREATE_BRUSH_WRAPPER( SDLK_8, &drawAI, ai_lineSensor,		NO_CHILDREN)),
+						}, 8
 					))),
 				}, 2
 			))),

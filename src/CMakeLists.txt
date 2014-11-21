@@ -6,7 +6,7 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(Lua 5.2 REQUIRED)
 
-set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel door)
+set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel door lineSensor)
 set(MY_FOV_SOURCES fov-util fov-raycast fov-line)
 set(MY_PF_SOURCES roughAStar roughAStar_depthLimited)
 

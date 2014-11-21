@@ -5,10 +5,7 @@
 #include "textConsole.h"
 #include "inventory.h"
 #include "array.h"
-
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#include "dsl.h"
 
 #define FOREACH_OBJ_WITH_ID( objId, itI, itObj, closure) for( itI=0; itI<myMap->objListCount ;itI++) {\
 	if( myMap->objList[itI]->id == objId) {\
@@ -41,7 +38,6 @@ enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
 
-lua_State *lua;
 SDL_Texture *textConsole_texture;
 
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
