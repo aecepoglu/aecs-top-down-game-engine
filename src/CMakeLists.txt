@@ -4,6 +4,7 @@ project( aecEngine)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules/")
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 find_package(Lua 5.2 REQUIRED)
 
 set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel door lineSensor)
@@ -43,9 +44,9 @@ add_executable(level-editor level-editor.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_F
 target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
-add_executable(aec-game game.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
-target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
-include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
+add_executable(aec-game game.c audio.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
+target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${SDL2_MIXER_LIBRARIES} ${LUA_LIBRARIES})
+include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 
 target_link_libraries(level-editor m)
 target_link_libraries(aec-game m)

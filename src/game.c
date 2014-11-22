@@ -6,6 +6,7 @@
 #include "inventory.h"
 #include "array.h"
 #include "dsl.h"
+#include "audio.h"
 
 #define FOREACH_OBJ_WITH_ID( objId, itI, itObj, closure) for( itI=0; itI<myMap->objListCount ;itI++) {\
 	if( myMap->objList[itI]->id == objId) {\
@@ -71,6 +72,7 @@ bool interact( struct Map *map, struct object *obj) {
 	
 	if( pos != NULL && map->objs[ pos->i][ pos->j]) {
 		objectInteract( player, map->objs[ pos->i][ pos->j], lua);
+		PLAY_AUDIO_FX( AUDIO_INTERACT);
 		return true;
 	}
 	else
@@ -172,10 +174,12 @@ bool eat( struct Map *map, struct object *obj) {
 void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 	if( ! playerMoved) {
 		playerMoved = true;
+		PLAY_AUDIO_FX( AUDIO_MOVE);
 		moveFunction( myMap, player);
 		CALL_FOV_FCN();
 	}
 }
+
 
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
@@ -445,28 +449,6 @@ void setDefaults() {
 	inventory_reset( false);
 }
 
-static int dsl_onInteract( lua_State *l) {
-	luaL_checkinteger( l, 1);
-	luaL_checktype( l, 2, LUA_TFUNCTION);
-	
-	int objId = lua_tointeger( l, 1);
-	
-	log1("Setting trigger for obj with id %d.\n", objId);
-	
-	int i;
-	struct object *o;
-	int count=0;
-	int ref = luaL_ref( l, LUA_REGISTRYINDEX);
-	FOREACH_OBJ_WITH_ID( objId, i, o, {
-		o->callbacks.onInteract = ref;
-		count ++;
-	})
-	
-	log1("Set interact-trigger for %d objects\n", count);
-
-	return 0;
-}
-
 int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua_State *L) {
 	if( myMap != NULL && strcmp( mapPath, myMap->filePath) != 0) {
 		freeMap( myMap);
@@ -532,6 +514,7 @@ int main( int argc, char *args[]) {
 	
 	init();
 	textures = loadAllTextures( renderer);
+	audio_init();
 	textConsole_texture = textConsole_init( renderer);
     
     if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {

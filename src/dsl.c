@@ -32,6 +32,28 @@ int luaStackDump(lua_State* l)
     return 0;
 }
 
+static int dsl_onInteract( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	luaL_checktype( l, 2, LUA_TFUNCTION);
+	
+	int objId = lua_tointeger( l, 1);
+	
+	log1("Setting trigger for obj with id %d.\n", objId);
+	
+	int i;
+	struct object *o;
+	int count=0;
+	int ref = luaL_ref( l, LUA_REGISTRYINDEX);
+	FOREACH_OBJ_WITH_ID( objId, i, o, {
+		o->callbacks.onInteract = ref;
+		count ++;
+	})
+	
+	log1("Set interact-trigger for %d objects\n", count);
+
+	return 0;
+}
+
 int dsl_startLevel( lua_State *l) {
 	luaL_checkstring( l, 1);
 	luaL_checkstring( l, 2);
@@ -103,6 +125,7 @@ int dsl_writeConsole( lua_State *l) {
 	
 	textConsole_add( str);
 	textConsole_write( renderer, textures->font, textConsole_texture);
+	PLAY_AUDIO_FX( AUDIO_CONSOLE);
 	return 0;
 }
 
@@ -112,6 +135,7 @@ int dsl_clearConsole( lua_State *l) {
 		textConsole_add("");
 	}
 	textConsole_write( renderer, textures->font, textConsole_texture);
+	PLAY_AUDIO_FX( AUDIO_CONSOLE);
 	return 0;
 }
 
