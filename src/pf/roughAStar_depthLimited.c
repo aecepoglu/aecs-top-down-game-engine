@@ -1,6 +1,7 @@
 #include "roughAStar_depthLimited.h"
 #include "../log.h"
 #include "../stack.h"
+#include <stdlib.h>
 
 #define HEURISTICS( pos1, pos2) ( abs( (pos1).i - pos2->i) + abs( (pos1).j - pos2->j) + ((pos1).i != pos2->i) + ((pos1).j != pos2->j) )
 

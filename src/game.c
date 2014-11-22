@@ -85,6 +85,8 @@ bool pickUp( struct Map *map, struct object *obj) {
 	struct Vector *pos = GET_PF_POS( nextNode);
 	
 	struct object *pickedObj = map->objs[ pos->i][ pos->j];
+	if( pickedObj->isPickable != true)
+		return false;
 	if( pos != NULL && pickedObj != NULL && inventory_add( pickedObj, lua) ) {
 		
 		ARRAY_REMOVE( myMap->objList, pickedObj, myMap->objListCount);

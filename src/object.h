@@ -5,7 +5,6 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include <SDL.h>
 #include <stdio.h>
 #include "ai.h"
 #include "basic.h"
@@ -34,11 +33,17 @@ struct object {
 	enum objType type;
 	enum direction dir;
 	struct AI *ai;
-	uint8_t health;
-	uint8_t maxHealth;
 	unsigned int timerCounter;
 	bool isDeleted;
 	unsigned int visualState;
+
+	uint8_t health;
+	uint8_t maxHealth;
+	int8_t healthGiven; /* health given upon getting eaten */
+	bool isMovable;
+	bool isPickable;
+	uint8_t attack;
+	uint8_t defence;
 
     struct {
 		int onInteract;

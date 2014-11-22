@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include "array.h"
 
@@ -7,7 +8,7 @@
 #include "log.h"
 #include "error.h"
 
-#define MAP_VERSION 1
+#define MAP_VERSION 2
 
 /* -----------
  *	FUNCTIONS

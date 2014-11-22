@@ -18,6 +18,12 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 	obj->ai = 0;
 	obj->health = 3;
 	obj->maxHealth = 3;
+	obj->healthGiven = 1;
+	obj->isMovable = true;
+	obj->isPickable = true;
+	obj->attack = 1;
+	obj->defence = 1;
+
 	obj->timerCounter= 0;
 	obj->isDeleted=false;
 	obj->visualState = 1;
@@ -33,6 +39,14 @@ void writeObject( FILE *fp, struct object *obj) {
 	enum aiType tmp = obj->ai == 0 ? ai_none : obj->ai->type;
 	fwrite( &tmp, 		sizeof(enum aiType),     1, fp);
     fwrite( &obj->id, sizeof(int), 1, fp);
+
+	fwrite( &obj->health,		sizeof(uint8_t), 	1, fp);
+	fwrite( &obj->maxHealth,	sizeof(uint8_t), 	1, fp);
+	fwrite( &obj->healthGiven,	sizeof(int8_t), 	1, fp);
+	fwrite( &obj->isMovable, 	sizeof(bool),		1, fp);
+	fwrite( &obj->isPickable, 	sizeof(bool),		1, fp);
+	fwrite( &obj->attack, 		sizeof(uint8_t), 	1, fp);
+	fwrite( &obj->defence, 		sizeof(uint8_t), 	1, fp);
 }
 
 struct object* readObject( FILE *fp) {
@@ -46,8 +60,14 @@ struct object* readObject( FILE *fp) {
 
     fread( &obj->id, sizeof( int), 1, fp);
 
-	obj->health = 3;
-	obj->maxHealth = 3;
+	fread( &obj->health,		sizeof(uint8_t),	1, fp);
+	fread( &obj->maxHealth,		sizeof(uint8_t),	1, fp);
+	fread( &obj->healthGiven,	sizeof(int8_t),		1, fp);
+	fread( &obj->isMovable,		sizeof(bool),		1, fp);
+	fread( &obj->isPickable,	sizeof(bool),		1, fp);
+	fread( &obj->attack,		sizeof(uint8_t),	1, fp);
+	fread( &obj->defence,		sizeof(uint8_t),	1, fp);
+
 	obj->timerCounter= 0;
 	obj->visualState = 1;
 	obj->isDeleted=false;
@@ -76,17 +96,20 @@ void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 
 bool objectHit( struct object *obj1, struct object *obj2) {
 	log1("Obj at (%d,%d) is hit\n", obj2->pos.i, obj2->pos.j);
-	if( obj2->health > 0) {
-		obj2->health -= 1;
+	int dmg = obj1->attack - obj2->defence;
+	if( obj2->health > 0 && dmg > 0) {
+		obj2->health = dmg > obj2->health
+			? 0
+			: obj2->health - dmg;
+		printf("obj health down to %d\n", obj2->health);
 
-		if( obj2->health ==0) {
+		if( obj2->health == 0) {
 			if( obj2->ai) {
 				AI_DESTROY( obj2->ai);
 				obj2->ai = NULL;
 			}
 			obj2->visualState = 0; //0 is always the state for dead
 		}
-			
 
 		return true;
 	}
@@ -98,6 +121,15 @@ bool objectHit( struct object *obj1, struct object *obj2) {
 void objectSwallow( struct object *obj1, struct object *obj2) {
 	if( obj2->health == 0) {
 		obj1->health += obj2->maxHealth;
+		int value = obj1->health + obj2->healthGiven;
+		if( value > obj1->maxHealth)
+			value = obj1->maxHealth;
+		else if (value <= 0) {
+			value = 0;
+			AI_DESTROY( obj1->ai);
+			obj1->ai = NULL;
+		}
+		obj1->health = value;
 		obj2->isDeleted = true;
 	}
 }

@@ -46,6 +46,11 @@ int brushVariant;
 struct SDLGUI_Element *textbox_id;
 struct SDLGUI_Element *textbox_health;
 struct SDLGUI_Element *textbox_maxHealth;
+struct SDLGUI_Element *textbox_healthGiven;
+struct SDLGUI_Element *textbox_movable;
+struct SDLGUI_Element *textbox_pickable;
+struct SDLGUI_Element *textbox_attack;
+struct SDLGUI_Element *textbox_defence;
 struct SDLGUI_Element *textbox_pos_x, *textbox_pos_y;
 struct object *selectedObj = NULL;
 
@@ -121,6 +126,21 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 
 		sprintf(tmp, "%d", selectedObj->maxHealth);
 		SDLGUI_SetText_Textbox( textbox_maxHealth, tmp);
+
+		sprintf(tmp, "%d", selectedObj->healthGiven);
+		SDLGUI_SetText_Textbox( textbox_healthGiven, tmp);
+
+		sprintf(tmp, "%d", selectedObj->isMovable);
+		SDLGUI_SetText_Textbox( textbox_movable, tmp);
+
+		sprintf(tmp, "%d", selectedObj->isPickable);
+		SDLGUI_SetText_Textbox( textbox_pickable, tmp);
+
+		sprintf(tmp, "%d", selectedObj->attack);
+		SDLGUI_SetText_Textbox( textbox_attack, tmp);
+
+		sprintf(tmp, "%d", selectedObj->defence);
+		SDLGUI_SetText_Textbox( textbox_defence, tmp);
 	}
 	else {
 		selectedObjContainer->isVisible = false;
@@ -320,11 +340,11 @@ void textbox_id_changed( struct SDLGUI_Element *textbox, const char *text) {
 void textbox_health_changed( struct SDLGUI_Element *textbox, const char *text) {
 	if( selectedObj) {
 		int newHealth = parseText( text);
-		if( newHealth < 256) {
+		if( newHealth <= UINT8_MAX) {
 			selectedObj->health = newHealth;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health should be less than 256");
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health should be <= 256");
 			isMessageBoxOn = true;
 		}
 	}
@@ -337,11 +357,96 @@ void textbox_health_changed( struct SDLGUI_Element *textbox, const char *text) {
 void textbox_maxHealth_changed( struct SDLGUI_Element *textbox, const char *text) {
 	if( selectedObj) {
 		int newHealth = parseText( text);
-		if( newHealth < 256) {
+		if( newHealth <= UINT8_MAX) {
 			selectedObj->maxHealth = newHealth;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Max-Health should be less than 256");
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Max-Health should be <= 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_healthGiven_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj) {
+		int newValue = parseText( text);
+		if( newValue <= INT8_MAX && newValue >= INT8_MIN) {
+			selectedObj->healthGiven = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health-Given must be >= -128 and <= 127");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_movable_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj) {
+		int newValue = parseText( text);
+		if( newValue == 1 || newValue == 0) {
+			selectedObj->isMovable = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Movable value can be 1 or 0");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_pickable_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj) {
+		int newValue = parseText( text);
+		if( newValue == 1 || newValue == 0) {
+			selectedObj->isPickable = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Pickable value can be 1 or 0");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_attack_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj) {
+		int newValue = parseText( text);
+		if( newValue <= UINT8_MAX ) {
+			selectedObj->attack = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Attack can be <= 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_defence_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObj) {
+		int newValue = parseText( text);
+		if( newValue <= UINT8_MAX ) {
+			selectedObj->defence = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Defence can be <= 256");
 			isMessageBoxOn = true;
 		}
 	}
@@ -725,21 +830,36 @@ void initGui() {
 
     /* Selected Object Panel
     */
-	selectedObjContainer = SDLGUI_Create_Panel( 10, 720, GUI_LEFTPANEL_WIDTH - 2*10, 130, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
+	selectedObjContainer = SDLGUI_Create_Panel( 10, 720, GUI_LEFTPANEL_WIDTH - 2*10, 230, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 1);
     selectedObjContainer->isVisible = false;
 
-    textbox_id =        SDLGUI_Create_Textbox( 	120, 40, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
-	textbox_health = 	SDLGUI_Create_Textbox( 	120, 60, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
-	textbox_maxHealth = SDLGUI_Create_Textbox( 	120, 80, 5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
+    textbox_id =        	SDLGUI_Create_Textbox( 	120,  40,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_id_changed);
+	textbox_health = 		SDLGUI_Create_Textbox( 	120,  60,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_health_changed);
+	textbox_maxHealth = 	SDLGUI_Create_Textbox( 	120,  80,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_maxHealth_changed);
+	textbox_healthGiven = 	SDLGUI_Create_Textbox( 	120, 100,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_healthGiven_changed);
+	textbox_movable = 		SDLGUI_Create_Textbox( 	120, 120,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_movable_changed);
+	textbox_pickable = 		SDLGUI_Create_Textbox( 	120, 140,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_pickable_changed);
+	textbox_attack = 		SDLGUI_Create_Textbox( 	120, 160,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_attack_changed);
+	textbox_defence = 		SDLGUI_Create_Textbox( 	120, 180,  5, TEXTBOX_INPUT_NUMERIC, (int[4]){255,255,255,255},  (int[4]){0,0,0,255}, 6, 8, &textbox_defence_changed);
 
 	struct SDLGUI_List *selectedObjElements = SDLGUI_Get_Panel_Elements( selectedObjContainer);
 	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 10,  10, -1, 25, NULL, "Selected Obj:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 12, 16, 0, NULL));
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  40, -1, 16, NULL, "        ID :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  60, -1, 16, NULL, "    Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
-	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  80, -1, 16, NULL, "Max-Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  40, -1, 16, NULL, "          ID :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  60, -1, 16, NULL, "      Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30,  80, -1, 16, NULL, "  Max-Health :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30, 100, -1, 16, NULL, "Health Given :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30, 120, -1, 16, NULL, "     Movable :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30, 140, -1, 16, NULL, "    Pickable :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30, 160, -1, 16, NULL, "      Attack :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
+	SDLGUI_List_Add( selectedObjElements, SDLGUI_Create_Text( 30, 180, -1, 16, NULL, "     Defence :", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL));
 	SDLGUI_List_Add( selectedObjElements, textbox_id);
-	SDLGUI_List_Add( selectedObjElements, textbox_maxHealth);
 	SDLGUI_List_Add( selectedObjElements, textbox_health);
+	SDLGUI_List_Add( selectedObjElements, textbox_maxHealth);
+	SDLGUI_List_Add( selectedObjElements, textbox_healthGiven);
+	SDLGUI_List_Add( selectedObjElements, textbox_movable);
+	SDLGUI_List_Add( selectedObjElements, textbox_pickable);
+	SDLGUI_List_Add( selectedObjElements, textbox_attack);
+	SDLGUI_List_Add( selectedObjElements, textbox_defence);
 	
 	SDLGUI_List_Add( bodyItems, selectedObjContainer);
 	
