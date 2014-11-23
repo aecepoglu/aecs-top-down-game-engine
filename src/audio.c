@@ -2,7 +2,7 @@
 #include "log.h"
 
 void audio_init() {
-	if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 1, 2048) < 0) {
+	if( Mix_OpenAudio( MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 1, 2048) < 0) {
 		printf( "SDL_mixer couldn't initialize. Error: %s\n", Mix_GetError());
 	}
 
