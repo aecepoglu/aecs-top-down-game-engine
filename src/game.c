@@ -85,7 +85,7 @@ bool pickUp( struct Map *map, struct object *obj) {
 	struct Vector *pos = GET_PF_POS( nextNode);
 	
 	struct object *pickedObj = map->objs[ pos->i][ pos->j];
-	if( pickedObj->isPickable != true)
+	if( pickedObj == NULL || pickedObj->isPickable != true)
 		return false;
 	if( pos != NULL && pickedObj != NULL && inventory_add( pickedObj, lua) ) {
 		
@@ -489,7 +489,6 @@ int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua
 	
 	myMap = readMapFile( mapPath);
 	player = createObject( go_player, 0, 0, 0);
-	player->health --;
 
     if (luaL_loadfile(L, scriptPath) || lua_pcall( L, 0, 0, 0)) {
         fprintf(stderr, "Error loading script '%s'\n%s\n", scriptPath, lua_tostring(L, -1));
