@@ -158,15 +158,16 @@ bool pushForward( struct Map *map, struct object* pusher) {
 	if( nextBase != NULL ) {
 		struct BasePfNode *nextNextBase = nextBase->neighbours[ pusher->dir];
 		struct object *pushedObj = map->objs[ nextBase->pos.i][ nextBase->pos.j];
-		struct object *nextNextObj = map->objs[ nextNextBase->pos.i][ nextNextBase->pos.j];
-
-		if( nextNextBase != NULL && pushedObj != NULL && nextNextObj == NULL) {
-			map->objs[ nextNextBase->pos.i][ nextNextBase->pos.j] = pushedObj;
-			map->objs[ pushedObj->pos.i][ pushedObj->pos.j] = pusher;
-			map->objs[ pusher->pos.i][ pusher->pos.j] = NULL;
-			vectorClone( &pusher->pos, &pushedObj->pos);
-			vectorClone( &pushedObj->pos, &nextNextBase->pos);
-			return true;
+		if( nextNextBase != NULL && pushedObj != NULL && pushedObj->isMovable ) {
+			struct object *nextNextObj = map->objs[ nextNextBase->pos.i][ nextNextBase->pos.j];
+			if( nextNextObj == NULL) {
+				map->objs[ nextNextBase->pos.i][ nextNextBase->pos.j] = pushedObj;
+				map->objs[ pushedObj->pos.i][ pushedObj->pos.j] = pusher;
+				map->objs[ pusher->pos.i][ pusher->pos.j] = NULL;
+				vectorClone( &pusher->pos, &pushedObj->pos);
+				vectorClone( &pushedObj->pos, &nextNextBase->pos);
+				return true;
+			}
 		}
 	}
 	return false;
@@ -209,10 +210,10 @@ void handleKey( SDL_KeyboardEvent *e) {
             quit("pressed 'q'. Quitting");
 			break;
 		case SDLK_UP:
-            if( e->keysym.mod & KMOD_LSHIFT)
-				movePlayer( moveForward);
-            else
+			if( e->keysym.mod & KMOD_LSHIFT)
 				movePlayer( pushForward);
+			else
+				movePlayer( moveForward);
 			break;
 		case SDLK_DOWN:
 			movePlayer( moveBackward);
