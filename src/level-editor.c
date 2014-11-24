@@ -751,6 +751,126 @@ struct brushWrapper* CREATE_BRUSH_WRAPPER( SDL_Keycode key, brushFun *brush, int
 #define NO_FUN NULL
 #define NO_CLICK_HANDLER NULL
 #define CREATE_LIST_BUTTON( i, text, data) SDLGUI_Create_Text( 5, 5 + 35*i, 160, 30, &brushListItem_clicked, text, (int[4]){255,255,255,255}, (int[4]){0,0,0,255}, 6, 9, 1, data)
+
+#define TEMPLATES_PATH "templates.csv"
+#define DELIMETER ","
+#define MAX_NAME_LENGTH 10
+#define MAX_TEMPLATES_COUNT 8
+
+#define CHECK_STRTOK_RESULT( string, no, name) EXIT_IF( string == NULL, "Error at line %d. Line ended but was expeting %s\n", no, name)
+
+struct object *objectTemplates[MAX_TEMPLATES_COUNT];
+
+bool applyObjTemplate( unsigned int x, unsigned int y, int templateNo) {
+	struct object *to = myMap->objs[x][y];
+	struct object *from = objectTemplates[ templateNo];
+
+	if( from != NULL && to != NULL) {
+		if( from->id != 0)
+			to->id = 0;
+		to->type = from->type;
+		to->health = from->health;
+		to->maxHealth = from->maxHealth;
+		to->healthGiven = from->healthGiven;
+		to->isMovable = from->isMovable;
+		to->isPickable = from->isPickable;
+		to->attack = from->attack;
+		to->defence = from->defence;
+
+		return true;
+	}
+	else
+		return false;
+}
+
+struct SDLGUI_Element* parseTemplateLine( char *line, int lineNo) {
+	char *string;
+	const char *delim = DELIMETER;
+
+	char *name;
+
+	struct object *template = (struct object*)malloc(sizeof(struct object));;
+
+	template->id = 0;
+
+	string = strtok( line, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "name");
+	EXIT_IF( strlen( string) > MAX_NAME_LENGTH, "template name %s is too long(%d) in line %d. Must be < %d\n", string, (int)strlen( string), lineNo, MAX_NAME_LENGTH);
+	name = string;
+
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "obj-type");
+	template->type = atoi( string);
+
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "ai-type");
+	//template->aiType = atoi( string);
+	
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "health");
+	template->health = atoi( string);
+	
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "maxHealth");
+	template->maxHealth = atoi( string);
+	
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "healthGiven");
+	template->healthGiven = atoi( string);
+	
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "isMovable");
+	template->isMovable = atoi( string);
+	
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "isPickable");
+	template->isPickable = atoi( string);
+	
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "attack");
+	template->attack = atoi( string);
+	
+	string = strtok( NULL, delim);
+	CHECK_STRTOK_RESULT( string, lineNo, "defence");
+	template->defence = atoi( string);
+
+	char buttonText[32];
+	sprintf( buttonText, "%d. %s", lineNo+1, name);
+
+	objectTemplates[ lineNo] = template;
+	return CREATE_LIST_BUTTON( lineNo, buttonText, CREATE_BRUSH_WRAPPER( SDLK_1 + lineNo, applyObjTemplate, lineNo, NO_CHILDREN));
+}
+
+
+struct SDLGUI_List* reloadBrushTemplates() {
+	struct SDLGUI_List *templateBrushes = SDLGUI_List_Create( MAX_TEMPLATES_COUNT/2);;
+
+	int i;
+	for( i=0; i<MAX_TEMPLATES_COUNT; i++)
+		objectTemplates[i] = NULL;
+
+	FILE *fp = fopen( TEMPLATES_PATH, "r");
+	if( fp == NULL)
+		return templateBrushes;
+
+	int lineNo = 0;
+	char line[BUFSIZ];
+
+	while( fgets( line, BUFSIZ, fp) ) {
+		if( lineNo > MAX_TEMPLATES_COUNT) {
+			fprintf( stderr, "Max %d templates supported.\n", MAX_TEMPLATES_COUNT);
+			break;
+		}
+
+		SDLGUI_List_Add( templateBrushes, parseTemplateLine( line, lineNo));
+		
+		lineNo ++;
+	}
+
+	fclose( fp);
+
+	return templateBrushes;
+}
 void initGui() {
     /* The left panel */
 	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
@@ -807,7 +927,8 @@ void initGui() {
 							CREATE_LIST_BUTTON( 3, "(4) \x83 left", 	CREATE_BRUSH_WRAPPER( SDLK_4, &setDirection, dir_left,		NO_CHILDREN)),
 						}, 4
 					))),
-				}, 4
+					CREATE_LIST_BUTTON( 4, "5. templates", CREATE_BRUSH_WRAPPER( SDLK_5, NO_FUN, NO_VAR, reloadBrushTemplates())),
+				}, 5
 			))),
 			CREATE_LIST_BUTTON( 3, "4. ai", CREATE_BRUSH_WRAPPER(/*key*/SDLK_4, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 					CREATE_LIST_BUTTON( 0, "1. erase",	CREATE_BRUSH_WRAPPER( SDLK_1, &eraseAI, NO_VAR, 	NO_CHILDREN)),

@@ -36,8 +36,8 @@ void writeObject( FILE *fp, struct object *obj) {
 	writeVector( fp, &obj->pos);
 	fwrite( &obj->type, sizeof(enum objType),   1, fp);
 	fwrite( &obj->dir,  sizeof(enum direction), 1, fp);
-	enum aiType tmp = obj->ai == 0 ? ai_none : obj->ai->type;
-	fwrite( &tmp, 		sizeof(enum aiType),     1, fp);
+	enum AIType tmp = obj->ai == 0 ? ai_none : obj->ai->type;
+	fwrite( &tmp, 		sizeof(enum AIType),     1, fp);
     fwrite( &obj->id, sizeof(int), 1, fp);
 
 	fwrite( &obj->health,		sizeof(uint8_t), 	1, fp);
@@ -54,8 +54,8 @@ struct object* readObject( FILE *fp) {
 	readToVector( fp, &obj->pos);
 	fread( &obj->type, sizeof(enum objType),   1, fp);
 	fread( &obj->dir,  sizeof(enum direction), 1, fp);
-	enum aiType type;
-	fread( &type,      sizeof(enum aiType),    1, fp);
+	enum AIType type;
+	fread( &type,      sizeof(enum AIType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
 
     fread( &obj->id, sizeof( int), 1, fp);

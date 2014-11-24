@@ -6,7 +6,7 @@
 #include "map.h"
 
 
-enum aiType {
+enum AIType {
 	ai_none,
 	ai_leftTurner,
 	ai_hungryLeftTurner,
@@ -19,7 +19,7 @@ enum aiType {
 };
 
 struct AI {
-	enum aiType type;
+	enum AIType type;
 	void *data;
 	bool enabled;
 };
