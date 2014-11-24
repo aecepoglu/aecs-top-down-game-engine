@@ -152,6 +152,26 @@ bool moveForward( struct Map *map, struct object* obj) {
 	}
 }
 
+bool pushForward( struct Map *map, struct object* pusher) {
+	struct BasePfNode *nextBase = map->pfBase[ pusher->pos.i ][ pusher->pos.j ]->neighbours[ pusher->dir ];
+
+	if( nextBase != NULL ) {
+		struct BasePfNode *nextNextBase = nextBase->neighbours[ pusher->dir];
+		struct object *pushedObj = map->objs[ nextBase->pos.i][ nextBase->pos.j];
+		struct object *nextNextObj = map->objs[ nextNextBase->pos.i][ nextNextBase->pos.j];
+
+		if( nextNextBase != NULL && pushedObj != NULL && nextNextObj == NULL) {
+			map->objs[ nextNextBase->pos.i][ nextNextBase->pos.j] = pushedObj;
+			map->objs[ pushedObj->pos.i][ pushedObj->pos.j] = pusher;
+			map->objs[ pusher->pos.i][ pusher->pos.j] = NULL;
+			vectorClone( &pusher->pos, &pushedObj->pos);
+			vectorClone( &pushedObj->pos, &nextNextBase->pos);
+			return true;
+		}
+	}
+	return false;
+}
+
 bool turnLeft( struct Map *map, struct object *obj) {
 	obj->dir = DIR_ROTATE_LEFT(obj->dir);
 	return true;
@@ -189,7 +209,10 @@ void handleKey( SDL_KeyboardEvent *e) {
             quit("pressed 'q'. Quitting");
 			break;
 		case SDLK_UP:
-			movePlayer( moveForward);
+            if( e->keysym.mod & KMOD_LSHIFT)
+				movePlayer( moveForward);
+            else
+				movePlayer( pushForward);
 			break;
 		case SDLK_DOWN:
 			movePlayer( moveBackward);
