@@ -102,9 +102,10 @@ SDL_Texture** loadFontSheet( SDL_Renderer *ren, const char *path) {
 	return result;
 }
 
+SDL_Rect _drawRect;
 void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int h) {
-	SDL_Rect r = (SDL_Rect){x, y, w, h };
-	SDL_RenderCopy( ren, tex, 0, &r);
+	_drawRect = (SDL_Rect){x, y, w, h };
+	SDL_RenderCopy( ren, tex, 0, &_drawRect);
 }
 
 

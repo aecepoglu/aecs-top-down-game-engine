@@ -521,6 +521,10 @@ lua_State* initLua() {
 		{"setObjTextures", dsl_setObjTextures},
 		{"setTileTextures", dsl_setTileTextures},
 		{"changeAIStatus", dsl_changeAIStatus},
+		{"cutClear", dsl_cutsceneClear},
+		{"cutWait", dsl_cutsceneWait},
+		{"cutWrite", dsl_cutsceneWrite},
+		{"cutImg", dsl_cutsceneImg},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

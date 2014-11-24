@@ -1,5 +1,7 @@
 /* This code is injected into game.c */
 
+#include "text.h"
+
 /* this is available for debug reasons only */
 int luaStackDump(lua_State* l)
 {
@@ -221,5 +223,65 @@ int dsl_changeAIStatus( lua_State *l) {
 		}
 	});
 
+	return 0;
+}
+
+int dsl_cutsceneClear( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	luaL_checkinteger( l, 2);
+	luaL_checkinteger( l, 3);
+
+	int r = lua_tointeger( l, 1);
+	int g = lua_tointeger( l, 2);
+	int b = lua_tointeger( l, 3);
+
+	SDL_SetRenderDrawColor( renderer, r, g, b, 255);
+	SDL_RenderClear( renderer);
+	SDL_RenderPresent( renderer);
+
+	return 0;
+}
+
+int dsl_cutsceneWait( lua_State *l) {
+	luaL_checkinteger( l, 1);
+
+	SDL_Delay( lua_tointeger( l, 1)/*miliseconds*/ );
+
+	return 0;
+}
+
+int dsl_cutsceneWrite( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	luaL_checkinteger( l, 2);
+	luaL_checkstring( l, 3);
+
+	int x = lua_tointeger( l, 1);
+	int y = lua_tointeger( l, 2);
+	const char *text = lua_tostring( l, 3);
+
+	drawText( renderer, textures->font, text, x, y, 18, 24);
+	SDL_RenderPresent( renderer);
+
+	return 0;
+}
+
+int dsl_cutsceneImg( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	luaL_checkinteger( l, 2);
+	luaL_checkinteger( l, 3);
+	luaL_checkinteger( l, 4);
+	luaL_checkstring( l, 5);
+
+	int x = lua_tointeger( l, 1),
+		y = lua_tointeger( l, 2),
+		width = lua_tointeger( l, 3),
+		height = lua_tointeger( l, 4);
+	const char *imgPath	= lua_tostring( l, 5);
+
+	SDL_Texture *imgTexture = loadTexture( renderer, imgPath);
+	drawTexture( renderer, imgTexture, x, y, width, height);
+	SDL_DestroyTexture( imgTexture);
+	SDL_RenderPresent( renderer);
+	
 	return 0;
 }
