@@ -146,6 +146,8 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 
 	result->highlitObjIndicator = loadTexture( ren, "res/selection_green.png");
 	result->unidentifiedObj = loadTexture( ren, "res/qmark.png");
+	result->emptyHeart = loadTexture( ren, "res/heart_empty.png");
+	result->fullHeart = loadTexture( ren, "res/heart.png");
 	
 	return result;
 }
@@ -189,6 +191,9 @@ void freeTextures( struct GameTextures* textures) {
 	free( textures->font);
 
 	SDL_DestroyTexture( textures->highlitObjIndicator);
+	SDL_DestroyTexture( textures->unidentifiedObj);
+	SDL_DestroyTexture( textures->emptyHeart);
+	SDL_DestroyTexture( textures->fullHeart);
 
 	free( textures);
 }

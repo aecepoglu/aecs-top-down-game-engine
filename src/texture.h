@@ -23,7 +23,9 @@ struct GameTextures {
 	struct TextureSheet **obj;
 	SDL_Texture **font;
 	SDL_Texture *highlitObjIndicator,
-				*unidentifiedObj;
+				*unidentifiedObj,
+				*fullHeart,
+				*emptyHeart;
 };
 
 

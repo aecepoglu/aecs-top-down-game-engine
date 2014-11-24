@@ -320,13 +320,19 @@ void draw() {
 	}
 
 	drawTexture( renderer, textConsole_texture, 20, 20, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+	j = 20 + CONSOLE_HEIGHT;
 	for( i=0; i<INVENTORY_SIZE; i++) {
 		drawTexture( renderer, 
 			inventory[i] != NULL
 				? textures->obj[ inventory[i]->type]->textures[ 1][0]
 				: textures->highlitObjIndicator,
-			0, 20 + CONSOLE_HEIGHT + i*TILELEN, TILELEN, TILELEN);
+			0, j + i*TILELEN, TILELEN, TILELEN);
 	}
+
+	for( i=0; i<player->health; i++)
+		drawTexture( renderer, textures->fullHeart, TILELEN + i*TILELEN, j, TILELEN, TILELEN);
+	for( ; i<player->maxHealth; i++)
+		drawTexture( renderer, textures->emptyHeart, TILELEN + i*TILELEN, j, TILELEN, TILELEN);
 
 	SDL_RenderPresent( renderer);
 }
@@ -483,6 +489,7 @@ int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua
 	
 	myMap = readMapFile( mapPath);
 	player = createObject( go_player, 0, 0, 0);
+	player->health --;
 
     if (luaL_loadfile(L, scriptPath) || lua_pcall( L, 0, 0, 0)) {
         fprintf(stderr, "Error loading script '%s'\n%s\n", scriptPath, lua_tostring(L, -1));
