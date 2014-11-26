@@ -11,7 +11,8 @@
 /* -----------
  * DEFINITIONS
  */
-enum terrainType { terrain_gnd, terrain_wall, terrain_dark };
+enum terrainType { terrain_gnd, terrain_marked, terrain_wall, terrain_dark,
+	terrain_NUM_ITEMS};
 
 struct BasePfNode {
 	struct Vector pos;
@@ -51,7 +52,7 @@ struct Map {
  */
 
 #define GET_PF_POS(x) (x != NULL ? &(x->pos) : NULL)
-#define TILE_CLEAR(_mapPtr,_x,_y) (_mapPtr->tiles[_x][_y] == terrain_gnd && _mapPtr->objs[_x][_y] == NULL)
+#define TILE_CLEAR(_mapPtr,_x,_y) (_mapPtr->tiles[_x][_y] != terrain_wall && _mapPtr->objs[_x][_y] == NULL)
 
 /*	Reads the map file at 'path'.
 	Returns the map read

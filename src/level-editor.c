@@ -157,7 +157,7 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 
 bool editor_createObj( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
-	if( myMap->objs[x][y]!=NULL || myMap->tiles[x][y]!=terrain_gnd)
+	if( myMap->objs[x][y]!=NULL || myMap->tiles[x][y]==terrain_wall)
 		return false;
 
 	//create and initialize a monster
@@ -891,8 +891,9 @@ void initGui() {
 			CREATE_LIST_BUTTON( 0, "1. select", CREATE_BRUSH_WRAPPER( SDLK_1, &editor_selectObj, 	NO_VAR, 	NO_CHILDREN)),
 			CREATE_LIST_BUTTON( 1, "2. terrain", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 					CREATE_LIST_BUTTON( 0, "1. ground", 			CREATE_BRUSH_WRAPPER( SDLK_1, &drawTerrain, terrain_gnd, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "2. wall", 	 			CREATE_BRUSH_WRAPPER( SDLK_2, &drawTerrain, terrain_wall, 	NO_CHILDREN)),
-				}, 2
+					CREATE_LIST_BUTTON( 1, "2. marked ground", 		CREATE_BRUSH_WRAPPER( SDLK_2, &drawTerrain, terrain_marked, NO_CHILDREN)),
+					CREATE_LIST_BUTTON( 2, "3. wall", 	 			CREATE_BRUSH_WRAPPER( SDLK_3, &drawTerrain, terrain_wall, 	NO_CHILDREN)),
+				}, 3
 			))),
 			CREATE_LIST_BUTTON( 2, "3. object", CREATE_BRUSH_WRAPPER( SDLK_3, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
 					CREATE_LIST_BUTTON( 0, "1. create", 	CREATE_BRUSH_WRAPPER( SDLK_1, &editor_createObj,	go_apple, 	NO_CHILDREN)),

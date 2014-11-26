@@ -8,7 +8,7 @@
 #include "log.h"
 #include "error.h"
 
-#define MAP_VERSION 2
+#define MAP_VERSION 3
 
 /* -----------
  *	FUNCTIONS
@@ -174,7 +174,7 @@ bool checkMapValidity( struct Map *map) {
 	for(x=0; x<map->width; x++) {
 		connectedTiles[x] = (int*)calloc( map->height, sizeof(int));
 		for(y=0; y<map->height; y++) {
-			if( map->tiles[x][y] == terrain_gnd) {
+			if( map->tiles[x][y] != terrain_wall) {
 
 				if( x == map->width -1 || x == 0 || y == map->height - 1 || y == 0) {
 					ERROR("Ground tile at position %d,%d is at the edge.\nThere cannot be ground tiles at map edges.\nEdges must be covered with walls.\n", x, y);
@@ -283,7 +283,7 @@ struct BasePfNode*** createPfBase( enum terrainType **tiles, unsigned int width,
 	struct BasePfNode *curNode, *dirNode;
 	for(x=0; x<width; x++) {
 		for(y=0; y<height; y++) {
-			if( tiles[x][y] == terrain_gnd) {
+			if( tiles[x][y] != terrain_wall) {
 				curPos.i = x;
 				curPos.j = y;
 				curNode = nodes[x][y];
@@ -291,7 +291,7 @@ struct BasePfNode*** createPfBase( enum terrainType **tiles, unsigned int width,
 				for( dir=1; dir<3; dir++) {
 					vectorAdd( &dirPos, &curPos, &dirVectors[dir]);
 
-					if( tiles[dirPos.i][dirPos.j] == terrain_gnd) {
+					if( tiles[dirPos.i][dirPos.j] != terrain_wall) {
 						dirNode = nodes[dirPos.i][dirPos.j];
 						curNode->neighbours[dir] = dirNode;
 						dirNode->neighbours[DIR_REVERSE(dir)] = curNode;

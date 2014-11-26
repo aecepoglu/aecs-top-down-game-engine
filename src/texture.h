@@ -7,12 +7,6 @@
 
 #include <SDL.h>
 
-/* indexes for textures */
-#define TEXTURE_TRN_GND 		0
-#define TEXTURE_TRN_WALL 		1
-#define TEXTURE_TRN_NONE 		2
-#define TEXTURES_COUNT_TERRAIN	3
-
 struct TextureSheet {
 	SDL_Texture ***textures;
 	int numStates;
