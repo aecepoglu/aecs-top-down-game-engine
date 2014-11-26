@@ -443,7 +443,7 @@ int run() {
 				quit("Quitting");
 				break;
 			case SDL_KEYDOWN:
-				log1("key down\n");
+				log0("key down\n");
 				handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
@@ -528,9 +528,10 @@ lua_State* initLua() {
 		{"setTileTextures", dsl_setTileTextures},
 		{"changeAIStatus", dsl_changeAIStatus},
 		{"cutClear", dsl_cutsceneClear},
-		{"cutWait", dsl_cutsceneWait},
 		{"cutWrite", dsl_cutsceneWrite},
 		{"cutImg", dsl_cutsceneImg},
+		{"cutRender", dsl_cutsceneRender},
+		{"cutWait", dsl_cutsceneWait},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);
@@ -551,6 +552,7 @@ int main( int argc, char *args[]) {
 	init();
 	textures = loadAllTextures( renderer);
 	audio_init();
+	cutscene_init();
 	textConsole_texture = textConsole_init( renderer);
     
     if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {

@@ -1,6 +1,7 @@
 /* This code is injected into game.c */
 
 #include "text.h"
+#include "cutscene.h"
 
 /* this is available for debug reasons only */
 int luaStackDump(lua_State* l)
@@ -226,26 +227,26 @@ int dsl_changeAIStatus( lua_State *l) {
 	return 0;
 }
 
+int dsl_cutsceneWait( lua_State *l) {
+	luaL_checkinteger( l, 1);
+
+	int miliseconds = lua_tointeger( l, 1);
+	cutscene_wait( renderer, miliseconds);
+
+	return 0;
+}
+
+
 int dsl_cutsceneClear( lua_State *l) {
 	luaL_checkinteger( l, 1);
 	luaL_checkinteger( l, 2);
 	luaL_checkinteger( l, 3);
 
-	int r = lua_tointeger( l, 1);
-	int g = lua_tointeger( l, 2);
-	int b = lua_tointeger( l, 3);
+	cutscene.bgColor.r = lua_tointeger( l, 1);
+	cutscene.bgColor.g = lua_tointeger( l, 2);
+	cutscene.bgColor.b = lua_tointeger( l, 3);
 
-	SDL_SetRenderDrawColor( renderer, r, g, b, 255);
-	SDL_RenderClear( renderer);
-	SDL_RenderPresent( renderer);
-
-	return 0;
-}
-
-int dsl_cutsceneWait( lua_State *l) {
-	luaL_checkinteger( l, 1);
-
-	SDL_Delay( lua_tointeger( l, 1)/*miliseconds*/ );
+	cutscene_clear();
 
 	return 0;
 }
@@ -255,12 +256,15 @@ int dsl_cutsceneWrite( lua_State *l) {
 	luaL_checkinteger( l, 2);
 	luaL_checkstring( l, 3);
 
-	int x = lua_tointeger( l, 1);
-	int y = lua_tointeger( l, 2);
+	struct CutsceneElement *elem = (struct CutsceneElement*)malloc( sizeof( struct CutsceneElement));
+	elem->rect.x = lua_tointeger( l, 1);
+	elem->rect.y = lua_tointeger( l, 2);
+	
 	const char *text = lua_tostring( l, 3);
 
-	drawText( renderer, textures->font, text, x, y, 18, 24);
-	SDL_RenderPresent( renderer);
+	elem->texture = getTextTexture( renderer, textures->font, text, 18, 24, (int[4]){0,0,0,0}, 255, 255, 255, &elem->rect.w, &elem->rect.h);
+
+	cutscene_add( elem);
 
 	return 0;
 }
@@ -272,16 +276,20 @@ int dsl_cutsceneImg( lua_State *l) {
 	luaL_checkinteger( l, 4);
 	luaL_checkstring( l, 5);
 
-	int x = lua_tointeger( l, 1),
-		y = lua_tointeger( l, 2),
-		width = lua_tointeger( l, 3),
-		height = lua_tointeger( l, 4);
-	const char *imgPath	= lua_tostring( l, 5);
+	struct CutsceneElement *elem = (struct CutsceneElement*)malloc( sizeof( struct CutsceneElement));
 
-	SDL_Texture *imgTexture = loadTexture( renderer, imgPath);
-	drawTexture( renderer, imgTexture, x, y, width, height);
-	SDL_DestroyTexture( imgTexture);
-	SDL_RenderPresent( renderer);
+	elem->rect.x = lua_tointeger( l, 1);
+	elem->rect.y = lua_tointeger( l, 2);
+	elem->rect.w = lua_tointeger( l, 3);
+	elem->rect.h = lua_tointeger( l, 4);
+	elem->texture = loadTexture( renderer, lua_tostring( l, 5));
+
+	cutscene_add( elem);
 	
+	return 0;
+}
+
+int dsl_cutsceneRender( lua_State *l) {
+	cutscene_draw( renderer);
 	return 0;
 }
