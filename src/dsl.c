@@ -231,7 +231,7 @@ int dsl_cutsceneWait( lua_State *l) {
 	luaL_checkinteger( l, 1);
 
 	int miliseconds = lua_tointeger( l, 1);
-	cutscene_wait( renderer, miliseconds);
+	cutscene_wait( renderer, miliseconds, false);
 
 	return 0;
 }
@@ -292,4 +292,9 @@ int dsl_cutsceneImg( lua_State *l) {
 int dsl_cutsceneRender( lua_State *l) {
 	cutscene_draw( renderer);
 	return 0;
+}
+
+int dsl_cutsceneReadKey( lua_State *l) {
+	lua_pushinteger( l, cutscene_wait( renderer, 0, true) );
+	return 1;
 }

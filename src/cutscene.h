@@ -26,5 +26,5 @@ void cutscene_clear();
 
 #define cutscene_add( item) ARRAY_ADD( cutscene.elements.list, item, cutscene.elements.count, cutscene.elements.size, sizeof( struct CutsceneElement*) )
 
-void cutscene_wait( SDL_Renderer *renderer, int miliseconds);
+SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectingKey);
 void cutscene_draw( SDL_Renderer *renderer);

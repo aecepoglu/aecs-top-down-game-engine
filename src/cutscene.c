@@ -29,10 +29,12 @@ Uint32 cutscene_timer_callback( Uint32 interval, void *param) {
 	return 0;
 }
 
-void cutscene_wait( SDL_Renderer *renderer, int miliseconds) {
-	SDL_AddTimer( miliseconds, cutscene_timer_callback, NULL);
+SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectingKey) {
+	if( miliseconds > 0)
+		SDL_AddTimer( miliseconds, cutscene_timer_callback, NULL);
 
 	int cutsceneRunning = 1;
+	SDL_Keycode result;
 
 	SDL_Event e;
 	while( cutsceneRunning) {
@@ -44,8 +46,31 @@ void cutscene_wait( SDL_Renderer *renderer, int miliseconds) {
 			case SDL_WINDOWEVENT:
 				cutscene_draw( renderer);
 				break;
+			case SDL_KEYDOWN: {
+					SDL_Keysym keysym = e.key.keysym;
+					if( expectingKey) {
+						switch( keysym.sym) {
+							case SDLK_LGUI:
+							case SDLK_RGUI:
+							case SDLK_LCTRL:
+							case SDLK_RCTRL:
+							case SDLK_LALT:
+							case SDLK_RALT:
+								break;
+							default:
+								if( keysym.mod == KMOD_NONE) {
+									cutsceneRunning = 0;
+									result = keysym.sym;
+								}
+								break;
+						};
+					}
+				}
+				break;
 		}
 	}
+
+	return result;
 }
 
 void cutscene_draw( SDL_Renderer *renderer) {

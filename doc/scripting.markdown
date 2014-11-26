@@ -22,6 +22,15 @@ On top of lua, a set of functions are available to command the engine. These are
 * [changeAIStatus( object-id, isEnabled )](#changeAIStatus)
 * [printStack()](#printStack)
 
+### Cutscene Functions
+
+* [cutClear](#cutClear)
+* [cutWrite](#cutWrite)
+* [cutImg](#cutImg)
+* [cutRender](#cutRender)
+* [cutWait](#cutWait)
+* [cutReadKey](#cutReadKey)
+
 You must prefix with **lib.** to call these functions. For example:
 
     lib.write("Hello World!")
@@ -183,3 +192,34 @@ If the object doesn't have an AI or if it is a passive AI (an AI with no update 
 ## printStack() <a id="printStack"></a>
 
 This is temporarily available, used for debugging purposes
+
+-----------------------------------------------
+-----------------------------------------------
+
+# Cutscene Functions
+
+## cutClear() <a id="cutClear"></a>
+
+Clears the cutscene
+
+## cutWrite( x, y, text) <a id="cutWrite"></a>
+
+Writes text at given position
+
+## cutImg( x, y, width, height, imgPath) <a id="cutImg"></a>
+
+Shows image at given file path at given location with given size
+
+## cutRender() <a id="cutRender"></a>
+
+Renders the cutscene. Changes to cutscene won't take affect until this function is called
+
+## cutWait( miliseconds) <a id="cutWait"></a>
+
+Waits for given amount of miliseconds
+
+## cutReadKey() : keysym <a id="cutReadKey"></a>
+
+Reads a key press from the keyboard and returns its value as integer.  
+
+Some form of definitions should be provided later, but at the moment integer value of [libsdl keycode](https://wiki.libsdl.org/SDL_Keycode) is returned

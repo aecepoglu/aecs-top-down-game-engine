@@ -532,6 +532,7 @@ lua_State* initLua() {
 		{"cutImg", dsl_cutsceneImg},
 		{"cutRender", dsl_cutsceneRender},
 		{"cutWait", dsl_cutsceneWait},
+		{"cutReadKey", dsl_cutsceneReadKey},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

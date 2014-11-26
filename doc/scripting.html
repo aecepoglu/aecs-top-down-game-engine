@@ -22,6 +22,17 @@ To learn more about <em>lua</em>, please visit <a href="http://lua.org/manual/5.
 <li><a href="#printStack">printStack()</a></li>
 </ul>
 
+<h3>Cutscene Functions</h3>
+
+<ul>
+<li><a href="#cutClear">cutClear</a></li>
+<li><a href="#cutWrite">cutWrite</a></li>
+<li><a href="#cutImg">cutImg</a></li>
+<li><a href="#cutRender">cutRender</a></li>
+<li><a href="#cutWait">cutWait</a></li>
+<li><a href="#cutReadKey">cutReadKey</a></li>
+</ul>
+
 <p>You must prefix with <strong>lib.</strong> to call these functions. For example:</p>
 
 <pre><code>lib.write("Hello World!")
@@ -218,3 +229,33 @@ If the object doesn't have an AI or if it is a passive AI (an AI with no update 
 <h2>printStack() <a id="printStack"></a></h2>
 
 <p>This is temporarily available, used for debugging purposes</p>
+
+<h2>-----------------------------------------------</h2>
+
+<h1>Cutscene Functions</h1>
+
+<h2>cutClear() <a id="cutClear"></a></h2>
+
+<p>Clears the cutscene</p>
+
+<h2>cutWrite( x, y, text) <a id="cutWrite"></a></h2>
+
+<p>Writes text at given position</p>
+
+<h2>cutImg( x, y, width, height, imgPath) <a id="cutImg"></a></h2>
+
+<p>Shows image at given file path at given location with given size</p>
+
+<h2>cutRender() <a id="cutRender"></a></h2>
+
+<p>Renders the cutscene. Changes to cutscene won't take affect until this function is called</p>
+
+<h2>cutWait( miliseconds) <a id="cutWait"></a></h2>
+
+<p>Waits for given amount of miliseconds</p>
+
+<h2>cutReadKey() : keysym <a id="cutReadKey"></a></h2>
+
+<p>Reads a key press from the keyboard and returns its value as integer.  </p>
+
+<p>Some form of definitions should be provided later, but at the moment integer value of <a href="https://wiki.libsdl.org/SDL_Keycode">libsdl keycode</a> is returned</p>
