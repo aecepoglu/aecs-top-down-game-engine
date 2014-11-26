@@ -117,10 +117,10 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	
 
 	char *trnPaths[terrain_NUM_ITEMS] = {
+		[ terrain_dark 	] = "res/empty.png",
+		[ terrain_wall 	] = "res/brick.png",
 		[ terrain_gnd 	] = "res/ground.png",
 		[ terrain_marked] = "res/specialGround.png",
-		[ terrain_wall 	] = "res/brick.png",
-		[ terrain_dark 	] = "res/empty.png",
 	};
 	char *resPaths[go_NUM_ITEMS] = {
 		[ go_player] 		= "res/player.png",

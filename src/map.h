@@ -11,7 +11,7 @@
 /* -----------
  * DEFINITIONS
  */
-enum terrainType { terrain_gnd, terrain_marked, terrain_wall, terrain_dark,
+enum terrainType { terrain_dark, terrain_wall, terrain_gnd, terrain_marked,
 	terrain_NUM_ITEMS};
 
 struct BasePfNode {

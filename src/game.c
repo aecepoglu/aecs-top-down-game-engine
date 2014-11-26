@@ -443,7 +443,6 @@ int run() {
 				quit("Quitting");
 				break;
 			case SDL_KEYDOWN:
-				log0("key down\n");
 				handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
