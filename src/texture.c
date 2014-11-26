@@ -133,7 +133,8 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 		[ go_door] 			= "res/door.png",
 		[ go_button] 		= "res/but.png",
 		[ go_switch] 		= "res/sw.png",
-		[ go_lineSensor] 	= "res/lineSensor.png"
+		[ go_lineSensor] 	= "res/lineSensor.png",
+		[ go_box] 	        = "res/box.png",
 	};
 
 	result->trn = calloc( terrain_NUM_ITEMS, sizeof(SDL_Texture*));

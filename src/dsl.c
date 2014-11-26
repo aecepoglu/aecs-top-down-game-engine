@@ -198,7 +198,7 @@ int dsl_setTileTextures( lua_State *l) {
 
 	lua_pushnil(l);
 	while( lua_next( l, 1) ) {
-		enum objType type = lua_tointeger( l, -2);
+		enum terrainType type = lua_tointeger( l, -2);
 		const char *texturePath = lua_tostring( l, -1);
 		if( type >= 0 && type < terrain_NUM_ITEMS) {
 			SDL_DestroyTexture( textures->trn[ type]);
