@@ -908,7 +908,8 @@ void initGui() {
 											CREATE_LIST_BUTTON( 0, "1. line",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_lineSensor,		NO_CHILDREN)),
 										}, 1
 									))),
-									CREATE_LIST_BUTTON( 5, "6. box",			CREATE_BRUSH_WRAPPER( SDLK_5, &editor_changeObjType, go_box,			NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 5, "6. box",			CREATE_BRUSH_WRAPPER( SDLK_6, &editor_changeObjType, go_box,			NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 6, "7. gate",			CREATE_BRUSH_WRAPPER( SDLK_7, &editor_changeObjType, go_gate,			NO_CHILDREN)),
 								}, 6
 							))),
 							CREATE_LIST_BUTTON( 2, "3. animate", 			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_leftTurner, 	SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){

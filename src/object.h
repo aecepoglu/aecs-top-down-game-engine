@@ -24,6 +24,7 @@ enum objType {
 	go_switch,
 	go_lineSensor,
 	go_box,
+	go_gate,
 	go_NUM_ITEMS
 };
 
