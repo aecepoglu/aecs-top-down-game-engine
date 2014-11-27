@@ -71,7 +71,7 @@ bool eraseObject( unsigned int x, unsigned int y, int type) {
 	if( obj != NULL && obj->ai == NULL) {
 		obj->isDeleted = true;
 		myMap->objs[x][y] = NULL;
-		
+
 		return true;
 	}
 	else
@@ -83,7 +83,7 @@ bool eraseAI( unsigned int x, unsigned int y, int type) {
 	if( obj != NULL && obj->ai != NULL) {
 		AI_DESTROY( obj->ai);
 		obj->ai = NULL;
-		
+
 		SHOW_TOOLTIP( x, y, "AI removed");
 
 		return true;
@@ -104,16 +104,16 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 bool editor_changeObjType( unsigned int x, unsigned int y, int type) {
 	if( myMap->objs[x][y]==NULL)
 		return false;
-	
+
 	myMap->objs[x][y]->type = type;
 
 	return true;
 }
 
 bool editor_selectObj( unsigned int x, unsigned int y, int type) {
-	
+
 	selectedObj = myMap->objs[x][y];
-	
+
 	char tmp[4];
 	if( selectedObj != NULL) {
 		selectedObjContainer->isVisible = true;
@@ -145,10 +145,10 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 	else {
 		selectedObjContainer->isVisible = false;
 	}
-	
+
 	sprintf( tmp, "%d", x);
 	SDLGUI_SetText_Textbox( textbox_pos_x, tmp);
-	
+
 	sprintf( tmp, "%d", y);
 	SDLGUI_SetText_Textbox( textbox_pos_y, tmp);
 
@@ -166,7 +166,7 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 
 	addObject( obj, myMap, x, y);
 	editor_selectObj( x, y, type);
-	
+
 	char tooltipText[8];
 	sprintf( tooltipText, "#%d", obj->id);
 	SHOW_TOOLTIP( x, y, tooltipText);
@@ -177,7 +177,7 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 bool drawAI( unsigned int x, unsigned int y, int type) {
 	//if there is an object at the given location, and it dsoen't have an AI
 	if( myMap->objs[x][y] != 0) {
-		if ( myMap->objs[x][y]->ai != NULL && myMap->objs[x][y]->ai->type != type) 
+		if ( myMap->objs[x][y]->ai != NULL && myMap->objs[x][y]->ai->type != type)
 			AI_DESTROY( myMap->objs[x][y]->ai);
 
 		struct AI *ai = AI_CREATE( type);
@@ -257,7 +257,7 @@ bool scrollScreen( enum direction dir) {
 }
 
 void changeBrush( struct brushWrapper *bw) {
-	
+
 	if( bw->brush) {
 		brush = bw->brush;
 		brushVariant = bw->brushVariant;
@@ -329,7 +329,7 @@ void textbox_id_changed( struct SDLGUI_Element *textbox, const char *text) {
 		int newId = atoi( text);
 		if( newId >= 1) {
 			selectedObj->id = newId;
-		} 
+		}
 		else {
 			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "You must give id >= 1");
 			isMessageBoxOn = true;
@@ -706,8 +706,8 @@ void drawObjects() {
 
 			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
 			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
-				drawTexture( renderer, 
-					textures->obj[obj->type]->textures[ obj->visualState][obj->dir], 
+				drawTexture( renderer,
+					textures->obj[obj->type]->textures[ obj->visualState][obj->dir],
 					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN );
 				if( obj == selectedObj) {
 					drawTexture( renderer, textures->highlitObjIndicator, screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN);
@@ -726,7 +726,7 @@ void drawObjects() {
 void draw() {
 	log3("draw\n");
 	SDL_RenderClear( renderer);
-	
+
 	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, viewSize.i*TILELEN, viewSize.j*TILELEN);
 	drawObjects( );
 
@@ -805,31 +805,31 @@ struct SDLGUI_Element* parseTemplateLine( char *line, int lineNo) {
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "ai-type");
 	//template->aiType = atoi( string);
-	
+
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "health");
 	template->health = atoi( string);
-	
+
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "maxHealth");
 	template->maxHealth = atoi( string);
-	
+
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "healthGiven");
 	template->healthGiven = atoi( string);
-	
+
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "isMovable");
 	template->isMovable = atoi( string);
-	
+
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "isPickable");
 	template->isPickable = atoi( string);
-	
+
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "attack");
 	template->attack = atoi( string);
-	
+
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "defence");
 	template->defence = atoi( string);
@@ -863,7 +863,7 @@ struct SDLGUI_List* reloadBrushTemplates() {
 		}
 
 		SDLGUI_List_Add( templateBrushes, parseTemplateLine( line, lineNo));
-		
+
 		lineNo ++;
 	}
 
@@ -874,7 +874,7 @@ struct SDLGUI_List* reloadBrushTemplates() {
 void initGui() {
     /* The left panel */
 	bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
-	
+
 	struct SDLGUI_List *bodyItems = SDLGUI_Get_Panel_Elements( bodyContainer);
 	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 10, GUI_LEFTPANEL_WIDTH - 2*10, 70, &buttonSave_clicked, "YZ-01\nLevel Editor\n------------", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 0, NULL));
 	SDLGUI_List_Add( bodyItems, SDLGUI_Create_Text( 10, 70, GUI_LEFTPANEL_WIDTH - 2*10, 30, &buttonSave_clicked, "(s)ave", (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 12, 20, 1, NULL));
@@ -889,19 +889,19 @@ void initGui() {
 	brushList = SDLGUI_List_Create_From_Array(
 		(struct SDLGUI_Element*[]){
 			CREATE_LIST_BUTTON( 0, "1. select", CREATE_BRUSH_WRAPPER( SDLK_1, &editor_selectObj, 	NO_VAR, 	NO_CHILDREN)),
-			CREATE_LIST_BUTTON( 1, "2. terrain", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+			CREATE_LIST_BUTTON( 1, "2. terrain", CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 					CREATE_LIST_BUTTON( 0, "1. ground", 			CREATE_BRUSH_WRAPPER( SDLK_1, &drawTerrain, terrain_gnd, 	NO_CHILDREN)),
 					CREATE_LIST_BUTTON( 1, "2. marked ground", 		CREATE_BRUSH_WRAPPER( SDLK_2, &drawTerrain, terrain_marked, NO_CHILDREN)),
 					CREATE_LIST_BUTTON( 2, "3. wall", 	 			CREATE_BRUSH_WRAPPER( SDLK_3, &drawTerrain, terrain_wall, 	NO_CHILDREN)),
 				}, 3
 			))),
-			CREATE_LIST_BUTTON( 2, "3. object", CREATE_BRUSH_WRAPPER( SDLK_3, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+			CREATE_LIST_BUTTON( 2, "3. object", CREATE_BRUSH_WRAPPER( SDLK_3, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 					CREATE_LIST_BUTTON( 0, "1. create", 	CREATE_BRUSH_WRAPPER( SDLK_1, &editor_createObj,	go_apple, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "2. change type",CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 				NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 1, "2. change type",CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 				NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 							CREATE_LIST_BUTTON( 0, "1. player", 			CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_player, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 1, "2. inanimate", 			CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_apple, 			SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 									CREATE_LIST_BUTTON( 0, "1. apple", 			CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_apple, 			NO_CHILDREN)),
-									CREATE_LIST_BUTTON( 1, "2. wall/door",		CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_door,			NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 1, "2. wall/door",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_door,			NO_CHILDREN)),
 									CREATE_LIST_BUTTON( 2, "3. button",			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_button,			NO_CHILDREN)),
 									CREATE_LIST_BUTTON( 3, "4. switch",			CREATE_BRUSH_WRAPPER( SDLK_4, &editor_changeObjType, go_switch,			NO_CHILDREN)),
 									CREATE_LIST_BUTTON( 4, "5. sensors",		CREATE_BRUSH_WRAPPER( SDLK_5, &editor_changeObjType, go_lineSensor,		SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
@@ -910,7 +910,7 @@ void initGui() {
 									))),
 									CREATE_LIST_BUTTON( 5, "6. box",			CREATE_BRUSH_WRAPPER( SDLK_6, &editor_changeObjType, go_box,			NO_CHILDREN)),
 									CREATE_LIST_BUTTON( 6, "7. gate",			CREATE_BRUSH_WRAPPER( SDLK_7, &editor_changeObjType, go_gate,			NO_CHILDREN)),
-								}, 6
+								}, 7
 							))),
 							CREATE_LIST_BUTTON( 2, "3. animate", 			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_leftTurner, 	SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 									CREATE_LIST_BUTTON( 0, "1. left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_leftTurner, 	NO_CHILDREN)),
@@ -923,7 +923,7 @@ void initGui() {
 						}, 3
 					))),
 					CREATE_LIST_BUTTON( 2, "3. remove", CREATE_BRUSH_WRAPPER( SDLK_3, &eraseObject, NO_VAR, NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 3, "4. rotate", CREATE_BRUSH_WRAPPER( SDLK_4, NO_FUN, NO_VAR, 		/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 3, "4. rotate", CREATE_BRUSH_WRAPPER( SDLK_4, NO_FUN, NO_VAR, 		/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 							CREATE_LIST_BUTTON( 0, "(1) \x80 up", 		CREATE_BRUSH_WRAPPER( SDLK_1, &setDirection, dir_up, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 1, "(2) \x81 right", 	CREATE_BRUSH_WRAPPER( SDLK_2, &setDirection, dir_right, 	NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 2, "(3) \x82 down", 	CREATE_BRUSH_WRAPPER( SDLK_3, &setDirection, dir_down,		NO_CHILDREN)),
@@ -933,9 +933,9 @@ void initGui() {
 					CREATE_LIST_BUTTON( 4, "5. templates", CREATE_BRUSH_WRAPPER( SDLK_5, NO_FUN, NO_VAR, reloadBrushTemplates())),
 				}, 5
 			))),
-			CREATE_LIST_BUTTON( 3, "4. ai", CREATE_BRUSH_WRAPPER(/*key*/SDLK_4, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+			CREATE_LIST_BUTTON( 3, "4. ai", CREATE_BRUSH_WRAPPER(/*key*/SDLK_4, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 					CREATE_LIST_BUTTON( 0, "1. erase",	CREATE_BRUSH_WRAPPER( SDLK_1, &eraseAI, NO_VAR, 	NO_CHILDREN)),
-					CREATE_LIST_BUTTON( 1, "2. put", 	CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 	NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){ 
+					CREATE_LIST_BUTTON( 1, "2. put", 	CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 	NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 							CREATE_LIST_BUTTON( 0, "(1) left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &drawAI, ai_leftTurner, 		NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 1, "(2) hungry left turner",CREATE_BRUSH_WRAPPER( SDLK_2, &drawAI, ai_hungryLeftTurner, NO_CHILDREN)),
 							CREATE_LIST_BUTTON( 2, "(3) simple flower", 	CREATE_BRUSH_WRAPPER( SDLK_3, &drawAI, ai_simpleFlower, 	NO_CHILDREN)),
@@ -984,9 +984,9 @@ void initGui() {
 	SDLGUI_List_Add( selectedObjElements, textbox_pickable);
 	SDLGUI_List_Add( selectedObjElements, textbox_attack);
 	SDLGUI_List_Add( selectedObjElements, textbox_defence);
-	
+
 	SDLGUI_List_Add( bodyItems, selectedObjContainer);
-	
+
 	/* top bar */
 	topbar = SDLGUI_Create_Panel( GUI_LEFTPANEL_WIDTH, 0, 1280, GUI_TOPBAR_HEIGHT, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
 
@@ -994,11 +994,11 @@ void initGui() {
 	struct SDLGUI_Element *textbox_mapName = SDLGUI_Create_Textbox( 40, 8, 23, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
 	SDLGUI_SetText_Textbox( textbox_mapName, myMap->filePath);
 	struct SDLGUI_Element *label_curPos = SDLGUI_Create_Text( 200,  0, -1, GUI_TOPBAR_HEIGHT, NO_CLICK_HANDLER, "pos:", 	(int[4]){0,0,0,0}, 			(int[4]){0,0,0,255}, 6, 8, 0, NULL);
-	
+
 	struct SDLGUI_Element *currentPosPanel = SDLGUI_Create_Panel( 230, 0, 80, GUI_TOPBAR_HEIGHT, (int[4]){0,0,0,0}, (int[4]){0,0,0,255}, 0);
 	textbox_pos_x = SDLGUI_Create_Textbox( 	00, 8, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
 	textbox_pos_y = SDLGUI_Create_Textbox( 	40, 8, 3, TEXTBOX_INPUT_NONE, (int[4]){0,0,0,0},  (int[4]){0,0,0,255}, 6, 8, NULL);
-	
+
 	struct SDLGUI_List *currentPosElements = SDLGUI_Get_Panel_Elements( currentPosPanel);
 	SDLGUI_List_Add( currentPosElements, textbox_pos_x);
 	SDLGUI_List_Add( currentPosElements, textbox_pos_y);
@@ -1008,7 +1008,7 @@ void initGui() {
 	SDLGUI_List_Add( topbarItems, textbox_mapName);
 	SDLGUI_List_Add( topbarItems, label_curPos);
 	SDLGUI_List_Add( topbarItems, currentPosPanel);
-	
+
 	SDLGUI_Add_Element( bodyContainer);
 	SDLGUI_Add_Element( topbar);
 }
@@ -1038,7 +1038,7 @@ void editor_createMap_clicked( struct SDLGUI_Element *from) {
 		char fileNameBuf[20];
 		sprintf( fileNameBuf, "%s.yz.map", text);
 		myMap->filePath = strdup( fileNameBuf);
-	
+
 		running = true;
 	}
 }
@@ -1063,7 +1063,7 @@ int main( int argc, char *args[]) {
     log0("loading textures\n");
 	textures = loadAllTextures( renderer);
 	SDLGUI_Init( renderer, textures->font);
-	
+
 	running = false;
 	createMapDialogData.running = true;
 
@@ -1093,7 +1093,7 @@ int main( int argc, char *args[]) {
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_width );
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_height);
 		SDLGUI_List_Add( panelElems, createMapDialogData.textbox_name);
-		
+
 		run0();
 	}
 

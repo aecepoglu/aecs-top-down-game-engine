@@ -1,5 +1,5 @@
 #include "cutscene.h"
-
+#include <stdlib.h>
 #define CUTSCENE_INIT_SIZE 8
 
 void cutscene_init() {
@@ -40,7 +40,7 @@ SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectin
 	while( cutsceneRunning) {
 		SDL_WaitEvent( &e);
 		switch(e.type) {
-			case SDL_USEREVENT: 
+			case SDL_USEREVENT:
 				cutsceneRunning = 0;
 				break;
 			case SDL_WINDOWEVENT:

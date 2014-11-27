@@ -1,5 +1,6 @@
 #include "audio.h"
 #include "log.h"
+#include <stdlib.h>
 
 void audio_init() {
 	if( Mix_OpenAudio( MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 1, 2048) < 0) {
