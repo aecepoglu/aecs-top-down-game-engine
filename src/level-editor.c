@@ -899,18 +899,25 @@ void initGui() {
 					CREATE_LIST_BUTTON( 0, "1. create", 	CREATE_BRUSH_WRAPPER( SDLK_1, &editor_createObj,	go_apple, 	NO_CHILDREN)),
 					CREATE_LIST_BUTTON( 1, "2. change type",CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 				NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 							CREATE_LIST_BUTTON( 0, "1. player", 			CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_player, 		NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 1, "2. inanimate", 			CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_apple, 			SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
-									CREATE_LIST_BUTTON( 0, "1. apple", 			CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_apple, 			NO_CHILDREN)),
-									CREATE_LIST_BUTTON( 1, "2. wall/door",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_door,			NO_CHILDREN)),
-									CREATE_LIST_BUTTON( 2, "3. button",			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_button,			NO_CHILDREN)),
-									CREATE_LIST_BUTTON( 3, "4. switch",			CREATE_BRUSH_WRAPPER( SDLK_4, &editor_changeObjType, go_switch,			NO_CHILDREN)),
-									CREATE_LIST_BUTTON( 4, "5. sensors",		CREATE_BRUSH_WRAPPER( SDLK_5, &editor_changeObjType, go_lineSensor,		SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
-											CREATE_LIST_BUTTON( 0, "1. line",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_lineSensor,		NO_CHILDREN)),
-										}, 1
+							CREATE_LIST_BUTTON( 1, "2. inanimate", 			CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_box, 			SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
+									CREATE_LIST_BUTTON( 0, "1. functional",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_button,		SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
+											CREATE_LIST_BUTTON( 0, "1. wall/door",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_door,			NO_CHILDREN)),
+											CREATE_LIST_BUTTON( 1, "2. button",			CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_button,			NO_CHILDREN)),
+											CREATE_LIST_BUTTON( 2, "3. switch",			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_switch,			NO_CHILDREN)),
+											CREATE_LIST_BUTTON( 3, "4. sensors",		CREATE_BRUSH_WRAPPER( SDLK_4, &editor_changeObjType, go_lineSensor,		SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
+													CREATE_LIST_BUTTON( 0, "1. line",		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_lineSensor,		NO_CHILDREN)),
+												}, 1
+											))),
+											CREATE_LIST_BUTTON( 4, "5. gate",			CREATE_BRUSH_WRAPPER( SDLK_5, &editor_changeObjType, go_gate,			NO_CHILDREN)),
+										}, 5
 									))),
-									CREATE_LIST_BUTTON( 5, "6. box",			CREATE_BRUSH_WRAPPER( SDLK_6, &editor_changeObjType, go_box,			NO_CHILDREN)),
-									CREATE_LIST_BUTTON( 6, "7. gate",			CREATE_BRUSH_WRAPPER( SDLK_7, &editor_changeObjType, go_gate,			NO_CHILDREN)),
-								}, 7
+									CREATE_LIST_BUTTON( 1, "2. misc",			CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_apple,		SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
+											CREATE_LIST_BUTTON( 0, "1. apple", 			CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_apple, 			NO_CHILDREN)),
+											CREATE_LIST_BUTTON( 1, "2. box",			CREATE_BRUSH_WRAPPER( SDLK_2, &editor_changeObjType, go_box,			NO_CHILDREN)),
+											CREATE_LIST_BUTTON( 2, "3. key",			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_key,			NO_CHILDREN)),
+										}, 3
+									))),
+								}, 2
 							))),
 							CREATE_LIST_BUTTON( 2, "3. animate", 			CREATE_BRUSH_WRAPPER( SDLK_3, &editor_changeObjType, go_leftTurner, 	SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 									CREATE_LIST_BUTTON( 0, "1. left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &editor_changeObjType, go_leftTurner, 	NO_CHILDREN)),
