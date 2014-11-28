@@ -26,6 +26,7 @@ end)
 
 for sw,doors in pairs(SW_DOOR) do
     lib.onInteract(sw, function()
+        lib.use(sw)
         for i,door in pairs(doors) do
             lib.use(door)
         end

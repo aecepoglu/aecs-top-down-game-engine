@@ -936,15 +936,22 @@ void initGui() {
 			CREATE_LIST_BUTTON( 3, "4. ai", CREATE_BRUSH_WRAPPER(/*key*/SDLK_4, NO_FUN, NO_VAR, /*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
 					CREATE_LIST_BUTTON( 0, "1. erase",	CREATE_BRUSH_WRAPPER( SDLK_1, &eraseAI, NO_VAR, 	NO_CHILDREN)),
 					CREATE_LIST_BUTTON( 1, "2. put", 	CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 	NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
-							CREATE_LIST_BUTTON( 0, "(1) left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &drawAI, ai_leftTurner, 		NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 1, "(2) hungry left turner",CREATE_BRUSH_WRAPPER( SDLK_2, &drawAI, ai_hungryLeftTurner, NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 2, "(3) simple flower", 	CREATE_BRUSH_WRAPPER( SDLK_3, &drawAI, ai_simpleFlower, 	NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 3, "(4) creeper plant", 	CREATE_BRUSH_WRAPPER( SDLK_4, &drawAI, ai_creeperPlant, 	NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 4, "(5) peek-a-boo chaser", CREATE_BRUSH_WRAPPER( SDLK_5, &drawAI, ai_peekaboo, 		NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 5, "(6) weeping angel", 	CREATE_BRUSH_WRAPPER( SDLK_6, &drawAI, ai_weepingAngel, 	NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 6, "(7) slide door", 		CREATE_BRUSH_WRAPPER( SDLK_7, &drawAI, ai_door, 			NO_CHILDREN)),
-							CREATE_LIST_BUTTON( 7, "(8) line sensor", 		CREATE_BRUSH_WRAPPER( SDLK_8, &drawAI, ai_lineSensor,		NO_CHILDREN)),
-						}, 8
+							CREATE_LIST_BUTTON( 0, "1. monster AI", 	CREATE_BRUSH_WRAPPER( SDLK_1, NO_FUN, 	NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
+									CREATE_LIST_BUTTON( 0, "(1) left turner", 		CREATE_BRUSH_WRAPPER( SDLK_1, &drawAI, ai_leftTurner, 		NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 1, "(2) hungry left turner",CREATE_BRUSH_WRAPPER( SDLK_2, &drawAI, ai_hungryLeftTurner, NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 2, "(3) simple flower", 	CREATE_BRUSH_WRAPPER( SDLK_3, &drawAI, ai_simpleFlower, 	NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 3, "(4) creeper plant", 	CREATE_BRUSH_WRAPPER( SDLK_4, &drawAI, ai_creeperPlant, 	NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 4, "(5) peek-a-boo chaser", CREATE_BRUSH_WRAPPER( SDLK_5, &drawAI, ai_peekaboo, 		NO_CHILDREN)),
+									CREATE_LIST_BUTTON( 5, "(6) weeping angel", 	CREATE_BRUSH_WRAPPER( SDLK_6, &drawAI, ai_weepingAngel, 	NO_CHILDREN)),
+								}, 6
+							))),
+							CREATE_LIST_BUTTON( 1, "2. misc AI", 		CREATE_BRUSH_WRAPPER( SDLK_2, NO_FUN, 	NO_VAR, 	/*children*/ SDLGUI_List_Create_From_Array( (struct SDLGUI_Element*[]){
+								CREATE_LIST_BUTTON( 0, "(1) slide door", 		CREATE_BRUSH_WRAPPER( SDLK_1, &drawAI, ai_door, 			NO_CHILDREN)),
+								CREATE_LIST_BUTTON( 1, "(2) line sensor", 		CREATE_BRUSH_WRAPPER( SDLK_2, &drawAI, ai_lineSensor,		NO_CHILDREN)),
+								CREATE_LIST_BUTTON( 2, "(3) switch", 		    CREATE_BRUSH_WRAPPER( SDLK_3, &drawAI, ai_switch,			NO_CHILDREN)),
+								}, 3
+							)))
+						}, 2
 					))),
 				}, 2
 			))),

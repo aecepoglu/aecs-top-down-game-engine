@@ -16,6 +16,7 @@ enum AIType {
 	ai_weepingAngel,
 	ai_door,
 	ai_lineSensor,
+	ai_switch,
 };
 
 struct AI {

@@ -9,6 +9,7 @@
 #include "ai/weepingAngel.h"
 #include "ai/door.h"
 #include "ai/lineSensor.h"
+#include "ai/switch.h"
 
 #include "ai.h"
 #include "aiFun.h"
@@ -33,6 +34,7 @@ static struct aiTableItem aiTable[] = {
 	[ai_weepingAngel] = 	{ weepingAngel_create, 		weepingAngel_update,		weepingAngel_destroy,		weepingAngel_seen,		NULL		},
 	[ai_door] = 			{ door_create, 				NULL,						door_destroy,				NULL,					door_use	},
 	[ai_lineSensor] = 		{ lineSensor_create, 		lineSensor_update,			common_ai_destroy,			NULL,					NULL		},
+	[ai_switch] = 			{ switch_create, 			NULL,						common_ai_destroy,			NULL,					switch_use	},
 };
 
 /* table interface */
