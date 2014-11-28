@@ -32,8 +32,9 @@ Uint32 cutscene_timer_callback( Uint32 interval, void *param) {
 }
 
 SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectingKey) {
+	SDL_TimerID timerID = 0;
 	if( miliseconds > 0)
-		SDL_AddTimer( miliseconds, cutscene_timer_callback, NULL);
+		timerID = SDL_AddTimer( miliseconds, cutscene_timer_callback, NULL);
 
 	int cutsceneRunning = 1;
 	SDL_Keycode result;
@@ -43,9 +44,7 @@ SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectin
 		SDL_WaitEvent( &e);
 		switch(e.type) {
 			case SDL_USEREVENT:
-				if (e.user.code == CUSTOM_EVENT_CUTSCENE_WAIT) {
-					cutsceneRunning = 0;
-				}
+				cutsceneRunning = 0;
 				break;
 			case SDL_WINDOWEVENT:
 				cutscene_draw( renderer);
@@ -73,6 +72,9 @@ SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectin
 				break;
 		}
 	}
+
+	if( timerID != 0)
+		SDL_RemoveTimer( timerID);
 
 	return result;
 }

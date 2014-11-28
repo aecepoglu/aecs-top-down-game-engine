@@ -40,6 +40,7 @@ int objsSeenCount;
 SDL_Texture *textConsole_texture;
 
 char *dirPath;
+SDL_TimerID levelTimer;
 
 #define MAX_PATH_LEN 256
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
@@ -52,6 +53,7 @@ struct {
 
 void gameOver( int levelEndValue) {
 	isPlayerPosSet = false;
+	SDL_RemoveTimer( levelTimer);
 
 	SDL_Event event = {
 		.type = SDL_USEREVENT,
@@ -274,7 +276,6 @@ void handleKey( SDL_KeyboardEvent *e) {
 			break;
 	};
 }
-
 Uint32 timerCallback( Uint32 interval, void *param) {
 	log3("tick\n");
 	SDL_PushEvent( &timerPushEvent);
@@ -404,8 +405,6 @@ int run() {
 	}
 	CALL_FOV_FCN();
 
-	SDL_AddTimer( timerDelay, timerCallback, 0);
-
 	SDL_Event e;
 	while( true) {
 		SDL_WaitEvent( &e);
@@ -507,6 +506,8 @@ int loadLevel( const char* relMapPath, const char* relScriptPath, int levelOptio
 		freeMap( myMap);
 		myMap = NULL;
 	}
+	
+	levelTimer = SDL_AddTimer( timerDelay, timerCallback, 0);
 
 	myMap = readMapFile( fullPath);
 
