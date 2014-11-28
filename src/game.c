@@ -574,7 +574,13 @@ char* getDirPath( const char *file) {
 		result = strdup( ".");
 	}
 	else {
-		result = strndup( file, slashPos - file);
+		/* result = strndup( file, slashPos - file);
+			This is not available on non-gnu systems. I have to do it manually
+		*/
+		int len = slashPos - file;
+		result = calloc( len+1, sizeof(char));
+		memcpy( result, file, len);
+		result[len] = '\0';
 	}
 
 	return result;
