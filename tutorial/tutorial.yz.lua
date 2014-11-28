@@ -139,9 +139,9 @@ lib.cutWrite(10,10, "So... This is the end of the tutorial\n\n"
     .. "http://bitbucket.org/aecepoglu/aecs-top-down-game-engine\n\n"
 
     .. "It also has a level-editor and is scriptable using Lua\n"
-    .. "To learn more about this project, go to the link above\n"
+    .. "To learn more about this project, go to the link above\n\n"
 
-    .. "Programmed by me, AEC (Ahmet Emre Cepoglu)\n"
+    .. "Programmed by me, AEC\n"
     .. "Sprites by Furkan Dutoglu\n\n"
     
     .. "Released under TeamFromBeyond (http://teamfrombeyond.com)\n\n"
@@ -150,5 +150,6 @@ lib.cutWrite(10,10, "So... This is the end of the tutorial\n\n"
     
     .. "Press any key to quit"
     )
+lib.cutImg(550, 195, 192, 64, "res/tfb-logo.png")
 lib.cutRender()
 lib.cutReadKey()
