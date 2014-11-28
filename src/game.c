@@ -39,6 +39,9 @@ int objsSeenCount;
 
 SDL_Texture *textConsole_texture;
 
+char *dirPath;
+
+#define MAX_PATH_LEN 256
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 
 struct {
@@ -495,17 +498,23 @@ void setDefaults() {
 	inventory_reset( false);
 }
 
-int loadLevel( const char* mapPath, const char* scriptPath, int levelOption, lua_State *L) {
-	if( myMap != NULL && strcmp( mapPath, myMap->filePath) != 0) {
+int loadLevel( const char* relMapPath, const char* relScriptPath, int levelOption, lua_State *L) {
+    char fullPath[MAX_PATH_LEN];
+	
+    sprintf( fullPath, "%s/%s", dirPath, relMapPath);
+
+	if( myMap != NULL && strcmp( fullPath, myMap->filePath) != 0) {
 		freeMap( myMap);
 		myMap = NULL;
 	}
-	
-	myMap = readMapFile( mapPath);
+
+	myMap = readMapFile( fullPath);
+
 	player = createObject( go_player, 0, 0, 0);
 
-    if (luaL_loadfile(L, scriptPath) || lua_pcall( L, 0, 0, 0)) {
-        fprintf(stderr, "Error loading script '%s'\n%s\n", scriptPath, lua_tostring(L, -1));
+    sprintf( fullPath, "%s/%s", dirPath, relScriptPath);
+    if (luaL_loadfile(L, fullPath) || lua_pcall( L, 0, 0, 0)) {
+        fprintf(stderr, "Error loading script '%s'\n%s\n", fullPath, lua_tostring(L, -1));
         exit(1);
 	}
 
@@ -556,6 +565,20 @@ lua_State* initLua() {
 	return L;
 }
 
+char* getDirPath( const char *file) {
+	char *result;
+
+	char *slashPos = strrchr( file, '/');
+	if( slashPos == NULL) {
+		result = strdup( ".");
+	}
+	else {
+		result = strndup( file, slashPos - file);
+	}
+
+	return result;
+}
+
 int main( int argc, char *args[]) {
 	
 	if( argc != 2) {
@@ -570,6 +593,7 @@ int main( int argc, char *args[]) {
 	audio_init();
 	cutscene_init();
 	textConsole_texture = textConsole_init( renderer);
+    dirPath = getDirPath( args[1]);
     
     if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {
         fprintf(stderr, "Error loading script '%s'\n%s\n", args[1], lua_tostring(lua, -1));
@@ -583,5 +607,6 @@ int main( int argc, char *args[]) {
 	SDL_DestroyWindow( window);
 	free_fovBase( fovBase);
 	freeMap( myMap);
+    free( dir);
 	return 0;
 }
