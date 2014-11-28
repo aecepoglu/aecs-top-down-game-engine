@@ -31,15 +31,15 @@ void door_use( struct Map *map, struct object *obj, void *data) {
 
 	switch( aiData->state) {
 		case INVISIBLE: 
-			aiData->state = VISIBLE;
-			map->objs[ obj->pos.i][ obj->pos.j] = obj;
-
+            if( map->objs[ obj->pos.i][ obj->pos.j] == NULL) {
+				aiData->state = VISIBLE;
+				map->objs[ obj->pos.i][ obj->pos.j] = obj;
+            }
 			break;
 
 		case VISIBLE: 
 			map->objs[ obj->pos.i][ obj->pos.j] = NULL;
 			aiData->state = INVISIBLE;
-
 			break;
 	};
 }
