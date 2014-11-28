@@ -549,6 +549,7 @@ lua_State* initLua() {
 		{"cutRender", dsl_cutsceneRender},
 		{"cutWait", dsl_cutsceneWait},
 		{"cutReadKey", dsl_cutsceneReadKey},
+		{"objAtPos", dsl_getObjAtPos},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

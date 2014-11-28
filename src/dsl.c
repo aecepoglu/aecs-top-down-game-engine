@@ -298,3 +298,18 @@ int dsl_cutsceneReadKey( lua_State *l) {
 	lua_pushinteger( l, cutscene_wait( renderer, 0, true) );
 	return 1;
 }
+
+int dsl_getObjAtPos( lua_State *l) {
+	luaL_checkinteger( l, 1);
+	luaL_checkinteger( l, 2);
+
+	int x = lua_tointeger( l, 1);
+	int y = lua_tointeger( l, 2);
+
+	if( x >= 0 && x < myMap->width && y >= 0 && y < myMap->height ) {
+		struct object *obj = NULL;
+		obj = myMap->objs[ x][ y];
+		lua_pushinteger( l, obj != NULL ? obj->id : -1 );
+	}
+	return 1;
+}
