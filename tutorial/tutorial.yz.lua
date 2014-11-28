@@ -67,17 +67,20 @@ end
 
 -- SCENE 5
 lib.cutClear(0, 50, 0)
-lib.cutWrite( 10, 10, "Good job solving the puzzle.\n"
+lib.cutWrite( 10, 10, "Good job solving the puzzle.\n\n"
+
     .. "So you can push objects, interact with them; you can also \n"
     .. "  - hit them, by trying to move onto them\n"
     .. "  - eat them, by pressing 'e' when they are dead\n"
     .. "  - pick them to inventory, by pressing 'p'\n\n"
 
     .. "Some objects give health when you eat them, but some damage you\n"
-    .. "Different objects have different amount of defence. You might not be able to destroy them all\n"
+    .. "Different objects have different amount of defence.\n"
+    .. " You might not be able to destroy them all\n"
     .. "You cannot pick every object into your inventory\n\n."
 
-    .. "This next level will have you use these mechanics to pass the next level\n\n"
+    .. "This next level will have you use these mechanics\n\n"
+
     .. "Press any key to start the level"
     )
 lib.cutRender()
@@ -121,7 +124,7 @@ end
 
 -- SCENE 7
 lib.cutClear(0,0,0)
-lib.cutWrite(10,10, "I'm not going to bother showing you each and every single AI written\n\n"
+lib.cutWrite(10,10, "I'm not going to bother showing you every single AI\n\n"
     
     .. "Press any key to continue"
     )
