@@ -1,4 +1,5 @@
 #include "cutscene.h"
+#include "customEventTypes.h"
 #include <stdlib.h>
 #define CUTSCENE_INIT_SIZE 8
 
@@ -23,6 +24,7 @@ Uint32 cutscene_timer_callback( Uint32 interval, void *param) {
 	SDL_Event event = {
 		.type = SDL_USEREVENT,
 	};
+	event.user.code = CUSTOM_EVENT_CUTSCENE_WAIT;
 
 	SDL_PushEvent( &event);
 
@@ -41,14 +43,16 @@ SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectin
 		SDL_WaitEvent( &e);
 		switch(e.type) {
 			case SDL_USEREVENT:
-				cutsceneRunning = 0;
+				if (e.user.code == CUSTOM_EVENT_CUTSCENE_WAIT) {
+					cutsceneRunning = 0;
+				}
 				break;
 			case SDL_WINDOWEVENT:
 				cutscene_draw( renderer);
 				break;
 			case SDL_KEYDOWN: {
 					SDL_Keysym keysym = e.key.keysym;
-					if( expectingKey ) {
+					if( expectingKey && e.key.repeat == 0 ) {
 						switch( keysym.sym) {
 							case SDLK_LGUI:
 							case SDLK_RGUI:
@@ -58,7 +62,7 @@ SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectin
 							case SDLK_RALT:
 								break;
 							default:
-								if( keysym.mod == KMOD_NONE && e.key.state == SDL_PRESSED) {
+								if( keysym.mod == KMOD_NONE ) {
 									cutsceneRunning = 0;
 									result = keysym.sym;
 								}

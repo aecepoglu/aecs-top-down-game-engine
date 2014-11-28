@@ -7,6 +7,7 @@
 #include "array.h"
 #include "dsl.h"
 #include "audio.h"
+#include "customEventTypes.h"
 
 #define FOREACH_OBJ_WITH_ID( objId, itI, itObj, closure) for( itI=0; itI<myMap->objListCount ;itI++) {\
 	if( myMap->objList[itI]->id == objId) {\
@@ -14,9 +15,6 @@
 		closure\
 	}\
 }
-
-#define CUSTOM_EVENT_UPDATE 	0
-#define CUSTOM_EVENT_ENDLEVEL	1
 
 SDL_Event timerPushEvent = {
 	.type= SDL_USEREVENT,
@@ -55,7 +53,7 @@ void gameOver( int levelEndValue) {
 	SDL_Event event = {
 		.type = SDL_USEREVENT,
 	};
-	event.user.code = 1;
+	event.user.code = CUSTOM_EVENT_ENDLEVEL;
 
 	int *iPtr = (int*)malloc( sizeof(int));
 	*iPtr = levelEndValue;
