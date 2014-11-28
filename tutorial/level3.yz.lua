@@ -6,15 +6,22 @@ BUTTON=6
 
 lib.setStartGate( START)
 
-lib.onInteract( DOOR, function()
+function tryUnlock()
     if lib.objAtPos(2,1) == BOX and lib.objAtPos(3,4) == BOX then
         lib.write("\nUnlocking door")
         lib.use( DOOR)
+        return true
+    else
+        return false
     end
-end)
+end
+
+lib.onInteract( DOOR, tryUnlock)
 
 lib.onInteract( BUTTON, function()
-    lib.endLevel(0)
+    if not tryUnlock() then
+        lib.endLevel(0)
+    end
 end)
 
 lib.onInteract( END, function()

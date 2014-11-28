@@ -32,9 +32,9 @@ void door_use( struct Map *map, struct object *obj, void *data) {
 	switch( aiData->state) {
 		case INVISIBLE: 
             if( map->objs[ obj->pos.i][ obj->pos.j] == NULL) {
-				aiData->state = VISIBLE;
 				map->objs[ obj->pos.i][ obj->pos.j] = obj;
             }
+			aiData->state = VISIBLE;
 			break;
 
 		case VISIBLE: 
