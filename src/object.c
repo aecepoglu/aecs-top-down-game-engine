@@ -81,7 +81,7 @@ struct object* readObject( FILE *fp) {
 */
 
 
-void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
+bool objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 	if( obj2->callbacks.onInteract != LUA_NOREF) {
 		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->callbacks.onInteract);
 
@@ -89,9 +89,12 @@ void objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 
 		if( lua_pcall( lua, 1, 0, 0) != 0) {
 			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));
-			return;
+			return false;
 		}
+		return true;
 	}
+	else
+		return false;
 }
 
 bool objectHit( struct object *obj1, struct object *obj2) {
@@ -118,7 +121,7 @@ bool objectHit( struct object *obj1, struct object *obj2) {
 	}
 }
 
-void objectSwallow( struct object *obj1, struct object *obj2) {
+bool objectSwallow( struct object *obj1, struct object *obj2) {
 	if( obj2->health == 0) {
 		obj1->health += obj2->maxHealth;
 		int value = obj1->health + obj2->healthGiven;
@@ -131,8 +134,12 @@ void objectSwallow( struct object *obj1, struct object *obj2) {
 		}
 		obj1->health = value;
 		obj2->isDeleted = true;
+		
+		return true;
 	}
-}
+	else
+		return false;
+};
 
 void objectFree( struct object *obj) {
 	if( obj->ai) {

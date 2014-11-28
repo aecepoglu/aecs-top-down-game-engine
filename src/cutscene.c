@@ -48,7 +48,7 @@ SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectin
 				break;
 			case SDL_KEYDOWN: {
 					SDL_Keysym keysym = e.key.keysym;
-					if( expectingKey) {
+					if( expectingKey ) {
 						switch( keysym.sym) {
 							case SDLK_LGUI:
 							case SDLK_RGUI:
@@ -58,7 +58,7 @@ SDL_Keycode cutscene_wait( SDL_Renderer *renderer, int miliseconds, int expectin
 							case SDLK_RALT:
 								break;
 							default:
-								if( keysym.mod == KMOD_NONE) {
+								if( keysym.mod == KMOD_NONE && e.key.state == SDL_PRESSED) {
 									cutsceneRunning = 0;
 									result = keysym.sym;
 								}

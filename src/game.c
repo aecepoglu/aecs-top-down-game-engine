@@ -75,8 +75,10 @@ bool interact( struct Map *map, struct object *obj) {
 		PLAY_AUDIO_FX( AUDIO_INTERACT);
 		return true;
 	}
-	else
+	else {
+		PLAY_AUDIO_FX( AUDIO_NO_INTERACT);
 		return false;
+	}
 }
 
 /* picks up the object in front of object*/
@@ -91,10 +93,13 @@ bool pickUp( struct Map *map, struct object *obj) {
 		
 		ARRAY_REMOVE( myMap->objList, pickedObj, myMap->objListCount);
 		myMap->objs[ pos->i][ pos->j] = NULL;
+		PLAY_AUDIO_FX( AUDIO_PICK);
 		return true;
     }
-	else
+	else {
+		PLAY_AUDIO_FX( AUDIO_NO_PICK);
 		return false;
+	}
 }
 
 bool dropItem( struct Map *map, struct object *droppingObj, int inventoryIndex) {
@@ -107,9 +112,11 @@ bool dropItem( struct Map *map, struct object *droppingObj, int inventoryIndex) 
 			droppedObj->dir = DIR_REVERSE( player->dir);
 			vectorClone( &droppedObj->pos, pos);
 			addObject( droppedObj, map, pos->i, pos->j);
+			PLAY_AUDIO_FX( AUDIO_DROP);
 			return true;
 		}
 	}
+	PLAY_AUDIO_FX( AUDIO_NO_DROP);
 	return false;
 }
 
@@ -121,10 +128,13 @@ bool moveBackward( struct Map *map, struct object* obj) {
 		map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
 		map->objs[ pos->i ][ pos->j ] = obj;
 		vectorClone( &obj->pos, pos);
+		PLAY_AUDIO_FX( AUDIO_MOVE);
 		return true;
 	}
-	else
+	else {
+		PLAY_AUDIO_FX( AUDIO_NO_MOVE);
 		return false;
+	}
 }
 
 /* Move forward. Hit the object if can't move forward */
@@ -138,16 +148,19 @@ bool moveForward( struct Map *map, struct object* obj) {
 			map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
 			map->objs[ pos->i ][ pos->j ] = obj;
 			vectorClone( &obj->pos, pos );
+			PLAY_AUDIO_FX( AUDIO_MOVE);
 			return true;
 		}
 		else {
 			if (objectHit( obj, objAtPos) && objAtPos == player && objAtPos->health == 0 ) {
 				gameOver( 0);
 			}
+			PLAY_AUDIO_FX( AUDIO_HIT);
 			return false;
 		}
 	}
 	else {
+		PLAY_AUDIO_FX( AUDIO_NO_MOVE);
 		return false;
 	}
 }
@@ -166,20 +179,24 @@ bool pushForward( struct Map *map, struct object* pusher) {
 				map->objs[ pusher->pos.i][ pusher->pos.j] = NULL;
 				vectorClone( &pusher->pos, &pushedObj->pos);
 				vectorClone( &pushedObj->pos, &nextNextBase->pos);
+				PLAY_AUDIO_FX( AUDIO_PUSH);
 				return true;
 			}
 		}
 	}
+	PLAY_AUDIO_FX( AUDIO_NO_PUSH);
 	return false;
 }
 
 bool turnLeft( struct Map *map, struct object *obj) {
 	obj->dir = DIR_ROTATE_LEFT(obj->dir);
+	PLAY_AUDIO_FX( AUDIO_MOVE);
 	return true;
 }
 
 bool turnRight( struct Map *map, struct object *obj) {
 	obj->dir = DIR_ROTATE_RIGHT(obj->dir);
+	PLAY_AUDIO_FX( AUDIO_MOVE);
 	return true;
 }
 
@@ -190,14 +207,17 @@ bool eat( struct Map *map, struct object *obj) {
 	if( otherObj != 0 && otherObj->health == 0) {
 		objectSwallow( obj, otherObj);
 		map->objs[ newPos.i ][ newPos.j ] = NULL;
+		PLAY_AUDIO_FX( AUDIO_EAT);
+		return true;
 	}
-	return true;
+
+	PLAY_AUDIO_FX( AUDIO_NO_EAT);
+	return false;
 }
 
 void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 	if( ! playerMoved) {
 		playerMoved = true;
-		PLAY_AUDIO_FX( AUDIO_MOVE);
 		moveFunction( myMap, player);
 		CALL_FOV_FCN();
 	}
@@ -210,10 +230,7 @@ void handleKey( SDL_KeyboardEvent *e) {
             quit("pressed 'q'. Quitting");
 			break;
 		case SDLK_UP:
-			if( e->keysym.mod & KMOD_LSHIFT)
-				movePlayer( pushForward);
-			else
-				movePlayer( moveForward);
+			movePlayer( ( e->keysym.mod & KMOD_LSHIFT) ? pushForward : moveForward );
 			break;
 		case SDLK_DOWN:
 			movePlayer( moveBackward);
@@ -225,13 +242,13 @@ void handleKey( SDL_KeyboardEvent *e) {
 			movePlayer( turnRight);
 			break;
 		case SDLK_e:
-			eat( myMap, player);
+			movePlayer( eat);
 			break;
         case SDLK_u:
-            interact( myMap, player);
+			movePlayer( interact);
             break;
 		case SDLK_p:
-			pickUp( myMap, player);
+			movePlayer( pickUp);
 			break;
 		case SDLK_1:
 			dropItem( myMap, player, 0);
