@@ -44,6 +44,7 @@ SDL_TimerID levelTimer;
 
 #define MAX_PATH_LEN 256
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
+#define PLAYER_DISTANCE( pos1) (abs( (pos1)->i - player->pos.i) + abs( (pos1)->j - player->pos.j))
 
 struct {
 	SDL_Rect container;
@@ -75,11 +76,11 @@ bool interact( struct Map *map, struct object *obj) {
 	
 	if( pos != NULL && map->objs[ pos->i][ pos->j]) {
 		objectInteract( player, map->objs[ pos->i][ pos->j], lua);
-		PLAY_AUDIO_FX( AUDIO_INTERACT);
+		PLAY_AUDIO_FX( AUDIO_INTERACT, PLAYER_DISTANCE( pos));
 		return true;
 	}
 	else {
-		PLAY_AUDIO_FX( AUDIO_NO_INTERACT);
+		PLAY_AUDIO_FX( AUDIO_NO_INTERACT, PLAYER_DISTANCE( &obj->pos));
 		return false;
 	}
 }
@@ -96,11 +97,11 @@ bool pickUp( struct Map *map, struct object *obj) {
 		
 		ARRAY_REMOVE( myMap->objList, pickedObj, myMap->objListCount);
 		myMap->objs[ pos->i][ pos->j] = NULL;
-		PLAY_AUDIO_FX( AUDIO_PICK);
+		PLAY_AUDIO_FX( AUDIO_PICK, PLAYER_DISTANCE( pos));
 		return true;
     }
 	else {
-		PLAY_AUDIO_FX( AUDIO_NO_PICK);
+		PLAY_AUDIO_FX( AUDIO_NO_PICK, PLAYER_DISTANCE( &obj->pos));
 		return false;
 	}
 }
@@ -115,11 +116,11 @@ bool dropItem( struct Map *map, struct object *droppingObj, int inventoryIndex) 
 			droppedObj->dir = DIR_REVERSE( player->dir);
 			vectorClone( &droppedObj->pos, pos);
 			addObject( droppedObj, map, pos->i, pos->j);
-			PLAY_AUDIO_FX( AUDIO_DROP);
+			PLAY_AUDIO_FX( AUDIO_DROP, PLAYER_DISTANCE( pos));
 			return true;
 		}
 	}
-	PLAY_AUDIO_FX( AUDIO_NO_DROP);
+	PLAY_AUDIO_FX( AUDIO_NO_DROP, PLAYER_DISTANCE( &droppingObj->pos));
 	return false;
 }
 
@@ -131,11 +132,11 @@ bool moveBackward( struct Map *map, struct object* obj) {
 		map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
 		map->objs[ pos->i ][ pos->j ] = obj;
 		vectorClone( &obj->pos, pos);
-		PLAY_AUDIO_FX( AUDIO_MOVE);
+		PLAY_AUDIO_FX( AUDIO_MOVE, PLAYER_DISTANCE( pos));
 		return true;
 	}
 	else {
-		PLAY_AUDIO_FX( AUDIO_NO_MOVE);
+		PLAY_AUDIO_FX( AUDIO_NO_MOVE, PLAYER_DISTANCE( &obj->pos));
 		return false;
 	}
 }
@@ -151,19 +152,19 @@ bool moveForward( struct Map *map, struct object* obj) {
 			map->objs[ obj->pos.i ][ obj->pos.j ] = 0;
 			map->objs[ pos->i ][ pos->j ] = obj;
 			vectorClone( &obj->pos, pos );
-			PLAY_AUDIO_FX( AUDIO_MOVE);
+			PLAY_AUDIO_FX( AUDIO_MOVE, PLAYER_DISTANCE( pos));
 			return true;
 		}
 		else {
 			if (objectHit( obj, objAtPos) && objAtPos == player && objAtPos->health == 0 ) {
 				gameOver( 0);
 			}
-			PLAY_AUDIO_FX( AUDIO_HIT);
+			PLAY_AUDIO_FX( AUDIO_HIT, PLAYER_DISTANCE( &obj->pos));
 			return false;
 		}
 	}
 	else {
-		PLAY_AUDIO_FX( AUDIO_NO_MOVE);
+		PLAY_AUDIO_FX( AUDIO_NO_MOVE, PLAYER_DISTANCE( &obj->pos));
 		return false;
 	}
 }
@@ -182,24 +183,24 @@ bool pushForward( struct Map *map, struct object* pusher) {
 				map->objs[ pusher->pos.i][ pusher->pos.j] = NULL;
 				vectorClone( &pusher->pos, &pushedObj->pos);
 				vectorClone( &pushedObj->pos, &nextNextBase->pos);
-				PLAY_AUDIO_FX( AUDIO_PUSH);
+				PLAY_AUDIO_FX( AUDIO_PUSH, PLAYER_DISTANCE( &pushedObj->pos));
 				return true;
 			}
 		}
 	}
-	PLAY_AUDIO_FX( AUDIO_NO_PUSH);
+	PLAY_AUDIO_FX( AUDIO_NO_PUSH, PLAYER_DISTANCE( &pusher->pos));
 	return false;
 }
 
 bool turnLeft( struct Map *map, struct object *obj) {
 	obj->dir = DIR_ROTATE_LEFT(obj->dir);
-	PLAY_AUDIO_FX( AUDIO_MOVE);
+	PLAY_AUDIO_FX( AUDIO_MOVE, PLAYER_DISTANCE( &obj->pos));
 	return true;
 }
 
 bool turnRight( struct Map *map, struct object *obj) {
 	obj->dir = DIR_ROTATE_RIGHT(obj->dir);
-	PLAY_AUDIO_FX( AUDIO_MOVE);
+	PLAY_AUDIO_FX( AUDIO_MOVE, PLAYER_DISTANCE( &obj->pos));
 	return true;
 }
 
@@ -210,11 +211,11 @@ bool eat( struct Map *map, struct object *obj) {
 	if( otherObj != 0 && otherObj->health == 0) {
 		objectSwallow( obj, otherObj);
 		map->objs[ newPos.i ][ newPos.j ] = NULL;
-		PLAY_AUDIO_FX( AUDIO_EAT);
+		PLAY_AUDIO_FX( AUDIO_EAT, PLAYER_DISTANCE( &newPos));
 		return true;
 	}
 
-	PLAY_AUDIO_FX( AUDIO_NO_EAT);
+	PLAY_AUDIO_FX( AUDIO_NO_EAT, PLAYER_DISTANCE( &newPos));
 	return false;
 }
 

@@ -35,6 +35,11 @@ void audio_init() {
 		}
 		audios.fx[ i] = fx;
 	}
+
+	int volumeStep = MIX_MAX_VOLUME / HEARING_DISTANCE;
+	Mix_AllocateChannels( HEARING_DISTANCE);
+	for( i=0; i<HEARING_DISTANCE; i++)
+		Mix_Volume( i, (HEARING_DISTANCE - i) * volumeStep);
 }
 
 void audio_free() {

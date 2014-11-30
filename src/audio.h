@@ -31,7 +31,8 @@ struct {
 
 
 
-#define PLAY_AUDIO_FX( type) Mix_PlayChannel( -1, audios.fx[ type], 0);
+#define PLAY_AUDIO_FX( type, distance) if( distance < HEARING_DISTANCE ) Mix_PlayChannel( distance, audios.fx[ type], 0);
+#define HEARING_DISTANCE 16
 
 void audio_init();
 

@@ -128,7 +128,7 @@ int dsl_writeConsole( lua_State *l) {
 	
 	textConsole_add( str);
 	textConsole_write( renderer, textures->font, textConsole_texture);
-	PLAY_AUDIO_FX( AUDIO_CONSOLE);
+	PLAY_AUDIO_FX( AUDIO_CONSOLE, 0);
 	return 0;
 }
 
@@ -138,7 +138,7 @@ int dsl_clearConsole( lua_State *l) {
 		textConsole_add("");
 	}
 	textConsole_write( renderer, textures->font, textConsole_texture);
-	PLAY_AUDIO_FX( AUDIO_CONSOLE);
+	PLAY_AUDIO_FX( AUDIO_CONSOLE, 0);
 	return 0;
 }
 
