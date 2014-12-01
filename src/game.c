@@ -169,6 +169,46 @@ bool moveForward( struct Map *map, struct object* obj) {
 	}
 }
 
+bool strafeRight( struct Map *map, struct object *obj) {
+	struct BasePfNode *nextNode = map->pfBase[ obj->pos.i][ obj->pos.j]->neighbours[ DIR_ROTATE_RIGHT( obj->dir) ];
+	
+	if( nextNode != NULL) {
+		struct Vector *pos = &nextNode->pos;
+
+		if( map->objs[ pos->i][ pos->j] == NULL ) {
+			map->objs[ obj->pos.i][ obj->pos.j] = NULL;
+			map->objs[ pos->i][ pos->j] = obj;
+			vectorClone( &obj->pos, &nextNode->pos);
+			
+			PLAY_AUDIO_FX( AUDIO_MOVE, PLAYER_DISTANCE( pos));
+			return true;
+		}
+	}
+
+	PLAY_AUDIO_FX( AUDIO_NO_MOVE, PLAYER_DISTANCE( &obj->pos));
+	return false;
+}
+
+bool strafeLeft( struct Map *map, struct object *obj) {
+	struct BasePfNode *nextNode = map->pfBase[ obj->pos.i][ obj->pos.j]->neighbours[ DIR_ROTATE_LEFT( obj->dir) ];
+	
+	if( nextNode != NULL) {
+		struct Vector *pos = &nextNode->pos;
+
+		if( map->objs[ pos->i][ pos->j] == NULL ) {
+			map->objs[ obj->pos.i][ obj->pos.j] = NULL;
+			map->objs[ pos->i][ pos->j] = obj;
+			vectorClone( &obj->pos, pos);
+			
+			PLAY_AUDIO_FX( AUDIO_MOVE, PLAYER_DISTANCE( pos));
+			return true;
+		}
+	}
+
+	PLAY_AUDIO_FX( AUDIO_NO_MOVE, PLAYER_DISTANCE( &obj->pos));
+	return false;
+}
+
 bool pushForward( struct Map *map, struct object* pusher) {
 	struct BasePfNode *nextBase = map->pfBase[ pusher->pos.i ][ pusher->pos.j ]->neighbours[ pusher->dir ];
 
@@ -240,10 +280,16 @@ void handleKey( SDL_KeyboardEvent *e) {
 			movePlayer( moveBackward);
 			break;
 		case SDLK_LEFT:
-			movePlayer( turnLeft);
+			movePlayer( (e->keysym.mod & KMOD_LSHIFT)
+				? strafeLeft
+				: turnLeft
+			);
 			break;
 		case SDLK_RIGHT:
-			movePlayer( turnRight);
+			movePlayer( (e->keysym.mod & KMOD_LSHIFT)
+				? strafeRight
+				: turnRight
+			);
 			break;
 		case SDLK_e:
 			movePlayer( eat);
