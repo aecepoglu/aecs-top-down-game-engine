@@ -1,8 +1,11 @@
 -- SCENE 1
 lib.cutClear( 0,0,0)
 lib.cutWrite( 10, 10, "Welcome to YZ-01\n\n"
-    .. "This project started as a platform where I\n could write and test AIs."
-    .. "Now it has got a bit bigger. This tutorial will demonstrate some of its mechanics.\n\nPress any key to continue"
+    .. "This project started as a platform where I could write and test AIs.\n"
+    .. "Now it has got a bit bigger. This tutorial will demonstrate some of\n"
+	.. "its mechanics.\n\n"
+	
+	.. "Press any key to continue"
     )
 
 lib.cutRender()
