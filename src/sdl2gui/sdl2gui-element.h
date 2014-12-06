@@ -30,6 +30,7 @@ struct SDLGUI_Element {
 	SDLGUI_Destructor *destructor;
 	SDLGUI_DrawFun *drawFun;
 	SDLGUI_MouseHandler *mouseHandler;
+	void (*textInputHandler)( struct SDLGUI_Element *e, char c, int backspace);
 
 	int isVisible;
 };

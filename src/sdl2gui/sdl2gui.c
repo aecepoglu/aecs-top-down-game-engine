@@ -89,7 +89,7 @@ void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e) {
 }
 
 int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e) {
-	if( guiCore.focusedElement) {
+	if( guiCore.focusedElement && guiCore.focusedElement->textInputHandler) {
 		SDL_Keycode sym = e->keysym.sym;
 		char c = 0;
 		int backspace = 0;
@@ -103,8 +103,7 @@ int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e) {
 		}
 		
 		if( c != 0 || backspace != 0) {
-			log1("input: %c, backspace: %d\n", c, backspace);
-			SDLGUI_ChangeText_Textbox( guiCore.focusedElement, c, backspace); //TODO don't forget to undo this
+			guiCore.focusedElement->textInputHandler( guiCore.focusedElement, c, backspace);
 			return 1;
 		}
 	}
@@ -205,8 +204,11 @@ void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text) {
 		.w = tooltipWidth,
 		.h = tooltipHeight
 	};
+	guiCore.tooltip->isVisible = 1;
 	guiCore.tooltip->destructor = SDLGUI_Destroy_Texture;
 	guiCore.tooltip->drawFun = SDLGUI_Draw_Texture;
-	guiCore.tooltip->textures.current = tooltipTexture;
+	guiCore.tooltip->textures.normal = guiCore.tooltip->textures.current = tooltipTexture;
+	guiCore.tooltip->textures.focused = guiCore.tooltip->textures.hover = 0;
+
 	guiCore.tooltipTimer = SDL_AddTimer(1000, mycallback, 0);
 }

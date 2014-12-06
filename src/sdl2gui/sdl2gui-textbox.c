@@ -39,6 +39,7 @@ struct SDLGUI_Element* SDLGUI_Create_Textbox( SDL_Rect rect, SDLGUI_Params param
 	e->textures.normal = e->textures.hover = e->textures.focused = 0;
 
 	e->isVisible = !params.isHidden;
+	e->textInputHandler = SDLGUI_ChangeText_Textbox;
 	
 	SDLGUI_SetText_Textbox( e, "");
 
@@ -123,16 +124,6 @@ void SDLGUI_ChangeText_Textbox( struct SDLGUI_Element *textbox, char c, int back
 		SDLGUI_SetText_Textbox( textbox, newText);
 	}
 }
-
-//void SDLGUI_ClearText_Textbox( struct SDLGUI_Element *textbox) {
-//	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)textbox->data;
-//	if( data->text) {
-//		SDL_DestroyTexture( data->fg);
-//		sprintf( data->text, "%s", ""); //Writing it this way is necessary to avoid the zero-length warning
-//		data->fg = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor[0], data->textColor[1], data->textColor[2], &data->textWidth, &data->textHeight);
-//		data->fgFocused = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, 255-data->textColor[0], 255-data->textColor[1], 255-data->textColor[2], &data->textWidth, &data->textHeight);
-//	}
-//}
 
 const char* SDLGUI_GetText_Textbox( struct SDLGUI_Element *textbox) {
 	return textbox->data.textData->text;

@@ -1,5 +1,5 @@
 #include "engine.h"
-#include "brush.h"
+#include "level-editor/brush.h"
 #include "aiTable.h"
 
 #include "sdl2gui/sdl2gui.h"
@@ -17,41 +17,32 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 /* GUI Elements */
 #define GUI_LEFTPANEL_WIDTH 192
 #define GUI_TOPBAR_HEIGHT 32
-//#define GUI_UGLY_BGCOLOR (int[4]){170,180,190,255}
-//#define GUI_UGLY_BORDERCOLOR (int[4]){100,100,100,255}
-struct SDLGUI_Element *bodyContainer;
-struct SDLGUI_Element *topbar;
-struct SDLGUI_Element *brushContainer;
-struct SDLGUI_Element *selectedObjContainer;
-struct SDLGUI_List *brushList;
+struct SDLGUI_Element *leftPanel;
+struct SDLGUI_Element *topBar;
 bool mouseDownInGui;
 bool isMessageBoxOn = false;
 
-struct SDLGUI_List *brushStack[5];
-int brushStackCount = 0;
 
-struct brushWrapper {
-	SDL_Keycode key;
-	brushFun *brush;
-	int brushVariant;
-	struct SDLGUI_List *children;
+struct {
+	struct {
+		struct SDLGUI_Element
+			*id,
+			*health,
+			*maxHealth,
+			*healthGiven,
+			*movable,
+			*pickable,
+			*attack,
+			*defence,
+			*pos_x,
+			*pos_y;
+	} textboxes;
+
+	struct SDLGUI_Element *panel;
+	struct object *obj;
+} selectedObjStuff = {
+	.obj = NULL,
 };
-
-
-/* Brush vars */
-brushFun *brush = NULL; //draws something on the given location
-int brushVariant;
-
-struct SDLGUI_Element *textbox_id;
-struct SDLGUI_Element *textbox_health;
-struct SDLGUI_Element *textbox_maxHealth;
-struct SDLGUI_Element *textbox_healthGiven;
-struct SDLGUI_Element *textbox_movable;
-struct SDLGUI_Element *textbox_pickable;
-struct SDLGUI_Element *textbox_attack;
-struct SDLGUI_Element *textbox_defence;
-struct SDLGUI_Element *textbox_pos_x, *textbox_pos_y;
-struct object *selectedObj = NULL;
 
 struct {
 	struct SDLGUI_Element *panel, *textbox_width, *textbox_height, *textbox_name;
@@ -75,46 +66,45 @@ bool drawTerrain( unsigned int x, unsigned int y, int type){
 }
 
 bool editor_selectObj( unsigned int x, unsigned int y, int type) {
+	selectedObjStuff.obj = myMap->objs[x][y];
 
-//	selectedObj = myMap->objs[x][y];
-//
-//	char tmp[4];
-//	if( selectedObj != NULL) {
-//		selectedObjContainer->isVisible = true;
-//
-//    	sprintf(tmp, "%d", selectedObj->id);
-//		SDLGUI_SetText_Textbox( textbox_id, tmp);
-//
-//		sprintf(tmp, "%d", selectedObj->health);
-//		SDLGUI_SetText_Textbox( textbox_health, tmp);
-//
-//		sprintf(tmp, "%d", selectedObj->maxHealth);
-//		SDLGUI_SetText_Textbox( textbox_maxHealth, tmp);
-//
-//		sprintf(tmp, "%d", selectedObj->healthGiven);
-//		SDLGUI_SetText_Textbox( textbox_healthGiven, tmp);
-//
-//		sprintf(tmp, "%d", selectedObj->isMovable);
-//		SDLGUI_SetText_Textbox( textbox_movable, tmp);
-//
-//		sprintf(tmp, "%d", selectedObj->isPickable);
-//		SDLGUI_SetText_Textbox( textbox_pickable, tmp);
-//
-//		sprintf(tmp, "%d", selectedObj->attack);
-//		SDLGUI_SetText_Textbox( textbox_attack, tmp);
-//
-//		sprintf(tmp, "%d", selectedObj->defence);
-//		SDLGUI_SetText_Textbox( textbox_defence, tmp);
-//	}
-//	else {
-//		selectedObjContainer->isVisible = false;
-//	}
-//
-//	sprintf( tmp, "%d", x);
-//	SDLGUI_SetText_Textbox( textbox_pos_x, tmp);
-//
-//	sprintf( tmp, "%d", y);
-//	SDLGUI_SetText_Textbox( textbox_pos_y, tmp);
+	char tmp[4];
+	if( selectedObjStuff.obj != NULL) {
+		selectedObjStuff.panel->isVisible = true;
+
+    	sprintf(tmp, "%d", selectedObjStuff.obj->id);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.id, tmp);
+
+		sprintf(tmp, "%d", selectedObjStuff.obj->health);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.health, tmp);
+
+		sprintf(tmp, "%d", selectedObjStuff.obj->maxHealth);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.maxHealth, tmp);
+
+		sprintf(tmp, "%d", selectedObjStuff.obj->healthGiven);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.healthGiven, tmp);
+
+		sprintf(tmp, "%d", selectedObjStuff.obj->isMovable);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.movable, tmp);
+
+		sprintf(tmp, "%d", selectedObjStuff.obj->isPickable);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.pickable, tmp);
+
+		sprintf(tmp, "%d", selectedObjStuff.obj->attack);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.attack, tmp);
+
+		sprintf(tmp, "%d", selectedObjStuff.obj->defence);
+		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.defence, tmp);
+	}
+	else {
+		selectedObjStuff.panel->isVisible = false;
+	}
+
+	sprintf( tmp, "%d", x);
+	SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.pos_x, tmp);
+
+	sprintf( tmp, "%d", y);
+	SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.pos_y, tmp);
 	return true;
 }
 
@@ -248,137 +238,137 @@ int parseText( const char *text) {
 		return atoi( text);
 }
 
-//void textbox_id_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj && strlen(text) > 0) {
-//		int newId = atoi( text);
-//		if( newId >= 1) {
-//			selectedObj->id = newId;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "You must give id >= 1");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//}
-//
-//void textbox_health_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj) {
-//		int newHealth = parseText( text);
-//		if( newHealth <= UINT8_MAX) {
-//			selectedObj->health = newHealth;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health should be <= 256");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//	else {
-//		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
-//		isMessageBoxOn = true;
-//	}
-//}
-//
-//void textbox_maxHealth_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj) {
-//		int newHealth = parseText( text);
-//		if( newHealth <= UINT8_MAX) {
-//			selectedObj->maxHealth = newHealth;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Max-Health should be <= 256");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//	else {
-//		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
-//		isMessageBoxOn = true;
-//	}
-//}
-//
-//void textbox_healthGiven_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj) {
-//		int newValue = parseText( text);
-//		if( newValue <= INT8_MAX && newValue >= INT8_MIN) {
-//			selectedObj->healthGiven = newValue;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health-Given must be >= -128 and <= 127");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//	else {
-//		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
-//		isMessageBoxOn = true;
-//	}
-//}
-//
-//void textbox_movable_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj) {
-//		int newValue = parseText( text);
-//		if( newValue == 1 || newValue == 0) {
-//			selectedObj->isMovable = newValue;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Movable value can be 1 or 0");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//	else {
-//		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
-//		isMessageBoxOn = true;
-//	}
-//}
-//
-//void textbox_pickable_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj) {
-//		int newValue = parseText( text);
-//		if( newValue == 1 || newValue == 0) {
-//			selectedObj->isPickable = newValue;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Pickable value can be 1 or 0");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//	else {
-//		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
-//		isMessageBoxOn = true;
-//	}
-//}
-//
-//void textbox_attack_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj) {
-//		int newValue = parseText( text);
-//		if( newValue <= UINT8_MAX ) {
-//			selectedObj->attack = newValue;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Attack can be <= 256");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//	else {
-//		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
-//		isMessageBoxOn = true;
-//	}
-//}
-//
-//void textbox_defence_changed( struct SDLGUI_Element *textbox, const char *text) {
-//	if( selectedObj) {
-//		int newValue = parseText( text);
-//		if( newValue <= UINT8_MAX ) {
-//			selectedObj->defence = newValue;
-//		}
-//		else {
-//			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Defence can be <= 256");
-//			isMessageBoxOn = true;
-//		}
-//	}
-//	else {
-//		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
-//		isMessageBoxOn = true;
-//	}
-//}
+void textbox_id_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj && strlen(text) > 0) {
+		int newId = atoi( text);
+		if( newId >= 1) {
+			selectedObjStuff.obj->id = newId;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "You must give id >= 1");
+			isMessageBoxOn = true;
+		}
+	}
+}
+
+void textbox_health_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj) {
+		int newHealth = parseText( text);
+		if( newHealth <= UINT8_MAX) {
+			selectedObjStuff.obj->health = newHealth;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health should be <= 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_maxHealth_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj) {
+		int newHealth = parseText( text);
+		if( newHealth <= UINT8_MAX) {
+			selectedObjStuff.obj->maxHealth = newHealth;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Max-Health should be <= 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_healthGiven_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj) {
+		int newValue = parseText( text);
+		if( newValue <= INT8_MAX && newValue >= INT8_MIN) {
+			selectedObjStuff.obj->healthGiven = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health-Given must be >= -128 and <= 127");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_movable_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj) {
+		int newValue = parseText( text);
+		if( newValue == 1 || newValue == 0) {
+			selectedObjStuff.obj->isMovable = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Movable value can be 1 or 0");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_pickable_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj) {
+		int newValue = parseText( text);
+		if( newValue == 1 || newValue == 0) {
+			selectedObjStuff.obj->isPickable = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Pickable value can be 1 or 0");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_attack_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj) {
+		int newValue = parseText( text);
+		if( newValue <= UINT8_MAX ) {
+			selectedObjStuff.obj->attack = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Attack can be <= 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
+
+void textbox_defence_changed( struct SDLGUI_Element *textbox, const char *text) {
+	if( selectedObjStuff.obj) {
+		int newValue = parseText( text);
+		if( newValue <= UINT8_MAX ) {
+			selectedObjStuff.obj->defence = newValue;
+		}
+		else {
+			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Defence can be <= 256");
+			isMessageBoxOn = true;
+		}
+	}
+	else {
+		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		isMessageBoxOn = true;
+	}
+}
 
 void handleKey( SDL_KeyboardEvent *e) {
 	bool matched = e->repeat != true;
@@ -431,7 +421,7 @@ bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
 	x += viewPos.i;
 	y += viewPos.j;
 
-	return ( brush != NULL && x < myMap->width && y < myMap->height && brush( x, y, brushVariant) );
+	return ( brush.fun != NULL && x < myMap->width && y < myMap->height && brush.fun( x, y, brush.variant) );
 }
 
 void handleWindowEvent( SDL_WindowEvent *e) {
@@ -450,8 +440,8 @@ void handleWindowEvent( SDL_WindowEvent *e) {
 		            e->windowID, e->data1,
 		            e->data2);
 			resizeView( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, e->data1, e->data2);
-			//bodyContainer->rect.h = e->data2;
-			//topbar->rect.w = e->data1 - GUI_LEFTPANEL_WIDTH;
+			leftPanel->rect.h = e->data2;
+			topBar->rect.w = e->data1 - GUI_LEFTPANEL_WIDTH;
 			drawBackground();
 		    break;
 		case SDL_WINDOWEVENT_MINIMIZED:
@@ -585,7 +575,10 @@ void run() {
 				}
 				break;
 			case SDL_MOUSEMOTION:
-				if( mouseDownInGui != true && handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
+				if (SDLGUI_Handle_MouseHover( (SDL_MouseMotionEvent*)&e)) {
+					break;
+				}
+				else if( mouseDownInGui != true && handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
 					drawBackground();
 					break;
 				}
@@ -627,7 +620,7 @@ void drawObjects() {
 				drawTexture( renderer,
 					textures->obj[obj->type]->textures[ obj->visualState][obj->dir],
 					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN );
-				if( obj == selectedObj) {
+				if( obj == selectedObjStuff.obj) {
 					drawTexture( renderer, textures->highlitObjIndicator, screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN);
 				}
 			}
@@ -642,7 +635,6 @@ void drawObjects() {
 
 
 void draw() {
-	log3("draw\n");
 	SDL_RenderClear( renderer);
 
 	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, viewSize.i*TILELEN, viewSize.j*TILELEN);
@@ -654,21 +646,6 @@ void draw() {
 }
 
 
-
-struct brushWrapper* CREATE_BRUSH_WRAPPER( SDL_Keycode key, brushFun *brush, int brushVariant, struct SDLGUI_List *children) {
-	struct brushWrapper *result = (struct brushWrapper*)malloc( sizeof( struct brushWrapper));
-	result->key = key;
-	result->brush = brush;
-	result->brushVariant = brushVariant;
-	result->children = children;
-	return result;
-}
-
-#define NO_VAR 0
-#define NO_CHILDREN NULL
-#define NO_FUN NULL
-#define NO_CLICK_HANDLER NULL
-#define CREATE_LIST_BUTTON( i, text, data) SDLGUI_Create_Text( 5, 5 + 35*i, 160, 30, &brushListItem_clicked, text, (int[4]){255,255,255,255}, (int[4]){0,0,0,255}, 6, 9, 1, data)
 
 #define TEMPLATES_PATH "templates.csv"
 #define DELIMETER ","
@@ -790,21 +767,176 @@ struct SDLGUI_List* reloadBrushTemplates() {
 
 	return templateBrushes;
 }
+
+void hideAll() { //TODO delete this function, and use focus-lost instead
+	brushOptionPanels.rotate->isVisible = false;
+	brushOptionPanels.terrain->isVisible = false;
+	brushOptionPanels.object->isVisible = false;
+	brushOptionPanels.ai->isVisible = false;
+}
+
+void button_select_clicked( struct SDLGUI_Element *e) {
+	brush.fun = editor_selectObj;
+	hideAll();
+}
+
+void button_rotate_clicked( struct SDLGUI_Element *e) {
+	brush.fun = setDirection;
+	brush.variant = dir_up;
+	hideAll();
+	brushOptionPanels.rotate->isVisible = true;
+}
+
+void button_terrain_clicked( struct SDLGUI_Element *e) {
+	brush.fun = drawTerrain;
+	brush.variant = terrain_wall;
+	hideAll();
+	brushOptionPanels.terrain->isVisible = true;
+}
+
+void button_object_clicked( struct SDLGUI_Element *e) {
+	brush.fun = editor_createObj;
+	brush.variant = go_apple;
+	hideAll();
+	brushOptionPanels.object->isVisible = true;
+}
+
+void button_ai_clicked( struct SDLGUI_Element *e) {
+	brush.fun = drawAI;
+	brush.variant = ai_none;
+	hideAll();
+	brushOptionPanels.ai->isVisible = true;
+}
+
 void initGui() {
     /* The left panel */
-	//bodyContainer = SDLGUI_Create_Panel( 0, 0, GUI_LEFTPANEL_WIDTH, 960, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
+	SDLGUI_Color panelsBgColor = (SDLGUI_Color){.r=170, .g=180, .b=190, .a=255};
+	SDLGUI_Color panelsBorderColor = (SDLGUI_Color){.r=255, .g=0, .b=0, .a=255};
+	SDLGUI_Params panelParams = {.bgColor=panelsBgColor, .fgColor=panelsBorderColor, .borderThickness=1};
+	SDLGUI_Params labelParams = (SDLGUI_Params){
+		.bgColor=COLOR_TRANSPARENT,
+		.fgColor=COLOR_BLACK,
+		.fontWidth=6,
+		.fontHeight=8
+	};
+	SDLGUI_Params buttonParams = (SDLGUI_Params){
+		.bgColor=COLOR_TRANSPARENT,
+		.fgColor=COLOR_BLACK,
+		.fontWidth=6,
+		.fontHeight=8,
+		.borderThickness=1
+	};
+
+	leftPanel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH, .h=960}, panelParams);
 
 	/* top bar */
-	//topbar = SDLGUI_Create_Panel( GUI_LEFTPANEL_WIDTH, 0, 1280, GUI_TOPBAR_HEIGHT, GUI_UGLY_BGCOLOR, GUI_UGLY_BORDERCOLOR, 4);
+	topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=1280-GUI_LEFTPANEL_WIDTH, .h=GUI_TOPBAR_HEIGHT}, panelParams);
 
-	//SDLGUI_Add_Element( bodyContainer);
-	//SDLGUI_Add_Element( topbar);
+	SDLGUI_Add_Element( leftPanel);
+	SDLGUI_Add_Element( topBar);
+
+
+	SDLGUI_AddTo_Panel( leftPanel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH}, " YZ-01 \n-------", (SDLGUI_Params){
+			.bgColor=labelParams.bgColor,
+			.fgColor=labelParams.fgColor,
+			.fontWidth=18,
+			.fontHeight=24
+		}
+	));
+
+
+	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h=200}, panelParams);
+	SDLGUI_AddTo_Panel( leftPanel, buttonsContainer);
+
+	struct buttonTemplate {
+		char *icon;
+		SDLGUI_Clicked *onClick;
+	};
+	struct buttonTemplate buttonTemplates[] = {
+		{"s", button_select_clicked},
+		{"\x85", button_rotate_clicked},
+		{"t", button_terrain_clicked},
+		{"o", button_object_clicked},
+		{"ai", button_ai_clicked},
+	};
+	
+	int i;
+	const int buttonsPerRow=3;
+	const int buttonSize = 32;
+	const int buttonSizeWithMargins = 48;
+	for( i=0; i<5; i++) {
+		struct buttonTemplate *template = &buttonTemplates[i];
+
+		struct SDLGUI_Element *element = SDLGUI_Create_Text( (SDL_Rect){.x=(i%buttonsPerRow) *buttonSizeWithMargins, .y=(i/buttonsPerRow) *buttonSizeWithMargins, .w=buttonSize, .h=buttonSize}, template->icon, buttonParams);
+		
+		element->clicked = template->onClick;
+
+		SDLGUI_AddTo_Panel( buttonsContainer, element);
+	}
+
+	struct SDLGUI_Element *brushOptionsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=370, .w=buttonsContainer->rect.w, .h=250}, (SDLGUI_Params) {
+			.bgColor = COLOR_TRANSPARENT,
+			.borderThickness = 0
+		}
+	);
+	SDLGUI_AddTo_Panel( leftPanel, brushOptionsContainer);
+
+	brushOptionPanels_init( brushOptionsContainer);
+
+	
+	selectedObjStuff.panel = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=700, .w=buttonsContainer->rect.w, .h=200}, panelParams);
+	selectedObjStuff.panel->isVisible = false;
+	SDLGUI_AddTo_Panel( leftPanel, selectedObjStuff.panel);
+
+	char mapText[256];
+	sprintf( mapText, "map: %s", myMap->filePath);
+	SDLGUI_AddTo_Panel( topBar, SDLGUI_Create_Text( (SDL_Rect){.x= 150, .y=0, .w=TEXT_SPAN_SIZE, .h=GUI_TOPBAR_HEIGHT}, mapText, labelParams));
+
+	struct textboxTemplate {
+		char *label;
+		struct SDLGUI_Element **elementPtr;
+		SDLGUI_TextBox_Changed *textChangeCallback;
+	};
+	struct textboxTemplate textboxesToCreate[] = {
+		{ "          id", 	&selectedObjStuff.textboxes.id			, textbox_id_changed },
+		{ "      health", 	&selectedObjStuff.textboxes.health		, textbox_health_changed },
+		{ "  max health", 	&selectedObjStuff.textboxes.maxHealth 	, textbox_maxHealth_changed },
+		{ "health given", 	&selectedObjStuff.textboxes.healthGiven	, textbox_healthGiven_changed },
+		{ "  is movable", 	&selectedObjStuff.textboxes.movable		, textbox_movable_changed },
+		{ " is pickable", 	&selectedObjStuff.textboxes.pickable	, textbox_pickable_changed },
+		{ "         ATK", 	&selectedObjStuff.textboxes.attack		, textbox_attack_changed },
+		{ "         DEF", 	&selectedObjStuff.textboxes.defence		, textbox_defence_changed },
+	};
+	SDLGUI_Params textboxParams = labelParams;
+	textboxParams.bgColor = COLOR_WHITE;
+
+	const int textboxPairHeight = 15;
+	for( i=0; i<8; i++) {
+		struct textboxTemplate *template = &textboxesToCreate[i];
+		int yVal = 5+i*textboxPairHeight;
+
+		struct SDLGUI_Element *label = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=yVal, .w=80, .h=textboxPairHeight}, template->label, labelParams);
+		struct SDLGUI_Element *textbox = SDLGUI_Create_Textbox( (SDL_Rect){.x=90, .y=yVal, .w=80, .h=textboxPairHeight}, textboxParams);
+		textbox->data.textData->acceptedChars  = TEXTBOX_INPUT_NUMERIC;
+		textbox->data.textData->textChanged = template->textChangeCallback;
+
+		SDLGUI_AddTo_Panel( selectedObjStuff.panel, label);
+		SDLGUI_AddTo_Panel( selectedObjStuff.panel, textbox);
+		
+		*template->elementPtr = textbox;
+	}
+
+
+	labelParams.fontWidth *= 2;
+	labelParams.fontHeight *= 2;
+
+	selectedObjStuff.textboxes.pos_x = SDLGUI_Create_Textbox( (SDL_Rect){.x=20, .y=0, .w=40, .h=GUI_TOPBAR_HEIGHT}, labelParams);
+	selectedObjStuff.textboxes.pos_y = SDLGUI_Create_Textbox( (SDL_Rect){.x=60, .y=0, .w=40, .h=GUI_TOPBAR_HEIGHT}, labelParams);
+	selectedObjStuff.textboxes.pos_x->data.textData->acceptedChars = TEXTBOX_INPUT_NONE;
+	selectedObjStuff.textboxes.pos_y->data.textData->acceptedChars = TEXTBOX_INPUT_NONE;
+	SDLGUI_AddTo_Panel( topBar, selectedObjStuff.textboxes.pos_x );
+	SDLGUI_AddTo_Panel( topBar, selectedObjStuff.textboxes.pos_y );
 }
-#undef NO_CLICK_HANDLER
-#undef CREATE_LIST_BUTTON
-#undef NO_VAR
-#undef NO_CHILDREN
-#undef NO_FUN
 
 void editor_createMap_clicked( struct SDLGUI_Element *from) {
 	int width = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_width  ) );

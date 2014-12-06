@@ -52,6 +52,7 @@ struct SDLGUI_Element* SDLGUI_Create_Text( SDL_Rect rect, const char *text, SDLG
 	e->destructor = SDLGUI_Destroy_Texture;
 	e->drawFun = SDLGUI_Draw_Texture;
 	e->mouseHandler = NULL;
+	e->textInputHandler = NULL;
 	e->isVisible = !params.isHidden;
 
 	return e;

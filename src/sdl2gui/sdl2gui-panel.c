@@ -32,12 +32,14 @@ struct SDLGUI_Element* SDLGUI_Create_Panel( SDL_Rect rect, SDLGUI_Params params)
 	struct SDLGUI_Element *panel = (struct SDLGUI_Element*)malloc( sizeof( struct SDLGUI_Element));
     
     panel->textures.current = panel->textures.normal = createElementTexture( rect.w, rect.h, params.bgColor, params.fgColor, params.borderThickness, 0, 0, 0);
+	panel->textures.hover = panel->textures.focused = NULL;
     panel->data.elements = SDLGUI_List_Create( 4);
 	panel->rect = rect;
 	panel->clicked = NULL;
 	panel->destructor = SDLGUI_Destroy_Panel;
 	panel->drawFun = SDLGUI_Draw_Panel;
 	panel->mouseHandler = SDLGUI_MouseHandler_Panel;
+	panel->textInputHandler = NULL;
 	panel->isVisible = !params.isHidden;
 
 	return panel;

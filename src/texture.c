@@ -42,7 +42,6 @@ SDL_Texture** loadTextureSheet( SDL_Renderer *ren, SDL_Surface *sheet, int inNum
 			if (SDL_BlitSurface( sheet, &surfRect, blitSurf, NULL) != 0)
 				log0("SDL_BlitSurface failed: %s\n", SDL_GetError());
 			result[ row*inNumCols + col] = SDL_CreateTextureFromSurface( ren, blitSurf);
-			log3("loadTextureSheet: %d <- (%d, %d)\n", row*inNumCols + col, surfRect.x, surfRect.y);
 		}
 	}
 
@@ -62,7 +61,6 @@ SDL_Texture*** loadTexturesIntoTable( SDL_Texture **list, int listLen, int outNu
 		table[ row] = (SDL_Texture**)calloc( outNumCols, sizeof( SDL_Texture*));
 		for( col=0; col<outNumCols; col++) {
 			table[ row][ col] = list[ row*rowJumpLen + col%rowJumpLen];
-			log3("loadTexturesIntoTablo: table[%d,%d] <- #%d\n", row, col, row*rowJumpLen + col%rowJumpLen);
 		}
 	}
 
