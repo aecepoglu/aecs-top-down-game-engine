@@ -9,7 +9,6 @@ struct SDLGUI_Element;
 typedef void (SDLGUI_Clicked)(struct SDLGUI_Element *);
 typedef void (SDLGUI_Destructor)(struct SDLGUI_Element *);
 typedef void (SDLGUI_DrawFun)(struct SDLGUI_Element *elem);
-typedef void (SDLGUI_TextChanged)(struct SDLGUI_Element *textbox, const char *text);
 typedef struct SDLGUI_Element* (SDLGUI_MouseHandler)(struct SDLGUI_Element *panel, int x, int y);
 
 struct SDLGUI_Element {
