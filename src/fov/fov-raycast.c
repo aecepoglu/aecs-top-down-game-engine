@@ -1,8 +1,8 @@
+#include <math.h>
 #include "fov.h"
 #include "../log.h"
 #include "../queue.h"
 #include "../definitions.h"
-#include <math.h>
 
 #define QUEUE_SIZE VIEW_BOX_PERIMETER
 struct FOVBase *queue[ QUEUE_SIZE];

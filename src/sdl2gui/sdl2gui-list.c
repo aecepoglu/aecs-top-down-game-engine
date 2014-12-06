@@ -78,3 +78,18 @@ void SDLGUI_List_Init( struct SDLGUI_List *list, int initSize) {
 	list->size = initSize;
 	list->count = 0;
 }
+
+struct SDLGUI_Element* SDLGUI_List_findItemAtPos( struct SDLGUI_List *list, int x, int y) {
+	struct SDLGUI_Element *elem;
+	int i;
+	for(i=0; i<list->count; i++) {
+		elem = list->list[i];
+		if (elem->isVisible && x >= elem->rect.x && y >= elem->rect.y && x<elem->rect.x+elem->rect.w && y<elem->rect.y+elem->rect.h) {
+			if( elem->mouseHandler != 0)
+				return elem->mouseHandler( elem, x, y);
+			else
+				return elem;
+		}
+	}
+	return 0;
+}
