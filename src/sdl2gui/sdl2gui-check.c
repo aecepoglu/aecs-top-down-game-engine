@@ -29,7 +29,7 @@ void SDLGUI_Checkbox_Clicked( struct SDLGUI_Element *e) {
 
 struct SDLGUI_Element* SDLGUI_Create_Checkbox( SDL_Rect rect, SDLGUI_Params params) {
 	if( rect.w == TEXT_SPAN_SIZE) {
-		rect.w = params.fontWidth * 2;
+		rect.w = params.fontWidth * 2 + params.borderThickness;
 	}
 	struct SDLGUI_Element *uncheckedElement = SDLGUI_Create_Text( rect, " ", params);
 	struct SDLGUI_Element *checkedElement = SDLGUI_Create_Text( rect, "X", params);

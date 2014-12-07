@@ -2,8 +2,6 @@
 #include "brush.h"
 #include "../map.h"
 
-#define BUTTON_SIZE 32
-
 void clicked_obj_player			( struct SDLGUI_Element *e) { brush.variant = go_player			; }
 void clicked_obj_monster		( struct SDLGUI_Element *e) { brush.variant = go_leftTurner		; }
 void clicked_obj_apple			( struct SDLGUI_Element *e) { brush.variant = go_apple			; }
@@ -19,7 +17,7 @@ void clicked_obj_box			( struct SDLGUI_Element *e) { brush.variant = go_box			; 
 void clicked_obj_gate			( struct SDLGUI_Element *e) { brush.variant = go_gate			; }
 void clicked_obj_key			( struct SDLGUI_Element *e) { brush.variant = go_key			; }
 
-struct SDLGUI_Element* brushOptionPanel_create_object( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams, SDLGUI_Params *buttonParams) {
+struct SDLGUI_Element* brushOptionPanel_create_object( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams, SDLGUI_Params *buttonParams, struct TextureSheet **objTextureSheets) {
 	struct SDLGUI_Element *panel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=parentPanel->rect.w, .h=160}, *panelParams);
 	SDLGUI_AddTo_Panel( parentPanel, panel);
 
@@ -40,12 +38,10 @@ struct SDLGUI_Element* brushOptionPanel_create_object( struct SDLGUI_Element *pa
 		&clicked_obj_key,
 	};
 
-	char text[4];
 	const int buttonsPerRow = 4;
 	int i;
 	for( i=0; i<go_NUM_ITEMS; i++) {
-		sprintf( text, "%d", i);
-		struct SDLGUI_Element *button = SDLGUI_Create_Text( (SDL_Rect){.x= 8 + (BUTTON_SIZE +8)* (i % buttonsPerRow), .y=8 + (BUTTON_SIZE +8)* (i / buttonsPerRow), .w=BUTTON_SIZE, .h=BUTTON_SIZE}, text, *buttonParams);
+		struct SDLGUI_Element *button = SDLGUI_Create_Texture( (SDL_Rect){.x= 8 + (BUTTON_SIZE +8)* (i % buttonsPerRow), .y=8 + (BUTTON_SIZE +8)* (i / buttonsPerRow), .w=BUTTON_SIZE, .h=BUTTON_SIZE}, objTextureSheets[ i]->textures[1][0], ICON_SIZE, ICON_SIZE, *buttonParams);
 		button->clicked = onClickFunctions[i];
 		SDLGUI_AddTo_Panel( panel, button);
 	}

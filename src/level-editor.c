@@ -835,28 +835,32 @@ void initGui() {
 	SDLGUI_AddTo_Panel( leftPanel, buttonsContainer);
 
 	struct buttonTemplate {
-		char *icon;
+		char *fileName;
 		SDLGUI_Clicked *onClick;
 	};
 	struct buttonTemplate buttonTemplates[] = {
-		{"s", button_select_clicked},
-		{"\x85", button_rotate_clicked},
-		{"t", button_terrain_clicked},
-		{"o", button_object_clicked},
-		{"ai", button_ai_clicked},
+		{"res/editor/select.png", 	button_select_clicked},
+		{"res/editor/rotate.png", 	button_rotate_clicked},
+		{"res/editor/terrain.png",	button_terrain_clicked},
+		{"res/editor/object.png", 	button_object_clicked},
+		{"res/editor/ai.png", 		button_ai_clicked},
 	};
 	
 	int i;
 	const int buttonsPerRow=3;
 	const int buttonSize = 32;
+	const int iconSize = 16;
 	const int buttonSizeWithMargins = 48;
-	for( i=0; i<5; i++) {
+	for( i=0; i<sizeof(buttonTemplates) / sizeof(struct buttonTemplate); i++) {
 		struct buttonTemplate *template = &buttonTemplates[i];
 
-		struct SDLGUI_Element *element = SDLGUI_Create_Text( (SDL_Rect){.x=(i%buttonsPerRow) *buttonSizeWithMargins, .y=(i/buttonsPerRow) *buttonSizeWithMargins, .w=buttonSize, .h=buttonSize}, template->icon, buttonParams);
+		SDL_Texture *texture = loadTexture( renderer, template->fileName);
+		
+		struct SDLGUI_Element *element = SDLGUI_Create_Texture( (SDL_Rect){.x=(i%buttonsPerRow) *buttonSizeWithMargins, .y=(i/buttonsPerRow) *buttonSizeWithMargins, .w=buttonSize, .h=buttonSize}, texture, iconSize, iconSize, buttonParams);
+
+		SDL_DestroyTexture( texture);
 		
 		element->clicked = template->onClick;
-
 		SDLGUI_AddTo_Panel( buttonsContainer, element);
 	}
 
@@ -867,7 +871,7 @@ void initGui() {
 	);
 	SDLGUI_AddTo_Panel( leftPanel, brushOptionsContainer);
 
-	brushOptionPanels_init( brushOptionsContainer);
+	brushOptionPanels_init( brushOptionsContainer, textures->obj, textures->trn);
 
 	
 	selectedObjStuff.panel = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=700, .w=buttonsContainer->rect.w, .h=200}, panelParams);

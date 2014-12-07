@@ -46,3 +46,43 @@ SDL_Texture *createElementTexture( int width, int height, SDLGUI_Color bgColor, 
 
 	return texture;
 }
+
+
+//TODO the texture should be const
+struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params) {
+	struct SDLGUI_Element *e = (struct SDLGUI_Element*) malloc( sizeof( struct SDLGUI_Element));
+
+	SDLGUI_Color bgColor = params.bgColor;
+	SDLGUI_Color fgColor = params.fgColor;
+	
+	
+	e->textures.normal = e->textures.current = createElementTexture( rect.w, rect.h, bgColor, fgColor, params.borderThickness, texture, textureWidth, textureHeight);
+
+	e->textures.hover = createElementTexture( rect.w, rect.h, (SDLGUI_Color){
+			.r = (fgColor.r + bgColor.r) / 2,
+			.g = (fgColor.g + bgColor.g) / 2,
+			.b = (fgColor.b + bgColor.b) / 2,
+			.a = bgColor.a + (255 - bgColor.a) / 2
+		}, fgColor, params.borderThickness, texture, textureWidth, textureHeight);
+	
+	
+	e->textures.focused = createElementTexture( rect.w, rect.h, (SDLGUI_Color){
+			.r = (fgColor.r + 3*bgColor.r) / 4,
+			.g = (fgColor.g + 3*bgColor.g) / 4,
+			.b = (fgColor.b + 3*bgColor.b) / 4,
+			.a = bgColor.a + (255 - bgColor.a) / 4
+		}, fgColor, params.borderThickness +2, texture, textureWidth, textureHeight);
+
+
+	
+	e->rect = rect;
+	e->clicked = NULL;
+	e->destructor = SDLGUI_Destroy_Texture;
+	e->drawFun = SDLGUI_Draw_Texture;
+	e->mouseHandler = NULL;
+	e->textInputHandler = NULL;
+	e->isVisible = !params.isHidden;
+
+	return e;
+}
+

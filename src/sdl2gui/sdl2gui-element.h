@@ -62,6 +62,7 @@ typedef struct {
 #define SDLGUI_Destroy_Element( element) (element)->destructor( element)
 
 SDL_Texture *createElementTexture( int width, int height, SDLGUI_Color bgColor, SDLGUI_Color borderColor, int borderThickness, SDL_Texture *fgTexture, int fgWidth, int fgHeight);
+struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params);
 
 void SDLGUI_Draw_Texture( struct SDLGUI_Element *element);
 void SDLGUI_Destroy_Texture( struct SDLGUI_Element *element);
