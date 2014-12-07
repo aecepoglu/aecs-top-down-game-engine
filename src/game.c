@@ -642,7 +642,7 @@ int main( int argc, char *args[]) {
 	lua = initLua();
 	setDefaults();
 	
-	init();
+	init( 0, 0, 1280, 960);
 	textures = loadAllTextures( renderer);
 	audio_init();
 	cutscene_init();

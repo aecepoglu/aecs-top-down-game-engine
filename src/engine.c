@@ -11,18 +11,13 @@ void quit( const char *msg) {
 
 /* Initializes the window, and creates a renderer object
  */
-void init() {
+void init( int offsetX, int offsetY, int winWidth, int winHeight) {
 	viewPos.i = 0;
 	viewPos.j = 0;
-	viewSize.i = 40;
-	viewSize.j = 30;
-	windowW = viewSize.i * TILELEN;
-	windowH = viewSize.j * TILELEN;
-
-	vectorAdd( &viewEnd, &viewPos, &viewSize  );
+	resizeView( offsetX, offsetY, winWidth, winHeight);
 
 	assert( SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER | SDL_INIT_AUDIO) >= 0);
-	window = SDL_CreateWindow("sdl-window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, viewSize.i*TILELEN, viewSize.j*TILELEN, 0);
+	window = SDL_CreateWindow("sdl-window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, winWidth, winHeight, 0);
 	assert( window);
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	assert( renderer);

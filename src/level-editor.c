@@ -372,7 +372,7 @@ void textbox_defence_changed( struct SDLGUI_Element *textbox, const char *text) 
 
 void handleKey( SDL_KeyboardEvent *e) {
 	bool matched = e->repeat != true;
-	if( e->repeat != true) {
+	if( matched) {
 		switch (e->keysym.sym) {
 			case SDLK_s:
 				buttonSave_clicked(NULL);
@@ -383,7 +383,7 @@ void handleKey( SDL_KeyboardEvent *e) {
 		};
 	}
 
-	if( matched != true) {
+	if( matched) {
 		switch( e->keysym.sym) {
 			case SDLK_UP:
 				scrollScreen( dir_up);
@@ -983,7 +983,7 @@ int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
 
-	init();
+	init( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, 1280, 960);
     log0("loading textures\n");
 	textures = loadAllTextures( renderer);
 	SDLGUI_Init( renderer, textures->font);

@@ -52,7 +52,7 @@ void quit( const char *);
 
 /* Initializes SDL Windows and what-not
 */
-void init();
+void init( int offsetX, int offsetY, int winWidth, int winHeight);
 
 /* Creates the background texture
 */
