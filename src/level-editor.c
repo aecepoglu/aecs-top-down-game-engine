@@ -30,13 +30,15 @@ struct {
 			*health,
 			*maxHealth,
 			*healthGiven,
-			*movable,
-			*pickable,
 			*attack,
 			*defence,
 			*pos_x,
 			*pos_y;
 	} textboxes;
+
+	struct {
+		struct SDLGUI_Element *pickable, *movable;
+	} checkboxes;
 
 	struct SDLGUI_Element *panel;
 	struct object *obj;
@@ -84,17 +86,15 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 		sprintf(tmp, "%d", selectedObjStuff.obj->healthGiven);
 		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.healthGiven, tmp);
 
-		sprintf(tmp, "%d", selectedObjStuff.obj->isMovable);
-		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.movable, tmp);
-
-		sprintf(tmp, "%d", selectedObjStuff.obj->isPickable);
-		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.pickable, tmp);
-
 		sprintf(tmp, "%d", selectedObjStuff.obj->attack);
 		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.attack, tmp);
 
 		sprintf(tmp, "%d", selectedObjStuff.obj->defence);
 		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.defence, tmp);
+		
+		SDLGUI_Checkbox_SetValue( selectedObjStuff.checkboxes.movable, selectedObjStuff.obj->isMovable);
+
+		SDLGUI_Checkbox_SetValue( selectedObjStuff.checkboxes.pickable, selectedObjStuff.obj->isPickable);
 	}
 	else {
 		selectedObjStuff.panel->isVisible = false;
@@ -302,16 +302,9 @@ void textbox_healthGiven_changed( struct SDLGUI_Element *textbox, const char *te
 	}
 }
 
-void textbox_movable_changed( struct SDLGUI_Element *textbox, const char *text) {
+void checkbox_movable_changed( struct SDLGUI_Element *checkbox, int value) {
 	if( selectedObjStuff.obj) {
-		int newValue = parseText( text);
-		if( newValue == 1 || newValue == 0) {
-			selectedObjStuff.obj->isMovable = newValue;
-		}
-		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Movable value can be 1 or 0");
-			isMessageBoxOn = true;
-		}
+		selectedObjStuff.obj->isMovable = value;
 	}
 	else {
 		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
@@ -319,16 +312,9 @@ void textbox_movable_changed( struct SDLGUI_Element *textbox, const char *text) 
 	}
 }
 
-void textbox_pickable_changed( struct SDLGUI_Element *textbox, const char *text) {
+void checkbox_pickable_changed( struct SDLGUI_Element *checkbox, int value) {
 	if( selectedObjStuff.obj) {
-		int newValue = parseText( text);
-		if( newValue == 1 || newValue == 0) {
-			selectedObjStuff.obj->isPickable = newValue;
-		}
-		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Pickable value can be 1 or 0");
-			isMessageBoxOn = true;
-		}
+		selectedObjStuff.obj->isPickable = value;
 	}
 	else {
 		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
@@ -892,38 +878,48 @@ void initGui() {
 	sprintf( mapText, "map: %s", myMap->filePath);
 	SDLGUI_AddTo_Panel( topBar, SDLGUI_Create_Text( (SDL_Rect){.x= 150, .y=0, .w=TEXT_SPAN_SIZE, .h=GUI_TOPBAR_HEIGHT}, mapText, labelParams));
 
-	struct textboxTemplate {
+	struct itemTemplate {
 		char *label;
 		struct SDLGUI_Element **elementPtr;
 		SDLGUI_TextBox_Changed *textChangeCallback;
+		SDLGUI_Checkbox_Changed *checkboxChangedCallback;
 	};
-	struct textboxTemplate textboxesToCreate[] = {
-		{ "          id", 	&selectedObjStuff.textboxes.id			, textbox_id_changed },
-		{ "      health", 	&selectedObjStuff.textboxes.health		, textbox_health_changed },
-		{ "  max health", 	&selectedObjStuff.textboxes.maxHealth 	, textbox_maxHealth_changed },
-		{ "health given", 	&selectedObjStuff.textboxes.healthGiven	, textbox_healthGiven_changed },
-		{ "  is movable", 	&selectedObjStuff.textboxes.movable		, textbox_movable_changed },
-		{ " is pickable", 	&selectedObjStuff.textboxes.pickable	, textbox_pickable_changed },
-		{ "         ATK", 	&selectedObjStuff.textboxes.attack		, textbox_attack_changed },
-		{ "         DEF", 	&selectedObjStuff.textboxes.defence		, textbox_defence_changed },
+	struct itemTemplate itemsToCreate[] = {
+		{ "          id", 	&selectedObjStuff.textboxes.id			, textbox_id_changed 			, NULL 	},
+		{ "      health", 	&selectedObjStuff.textboxes.health		, textbox_health_changed 		, NULL 	},
+		{ "  max health", 	&selectedObjStuff.textboxes.maxHealth 	, textbox_maxHealth_changed 	, NULL 	},
+		{ "health given", 	&selectedObjStuff.textboxes.healthGiven	, textbox_healthGiven_changed 	, NULL 	},
+		{ "  is movable", 	&selectedObjStuff.checkboxes.movable	, NULL							, checkbox_movable_changed 	},
+		{ " is pickable", 	&selectedObjStuff.checkboxes.pickable	, NULL							, checkbox_pickable_changed },
+		{ "         ATK", 	&selectedObjStuff.textboxes.attack		, textbox_attack_changed 		, NULL 	},
+		{ "         DEF", 	&selectedObjStuff.textboxes.defence		, textbox_defence_changed 		, NULL 	},
 	};
 	SDLGUI_Params textboxParams = labelParams;
 	textboxParams.bgColor = COLOR_WHITE;
+	textboxParams.borderThickness = 1;
 
 	const int textboxPairHeight = 15;
 	for( i=0; i<8; i++) {
-		struct textboxTemplate *template = &textboxesToCreate[i];
+		struct itemTemplate *template = &itemsToCreate[i];
 		int yVal = 5+i*textboxPairHeight;
 
 		struct SDLGUI_Element *label = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=yVal, .w=80, .h=textboxPairHeight}, template->label, labelParams);
-		struct SDLGUI_Element *textbox = SDLGUI_Create_Textbox( (SDL_Rect){.x=90, .y=yVal, .w=80, .h=textboxPairHeight}, textboxParams);
-		textbox->data.textData->acceptedChars  = TEXTBOX_INPUT_NUMERIC;
-		textbox->data.textData->textChanged = template->textChangeCallback;
+		struct SDLGUI_Element *value;
+		
+		if ( template->textChangeCallback != NULL) {
+			value = SDLGUI_Create_Textbox( (SDL_Rect){.x=90, .y=yVal, .w=80, .h=textboxPairHeight}, textboxParams);
+			value->data.textData->acceptedChars  = TEXTBOX_INPUT_NUMERIC;
+			value->data.textData->textChanged = template->textChangeCallback;
+		}
+		else {
+			value = SDLGUI_Create_Checkbox( (SDL_Rect){.x=90, .y=yVal, .w=0, .h=textboxPairHeight}, textboxParams);
+			SDLGUI_Checkbox_SetOnCheckChanged( value, template->checkboxChangedCallback);
+		}
 
 		SDLGUI_AddTo_Panel( selectedObjStuff.panel, label);
-		SDLGUI_AddTo_Panel( selectedObjStuff.panel, textbox);
+		SDLGUI_AddTo_Panel( selectedObjStuff.panel, value);
 		
-		*template->elementPtr = textbox;
+		*template->elementPtr = value;
 	}
 
 

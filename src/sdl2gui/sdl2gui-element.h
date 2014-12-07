@@ -17,6 +17,7 @@ struct SDLGUI_Element {
 	union {
 		struct SDLGUI_List *elements;
 		struct SDLGUI_Text_Data *textData;
+		struct SDLGUI_Checkbox_Data *check;
 	} data;
 
 	struct {

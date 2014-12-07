@@ -8,6 +8,7 @@
 #include "sdl2gui-text.h"
 #include "sdl2gui-panel.h"
 #include "sdl2gui-textbox.h"
+#include "sdl2gui-check.h"
 
 /*
 */
