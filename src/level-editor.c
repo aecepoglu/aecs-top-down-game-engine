@@ -919,6 +919,13 @@ void initGui() {
 	selectedObjStuff.panel->isVisible = false;
 	SDLGUI_AddTo_Panel( leftPanel, selectedObjStuff.panel);
 
+	SDLGUI_AddTo_Panel( selectedObjStuff.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH - 20, .h=20}, "Selected Obj", (SDLGUI_Params){
+		.fontWidth = 12,
+		.fontHeight = 16,
+		.bgColor = COLOR_TRANSPARENT,
+		.fgColor = COLOR_BLACK
+	}));
+
 	char mapText[256];
 	sprintf( mapText, "map: %s", myMap->filePath);
 	SDLGUI_AddTo_Panel( topBar, SDLGUI_Create_Text( (SDL_Rect){.x= 150, .y=0, .w=TEXT_SPAN_SIZE, .h=GUI_TOPBAR_HEIGHT}, mapText, labelParams));
@@ -949,7 +956,7 @@ void initGui() {
 	const int textboxPairHeight = 15;
 	for( i=0; i<sizeof(itemsToCreate) / sizeof(struct itemTemplate); i++) {
 		struct itemTemplate *template = &itemsToCreate[i];
-		int yVal = 5+i*textboxPairHeight;
+		int yVal = 25+i*textboxPairHeight;
 
 		struct SDLGUI_Element *label = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=yVal, .w=80, .h=textboxPairHeight * template->numRows}, template->label, labelParams);
 		struct SDLGUI_Element *value;
@@ -1027,6 +1034,7 @@ void mapDialog_quit_clicked( struct SDLGUI_Element *from) {
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
+	brush.fun = editor_selectObj;
 
 	init( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, 1280, 960);
     log0("loading textures\n");
