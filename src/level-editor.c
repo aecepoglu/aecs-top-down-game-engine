@@ -1,6 +1,5 @@
 #include "engine.h"
 #include "level-editor/brush.h"
-#include "aiTable.h"
 
 #include "sdl2gui/sdl2gui.h"
 #include "stack.h"
@@ -32,6 +31,7 @@ struct {
 			*healthGiven,
 			*attack,
 			*defence,
+			*ai,
 			*pos_x,
 			*pos_y;
 	} textboxes;
@@ -100,6 +100,22 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 
 		sprintf(tmp, "%d", selectedObjStuff.obj->defence);
 		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.defence, tmp);
+
+		if (selectedObjStuff.obj->ai != NULL) {
+			/* replace ' ' with '\n' in ai name so it fits in the textbox */
+			char *name = aiNames[selectedObjStuff.obj->ai->type];
+			int len = strlen(name);
+			int i;
+			char *newName = calloc(len + 1, sizeof(char));
+			for( i=0; i<len; i++)
+				newName[i] = name[i] != ' ' ? name[i] : '\n';
+
+			SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.ai, newName);
+
+			free( newName);
+		}
+		else
+			SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.ai, aiNames[ai_none]);
 		
 		SDLGUI_Checkbox_SetValue( selectedObjStuff.checkboxes.movable, selectedObjStuff.obj->isMovable);
 
@@ -139,11 +155,14 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 bool drawAI( unsigned int x, unsigned int y, int type) {
 	//if there is an object at the given location, and it dsoen't have an AI
 	if( myMap->objs[x][y] != 0) {
-		if ( myMap->objs[x][y]->ai != NULL && myMap->objs[x][y]->ai->type != type)
-			AI_DESTROY( myMap->objs[x][y]->ai);
-
-		struct AI *ai = AI_CREATE( type); //TODO don't create the whole AI, just create a placeholder
-		myMap->objs[x][y]->ai = ai;
+		if ( myMap->objs[x][y]->ai != NULL) {
+			myMap->objs[x][y]->ai->type = type;
+		}
+		else {
+			struct AI *ai = (struct AI*)malloc( sizeof( struct AI));
+			ai->type = type;
+			myMap->objs[x][y]->ai = ai;
+		}
 
 		SHOW_TOOLTIP( x, y, "AI put");
 		return true;
@@ -811,8 +830,7 @@ void button_remove_clicked( struct SDLGUI_Element *e) {
 void initGui() {
     /* The left panel */
 	SDLGUI_Color panelsBgColor = (SDLGUI_Color){.r=170, .g=180, .b=190, .a=255};
-	SDLGUI_Color panelsBorderColor = (SDLGUI_Color){.r=255, .g=0, .b=0, .a=255};
-	SDLGUI_Params panelParams = {.bgColor=panelsBgColor, .fgColor=panelsBorderColor, .borderThickness=1};
+	SDLGUI_Params panelParams = {.bgColor=panelsBgColor, .fgColor=COLOR_BLACK, .borderThickness=1};
 	SDLGUI_Params labelParams = (SDLGUI_Params){
 		.bgColor=COLOR_TRANSPARENT,
 		.fgColor=COLOR_BLACK,
@@ -851,9 +869,11 @@ void initGui() {
 	saveButton->clicked = buttonSave_clicked;
 	quitButton->clicked = buttonQuit_clicked;
 
-
-	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h=200}, panelParams);
-	SDLGUI_AddTo_Panel( leftPanel, buttonsContainer);
+	const int buttonsPerRow=3;
+	const int buttonSize = 32;
+	const int iconSize = 16;
+	const int buttonLeftMargin = (GUI_LEFTPANEL_WIDTH - 2*10 - buttonsPerRow*buttonSize ) / (buttonsPerRow+1);
+	const int buttonSizeWithMargins = buttonSize + buttonLeftMargin;
 
 	struct buttonTemplate {
 		char *fileName;
@@ -867,18 +887,17 @@ void initGui() {
 		{"res/editor/ai.png", 		button_ai_clicked},
 		{"res/editor/delete.png", 	button_remove_clicked},
 	};
+
+	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h= buttonLeftMargin + ((sizeof(buttonTemplates) / sizeof(struct buttonTemplate) - 1) / buttonsPerRow + 1) * buttonSizeWithMargins}, panelParams);
+	SDLGUI_AddTo_Panel( leftPanel, buttonsContainer);
 	
 	int i;
-	const int buttonsPerRow=3;
-	const int buttonSize = 32;
-	const int iconSize = 16;
-	const int buttonSizeWithMargins = 48;
 	for( i=0; i<sizeof(buttonTemplates) / sizeof(struct buttonTemplate); i++) {
 		struct buttonTemplate *template = &buttonTemplates[i];
 
 		SDL_Texture *texture = loadTexture( renderer, template->fileName);
 		
-		struct SDLGUI_Element *element = SDLGUI_Create_Texture( (SDL_Rect){.x=(i%buttonsPerRow) *buttonSizeWithMargins, .y=(i/buttonsPerRow) *buttonSizeWithMargins, .w=buttonSize, .h=buttonSize}, texture, iconSize, iconSize, buttonParams);
+		struct SDLGUI_Element *element = SDLGUI_Create_Texture( (SDL_Rect){.x=buttonLeftMargin + (i%buttonsPerRow) *buttonSizeWithMargins, .y= buttonLeftMargin + (i/buttonsPerRow) *buttonSizeWithMargins, .w=buttonSize, .h=buttonSize}, texture, iconSize, iconSize, buttonParams);
 
 		SDL_DestroyTexture( texture);
 		
@@ -886,7 +905,7 @@ void initGui() {
 		SDLGUI_AddTo_Panel( buttonsContainer, element);
 	}
 
-	struct SDLGUI_Element *brushOptionsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=370, .w=buttonsContainer->rect.w, .h=250}, (SDLGUI_Params) {
+	struct SDLGUI_Element *brushOptionsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=240, .w=buttonsContainer->rect.w, .h=250}, (SDLGUI_Params) {
 			.bgColor = COLOR_TRANSPARENT,
 			.borderThickness = 0
 		}
@@ -907,38 +926,42 @@ void initGui() {
 	struct itemTemplate {
 		char *label;
 		struct SDLGUI_Element **elementPtr;
+		int numRows;
+		bool isReadOnly;
 		SDLGUI_TextBox_Changed *textChangeCallback;
 		SDLGUI_Checkbox_Changed *checkboxChangedCallback;
 	};
 	struct itemTemplate itemsToCreate[] = {
-		{ "          id", 	&selectedObjStuff.textboxes.id			, textbox_id_changed 			, NULL 	},
-		{ "      health", 	&selectedObjStuff.textboxes.health		, textbox_health_changed 		, NULL 	},
-		{ "  max health", 	&selectedObjStuff.textboxes.maxHealth 	, textbox_maxHealth_changed 	, NULL 	},
-		{ "health given", 	&selectedObjStuff.textboxes.healthGiven	, textbox_healthGiven_changed 	, NULL 	},
-		{ "  is movable", 	&selectedObjStuff.checkboxes.movable	, NULL							, checkbox_movable_changed 	},
-		{ " is pickable", 	&selectedObjStuff.checkboxes.pickable	, NULL							, checkbox_pickable_changed },
-		{ "         ATK", 	&selectedObjStuff.textboxes.attack		, textbox_attack_changed 		, NULL 	},
-		{ "         DEF", 	&selectedObjStuff.textboxes.defence		, textbox_defence_changed 		, NULL 	},
+		{ "          id", 	&selectedObjStuff.textboxes.id			, 1, false,	textbox_id_changed 			, NULL 	},
+		{ "      health", 	&selectedObjStuff.textboxes.health		, 1, false,	textbox_health_changed 		, NULL 	},
+		{ "  max health", 	&selectedObjStuff.textboxes.maxHealth 	, 1, false,	textbox_maxHealth_changed 	, NULL 	},
+		{ "health given", 	&selectedObjStuff.textboxes.healthGiven	, 1, false,	textbox_healthGiven_changed , NULL 	},
+		{ "  is movable", 	&selectedObjStuff.checkboxes.movable	, 1, false,	NULL						, checkbox_movable_changed 	},
+		{ " is pickable", 	&selectedObjStuff.checkboxes.pickable	, 1, false,	NULL						, checkbox_pickable_changed },
+		{ "         ATK", 	&selectedObjStuff.textboxes.attack		, 1, false,	textbox_attack_changed 		, NULL 	},
+		{ "         DEF", 	&selectedObjStuff.textboxes.defence		, 1, false,	textbox_defence_changed 	, NULL 	},
+		{ "          AI", 	&selectedObjStuff.textboxes.ai			, 3, true,	NULL 						, NULL 	},
 	};
 	SDLGUI_Params textboxParams = labelParams;
 	textboxParams.bgColor = COLOR_WHITE;
 	textboxParams.borderThickness = 1;
 
 	const int textboxPairHeight = 15;
-	for( i=0; i<8; i++) {
+	for( i=0; i<sizeof(itemsToCreate) / sizeof(struct itemTemplate); i++) {
 		struct itemTemplate *template = &itemsToCreate[i];
 		int yVal = 5+i*textboxPairHeight;
 
-		struct SDLGUI_Element *label = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=yVal, .w=80, .h=textboxPairHeight}, template->label, labelParams);
+		struct SDLGUI_Element *label = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=yVal, .w=80, .h=textboxPairHeight * template->numRows}, template->label, labelParams);
 		struct SDLGUI_Element *value;
 		
-		if ( template->textChangeCallback != NULL) {
-			value = SDLGUI_Create_Textbox( (SDL_Rect){.x=90, .y=yVal, .w=80, .h=textboxPairHeight}, textboxParams);
-			value->data.textData->acceptedChars  = TEXTBOX_INPUT_NUMERIC;
+		if ( template->checkboxChangedCallback == NULL) {
+			value = SDLGUI_Create_Textbox( (SDL_Rect){.x=90, .y=yVal, .w=80, .h=textboxPairHeight * template->numRows}, textboxParams);
+			if( template->isReadOnly != true)
+				value->data.textData->acceptedChars  = TEXTBOX_INPUT_NUMERIC;
 			value->data.textData->textChanged = template->textChangeCallback;
 		}
 		else {
-			value = SDLGUI_Create_Checkbox( (SDL_Rect){.x=90, .y=yVal, .w=0, .h=textboxPairHeight}, textboxParams);
+			value = SDLGUI_Create_Checkbox( (SDL_Rect){.x=90, .y=yVal, .w=0, .h=textboxPairHeight * template->numRows}, textboxParams);
 			SDLGUI_Checkbox_SetOnCheckChanged( value, template->checkboxChangedCallback);
 		}
 

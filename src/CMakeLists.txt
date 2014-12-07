@@ -36,7 +36,7 @@ foreach(x ${MY_BRUSH_SOURCES})
 endforeach(x ${MY_BRUSH_SOURCES})
 set(MY_BRUSH_SOURCES ${_tmp})
 
-set(MY_SOURCE_FILES engine.c texture.c map.c map.h object.c vector.c linkedList.c text.c textConsole.c inventory.c cutscene.c)
+set(MY_SOURCE_FILES engine.c texture.c map.c map.h object.c vector.c linkedList.c text.c textConsole.c inventory.c cutscene.c ai.c)
 
 set(SDLGUI_SOURCE_FILES sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c sdl2gui/sdl2gui-text.c sdl2gui/sdl2gui-element.c sdl2gui/sdl2gui-panel.c sdl2gui/sdl2gui-textbox.c sdl2gui/sdl2gui-check.c)
 

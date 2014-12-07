@@ -26,5 +26,6 @@ struct AI {
 	bool enabled;
 };
 
+extern char *aiNames[];
 
 #endif

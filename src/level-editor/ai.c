@@ -19,29 +19,24 @@ struct SDLGUI_Element* brushOptionPanel_create_ai( struct SDLGUI_Element *parent
 	struct SDLGUI_Element *panel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=parentPanel->rect.w, .h=230}, *panelParams);
 	SDLGUI_AddTo_Panel( parentPanel, panel);
 
-	struct buttonTemplate {
-		char *text;
-		SDLGUI_Clicked *onClick;
-	};
 
-	struct buttonTemplate templates[] = {
-		{"none",		 		clicked_ai_none },
-		{"left turner", 		clicked_ai_leftTurner },
-		{"hungry left turner", 	clicked_ai_hungryLeftTurner },
-		{"flower", 				clicked_ai_flower },
-		{"creeper", 			clicked_ai_creeperPlant },
-		{"peekaboo", 			clicked_ai_peekaboo },
-		{"weeping angel", 		clicked_ai_weepingAngel },
-		{"door", 				clicked_ai_door },
-		{"distance sensor", 	clicked_ai_lineSensor },
-		{"switch", 				clicked_ai_sw },
+	SDLGUI_Clicked *templates[ai_NUM_ITEMS] = {
+		clicked_ai_none,
+		clicked_ai_leftTurner,
+		clicked_ai_hungryLeftTurner,
+		clicked_ai_flower,
+		clicked_ai_creeperPlant,
+		clicked_ai_peekaboo,
+		clicked_ai_weepingAngel,
+		clicked_ai_door,
+		clicked_ai_lineSensor,
+		clicked_ai_sw,
 	};
 
 	int i;
 	for( i=0; i<ai_NUM_ITEMS; i++) {
-		struct buttonTemplate *template = &templates[i];
-		struct SDLGUI_Element *button = SDLGUI_Create_Text( (SDL_Rect){.x= 10, .y=10 + 20*i, .w=parentPanel->rect.w - 2*10, .h=20}, template->text, *buttonParams);
-		button->clicked = template->onClick;
+		struct SDLGUI_Element *button = SDLGUI_Create_Text( (SDL_Rect){.x= 10, .y=10 + 20*i, .w=parentPanel->rect.w - 2*10, .h=20}, aiNames[i], *buttonParams);
+		button->clicked = templates[i];
 		SDLGUI_AddTo_Panel( panel, button);
 	}
 
