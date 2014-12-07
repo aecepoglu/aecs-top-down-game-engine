@@ -58,6 +58,15 @@ struct {
 	Brush Functions
 */
 
+bool editor_removeObject( unsigned int x, unsigned int y, int type) {
+	if( myMap->objs[x][y] != 0) {
+		objectFree( myMap->objs[x][y]);
+		return true;
+	}
+	else
+		return false;
+}
+
 bool drawTerrain( unsigned int x, unsigned int y, int type){
 	if( myMap->tiles[x][y] != type && myMap->objs[x][y]==NULL) {
 		myMap->tiles[x][y] = type;
@@ -794,6 +803,11 @@ void button_ai_clicked( struct SDLGUI_Element *e) {
 	brushOptionPanels.ai->isVisible = true;
 }
 
+void button_remove_clicked( struct SDLGUI_Element *e) {
+	brush.fun = editor_removeObject;
+	hideAll();
+}
+
 void initGui() {
     /* The left panel */
 	SDLGUI_Color panelsBgColor = (SDLGUI_Color){.r=170, .g=180, .b=190, .a=255};
@@ -808,8 +822,8 @@ void initGui() {
 	SDLGUI_Params buttonParams = (SDLGUI_Params){
 		.bgColor=COLOR_TRANSPARENT,
 		.fgColor=COLOR_BLACK,
-		.fontWidth=6,
-		.fontHeight=8,
+		.fontWidth=12,
+		.fontHeight=16,
 		.borderThickness=1
 	};
 
@@ -822,13 +836,20 @@ void initGui() {
 	SDLGUI_Add_Element( topBar);
 
 
-	SDLGUI_AddTo_Panel( leftPanel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH}, " YZ-01 \n-------", (SDLGUI_Params){
+	SDLGUI_AddTo_Panel( leftPanel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=10, .w=GUI_LEFTPANEL_WIDTH}, " YZ-01 \n-------", (SDLGUI_Params){
 			.bgColor=labelParams.bgColor,
 			.fgColor=labelParams.fgColor,
 			.fontWidth=18,
 			.fontHeight=24
 		}
 	));
+
+	struct SDLGUI_Element *saveButton = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=60, .w=GUI_LEFTPANEL_WIDTH/2 - 15, .h=20}, "Save", buttonParams);
+	struct SDLGUI_Element *quitButton = SDLGUI_Create_Text( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH/2 + 5, .y=60, .w=GUI_LEFTPANEL_WIDTH/2 - 15, .h=20}, "Quit", buttonParams);
+	SDLGUI_AddTo_Panel( leftPanel, saveButton);
+	SDLGUI_AddTo_Panel( leftPanel, quitButton);
+	saveButton->clicked = buttonSave_clicked;
+	quitButton->clicked = buttonQuit_clicked;
 
 
 	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h=200}, panelParams);
@@ -844,6 +865,7 @@ void initGui() {
 		{"res/editor/terrain.png",	button_terrain_clicked},
 		{"res/editor/object.png", 	button_object_clicked},
 		{"res/editor/ai.png", 		button_ai_clicked},
+		{"res/editor/delete.png", 	button_remove_clicked},
 	};
 	
 	int i;
