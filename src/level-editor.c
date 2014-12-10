@@ -179,6 +179,27 @@ bool drawAI( unsigned int x, unsigned int y, int type) {
 	return false;
 }
 
+bool editor_moveObject( unsigned int x, unsigned int y, int type) {
+	if( brush.isRepeat ) {
+		int oldX = selectedObjStuff.obj->pos.i;
+		int oldY = selectedObjStuff.obj->pos.j;
+		if( (x != oldX || y != oldY) && myMap->objs[x][y] == NULL && myMap->tiles[x][y] != terrain_wall) {
+			myMap->objs[oldX][oldY] = NULL;
+			myMap->objs[x][y] = selectedObjStuff.obj;
+			selectedObjStuff.obj->pos.i = x;
+			selectedObjStuff.obj->pos.j = y;
+			return true;
+		}
+	}
+	else {
+		selectedObjStuff.obj = myMap->objs[x][y];
+		
+		if( selectedObjStuff.obj != NULL)
+			brush.isRepeat = true;
+	}
+	return false;
+}
+
 bool setDirection( unsigned int x, unsigned int y, int type) {
 	if( brush.isRepeat ) {
 		enum direction newDir = vector_dirTan( y - selectedObjStuff.obj->pos.j, x - selectedObjStuff.obj->pos.i);
@@ -691,6 +712,13 @@ void button_select_clicked( struct SDLGUI_Element *e) {
 	hideAll();
 }
 
+void button_move_clicked( struct SDLGUI_Element *e) {
+	brush.fun = editor_moveObject;
+	brush.variant = 0;
+	hideAll();
+	brushOptionPanels.move->isVisible = true;
+}
+
 void button_rotate_clicked( struct SDLGUI_Element *e) {
 	brush.fun = setDirection;
 	brush.variant = 0;
@@ -785,6 +813,7 @@ void initGui() {
 	};
 	struct buttonTemplate buttonTemplates[] = {
 		{"res/editor/select.png", 	button_select_clicked},
+		{"res/editor/move.png", 	button_move_clicked},
 		{"res/editor/rotate.png", 	button_rotate_clicked},
 		{"res/editor/terrain.png",	button_terrain_clicked},
 		{"res/editor/object.png", 	button_object_clicked},

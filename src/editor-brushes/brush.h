@@ -29,7 +29,8 @@ struct {
 		*rotate,
 		*object,
 		*ai,
-		*templates;
+		*templates,
+		*move;
 } brushOptionPanels;
 
 
