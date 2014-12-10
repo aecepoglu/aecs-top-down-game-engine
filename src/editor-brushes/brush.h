@@ -4,6 +4,7 @@
 #include "../sdl2gui/sdl2gui.h"
 #include "../basic.h"
 #include "../texture.h"
+#include "../object.h"
 
 typedef bool (brushFun)(unsigned int, unsigned int, int);
 
@@ -26,13 +27,14 @@ struct {
 		*terrain,
 		*rotate,
 		*object,
-		*ai;
+		*ai,
+		*templates;
 } brushOptionPanels;
 
 
 #define BUTTON_SIZE 32
 #define ICON_SIZE 16
 
-void brushOptionPanels_init( struct SDLGUI_Element *parentPanel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures);
+void brushOptionPanels_init( struct SDLGUI_Element *parentPanel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures, struct object **selectedObjPtr);
 
 #endif /* BRUSH_H */

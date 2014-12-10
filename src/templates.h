@@ -14,7 +14,10 @@ struct ObjectTemplate {
 struct ObjectTemplate *objectTemplates[MAX_TEMPLATES_COUNT];
 int templatesCount;
 
+struct ObjectTemplate* template_create( int templateIndex, const char *name, int aiType, const struct object *o );
+void template_remove( int index);
 void templates_load();
 void templates_save();
+bool template_apply( struct object *to, int templateNo);
 
 #endif

@@ -9,7 +9,7 @@
 
 #define CHECK_STRTOK_RESULT( string, no, name) EXIT_IF( string == NULL, "Error at line %d. Line ended but was expeting %s\n", no, name)
 
-bool applyObjTemplate( struct object *to, int templateNo) {
+bool template_apply( struct object *to, int templateNo) {
     struct ObjectTemplate *from = NULL;
     if( templateNo >= 0 && templateNo < MAX_TEMPLATES_COUNT)
         from = objectTemplates[ templateNo];
@@ -33,6 +33,31 @@ bool applyObjTemplate( struct object *to, int templateNo) {
 		return false;
 }
 
+struct ObjectTemplate* template_create( int templateIndex, const char *name, int aiType, const struct object *o ) {
+    
+	struct ObjectTemplate *template = (struct ObjectTemplate*)malloc(sizeof(struct ObjectTemplate));
+	template->obj = (struct object*)malloc(sizeof(struct object));
+
+	int nameLen = (int)strlen(name);
+	EXIT_IF( nameLen > MAX_NAME_LENGTH, "template name %s is too long(%d) in line %d. Must be < %d\n", name, nameLen, templateIndex, MAX_NAME_LENGTH);
+	template->name = (char*)calloc( nameLen+1, sizeof(char));
+	memcpy( template->name, name, (strlen(name) + 1)*sizeof(char));
+
+    template->aiType = aiType;
+    template->obj->ai = NULL;
+
+    template->obj->type = o->type;
+    template->obj->health = o->health;
+    template->obj->maxHealth = o->maxHealth;
+    template->obj->healthGiven = o->healthGiven;
+    template->obj->isPickable = o->isPickable;
+    template->obj->isMovable = o->isMovable;
+    template->obj->attack = o->attack;
+    template->obj->defence = o->defence;
+
+    return template;
+}
+
 void parseTemplateLine( char *line, int lineNo) {
 	char *string;
 	const char *delim = DELIMETER;
@@ -40,52 +65,53 @@ void parseTemplateLine( char *line, int lineNo) {
 	struct ObjectTemplate *template = (struct ObjectTemplate*)malloc(sizeof(struct ObjectTemplate));
 	template->obj = (struct object*)malloc(sizeof(struct object));
 
+    struct object obj;
+    char *templateName;
+    int aiType;
+
 	template->obj->id = 0;
 
 	string = strtok( line, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "name");
-	int nameLen = (int)strlen(string);
-	EXIT_IF( nameLen > MAX_NAME_LENGTH, "template name %s is too long(%d) in line %d. Must be < %d\n", string, nameLen, lineNo, MAX_NAME_LENGTH);
-	template->name = (char*)calloc( nameLen+1, sizeof(char));
-	memcpy( template->name, string, (strlen(string) + 1)*sizeof(char));
+    templateName = string;
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "obj-type");
-	template->obj->type = atoi( string);
+	obj.type = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "ai-type");
-	template->aiType = atoi( string);
+	aiType = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "health");
-	template->obj->health = atoi( string);
+	obj.health = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "maxHealth");
-	template->obj->maxHealth = atoi( string);
+	obj.maxHealth = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "healthGiven");
-	template->obj->healthGiven = atoi( string);
+	obj.healthGiven = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "isMovable");
-	template->obj->isMovable = atoi( string);
+	obj.isMovable = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "isPickable");
-	template->obj->isPickable = atoi( string);
+	obj.isPickable = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "attack");
-	template->obj->attack = atoi( string);
+	obj.attack = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "defence");
-	template->obj->defence = atoi( string);
+	obj.defence = atoi( string);
 
-    objectTemplates[ lineNo] = template;
+    objectTemplates[ lineNo] = template_create( lineNo, templateName, aiType, &obj);
 }
 
 
@@ -120,6 +146,7 @@ void templates_load() {
 void templates_save() {
 	FILE *fp = fopen( TEMPLATES_PATH, "w");
 	if( fp == NULL) {
+		printf("couldn't open template file. returning.\n");
 		return;
     }
 
@@ -129,7 +156,7 @@ void templates_save() {
 		if( t == NULL)
 			break;
 
-		fprintf( fp, "%s,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+		fprintf( fp, "%s,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 			t->name,
 			t->obj->type,
 			t->aiType,
@@ -146,3 +173,15 @@ void templates_save() {
 	fclose( fp);
 }
 
+void template_remove( int index) {
+	if( index < 0 || index >= MAX_TEMPLATES_COUNT)
+		return;
+	
+	struct ObjectTemplate *t = objectTemplates[index];
+	if( t == NULL)
+		return;
+	
+	free( t->obj);
+	free( t->name);
+	free( t);
+}

@@ -3,8 +3,9 @@
 #include "terrain.h"
 #include "object.h"
 #include "ai.h"
+#include "templates.h"
 
-void brushOptionPanels_init( struct SDLGUI_Element *panel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures) {
+void brushOptionPanels_init( struct SDLGUI_Element *panel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures, struct object **selectedObjPtr) {
 	SDLGUI_Params panelParams = (SDLGUI_Params) {
 		.bgColor = (SDLGUI_Color){255, 255, 0, 64},
 		.fgColor = COLOR_BLACK,
@@ -26,4 +27,5 @@ void brushOptionPanels_init( struct SDLGUI_Element *panel, struct TextureSheet *
 	brushOptionPanels.terrain = brushOptionPanel_create_terrain( panel, &panelParams, &buttonParams, trnTextures);
 	brushOptionPanels.object = brushOptionPanel_create_object( panel, &panelParams, &buttonParams, objTextureSheets);
 	brushOptionPanels.ai = brushOptionPanel_create_ai( panel, &panelParams, &textButtonParams);
+	brushOptionPanels.templates = brushOptionPanel_create_templates( panel, &panelParams, &buttonParams, selectedObjPtr);
 }

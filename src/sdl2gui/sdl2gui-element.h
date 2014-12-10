@@ -34,6 +34,8 @@ struct SDLGUI_Element {
 	void (*textInputHandler)( struct SDLGUI_Element *e, char c, int backspace);
 
 	int isVisible;
+
+    void *userData;
 };
 
 typedef struct {

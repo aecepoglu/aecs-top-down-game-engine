@@ -67,6 +67,13 @@ bool editor_removeObject( unsigned int x, unsigned int y, int type) {
 		return false;
 }
 
+bool editor_applyTemplate( unsigned int x, unsigned int y, int type) {
+	if( myMap->objs[x][y] != 0)
+        return template_apply( myMap->objs[x][y], type);
+	else
+		return false;
+}
+
 bool drawTerrain( unsigned int x, unsigned int y, int type){
 	if( myMap->tiles[x][y] != type && myMap->objs[x][y]==NULL) {
 		myMap->tiles[x][y] = type;
@@ -706,6 +713,13 @@ void button_remove_clicked( struct SDLGUI_Element *e) {
 	hideAll();
 }
 
+void button_template_clicked( struct SDLGUI_Element *e) {
+    brush.fun = editor_applyTemplate;
+    brush.variant = 0;
+    hideAll();
+    brushOptionPanels.templates->isVisible = true;
+}
+
 void initGui() {
     /* The left panel */
 	SDLGUI_Color panelsBgColor = (SDLGUI_Color){.r=170, .g=180, .b=190, .a=255};
@@ -765,6 +779,7 @@ void initGui() {
 		{"res/editor/object.png", 	button_object_clicked},
 		{"res/editor/ai.png", 		button_ai_clicked},
 		{"res/editor/delete.png", 	button_remove_clicked},
+		{"res/editor/delete.png", 	button_template_clicked},
 	};
 
 	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h= buttonLeftMargin + ((sizeof(buttonTemplates) / sizeof(struct buttonTemplate) - 1) / buttonsPerRow + 1) * buttonSizeWithMargins}, panelParams);
@@ -784,14 +799,14 @@ void initGui() {
 		SDLGUI_AddTo_Panel( buttonsContainer, element);
 	}
 
-	struct SDLGUI_Element *brushOptionsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=240, .w=buttonsContainer->rect.w, .h=250}, (SDLGUI_Params) {
+	struct SDLGUI_Element *brushOptionsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=300, .w=buttonsContainer->rect.w, .h=250}, (SDLGUI_Params) {
 			.bgColor = COLOR_TRANSPARENT,
 			.borderThickness = 0
 		}
 	);
 	SDLGUI_AddTo_Panel( leftPanel, brushOptionsContainer);
 
-	brushOptionPanels_init( brushOptionsContainer, textures->obj, textures->trn);
+	brushOptionPanels_init( brushOptionsContainer, textures->obj, textures->trn, &selectedObjStuff.obj);
 
 	
 	selectedObjStuff.panel = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=700, .w=buttonsContainer->rect.w, .h=200}, panelParams);
@@ -976,6 +991,8 @@ int main( int argc, char *args[]) {
 		initGui();
 		run();
 	}
+
+    templates_save();
 
 	log0("Program over\nPeace\n");
 	SDLGUI_Destroy();
