@@ -779,7 +779,7 @@ void initGui() {
 		{"res/editor/object.png", 	button_object_clicked},
 		{"res/editor/ai.png", 		button_ai_clicked},
 		{"res/editor/delete.png", 	button_remove_clicked},
-		{"res/editor/delete.png", 	button_template_clicked},
+		{"res/editor/template.png", button_template_clicked},
 	};
 
 	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h= buttonLeftMargin + ((sizeof(buttonTemplates) / sizeof(struct buttonTemplate) - 1) / buttonsPerRow + 1) * buttonSizeWithMargins}, panelParams);
