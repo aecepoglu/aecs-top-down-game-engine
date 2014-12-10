@@ -180,13 +180,22 @@ bool drawAI( unsigned int x, unsigned int y, int type) {
 }
 
 bool setDirection( unsigned int x, unsigned int y, int type) {
-	//if there is an object at the given location, and it dsoen't have an AI
-	if( myMap->objs[x][y] != 0) {
-		myMap->objs[x][y]->dir = (enum direction)type;
-		return true;
+	if( brush.isRepeat ) {
+		enum direction newDir = vector_dirTan( y - selectedObjStuff.obj->pos.j, x - selectedObjStuff.obj->pos.i);
+		if( selectedObjStuff.obj->dir != newDir) {
+			selectedObjStuff.obj->dir = newDir;
+			return true;
+		}
 	}
-	else
-		return false;
+	else {
+		selectedObjStuff.obj = myMap->objs[x][y];
+		
+		if( selectedObjStuff.obj != NULL) {
+			brush.isRepeat = true;
+			return true;
+		}
+	}
+	return false;
 }
 
 /* ----------------
@@ -523,6 +532,7 @@ void run0() {
 					continue;
 				}
 			case SDL_MOUSEBUTTONUP:
+				brush.isRepeat = false;
 				if( isMessageBoxOn) {
 					SDLGUI_Hide_Message();
 					isMessageBoxOn =false;
@@ -683,7 +693,7 @@ void button_select_clicked( struct SDLGUI_Element *e) {
 
 void button_rotate_clicked( struct SDLGUI_Element *e) {
 	brush.fun = setDirection;
-	brush.variant = dir_up;
+	brush.variant = 0;
 	hideAll();
 	brushOptionPanels.rotate->isVisible = true;
 }
@@ -930,6 +940,7 @@ int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
 	brush.fun = editor_selectObj;
+	brush.isRepeat =  false;
     templates_load();
 
 	init( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, 1280, 960);

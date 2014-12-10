@@ -9,6 +9,8 @@ struct Vector {
 	int i, j ;
 };
 
+enum direction { dir_up, dir_right, dir_down, dir_left};
+
 /* Sums two vectors. 3rd vector has the result
 */
 void vectorAdd( struct Vector*, struct Vector* , struct Vector*);
@@ -28,8 +30,8 @@ bool vectorEquals( struct Vector*, struct Vector *);
 struct Vector* readVector( FILE *fp);
 void readToVector( FILE *fp, struct Vector*);
 void writeVector( FILE *fp, struct Vector*);
+enum direction vector_dirTan( int y, int x);
 
-enum direction { dir_up, dir_right, dir_down, dir_left};
 extern struct Vector dirVectors[4];
 extern uint8_t dirFlags[4];
 

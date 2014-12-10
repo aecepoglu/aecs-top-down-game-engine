@@ -56,3 +56,15 @@ void writeVector( FILE *fp, struct Vector *v) {
 	fwrite( &v->j, sizeof( int), 1, fp);
 }
 
+enum direction vector_dirTan( int y, int x) {
+	bool f1 = (y-x) >= 0;
+	bool f2 = (y+x) >= 0;
+
+	enum direction result;
+	if( f1)
+		result = f2 ? dir_up : dir_right;
+	else
+		result = f2 ? dir_left : dir_down;
+	
+	return result;
+}

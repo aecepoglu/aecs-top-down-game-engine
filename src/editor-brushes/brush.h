@@ -11,6 +11,7 @@ typedef bool (brushFun)(unsigned int, unsigned int, int);
 struct {
 	brushFun *fun;
 	int variant;
+	bool isRepeat;
 } brush;
 
 brushFun defaultBrush,
