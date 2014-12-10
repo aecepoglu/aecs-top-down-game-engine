@@ -700,12 +700,13 @@ void draw() {
 
 
 
-void hideAll() { //TODO delete this function, and use focus-lost instead
+void hideAll() {
 	brushOptionPanels.move->isVisible = false;
 	brushOptionPanels.rotate->isVisible = false;
 	brushOptionPanels.terrain->isVisible = false;
 	brushOptionPanels.object->isVisible = false;
 	brushOptionPanels.ai->isVisible = false;
+	brushOptionPanels.templates->isVisible = false;
 }
 
 void button_select_clicked( struct SDLGUI_Element *e) {
