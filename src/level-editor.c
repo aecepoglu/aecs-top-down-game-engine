@@ -701,6 +701,7 @@ void draw() {
 
 
 void hideAll() { //TODO delete this function, and use focus-lost instead
+	brushOptionPanels.move->isVisible = false;
 	brushOptionPanels.rotate->isVisible = false;
 	brushOptionPanels.terrain->isVisible = false;
 	brushOptionPanels.object->isVisible = false;
