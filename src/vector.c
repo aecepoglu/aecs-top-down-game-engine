@@ -62,9 +62,9 @@ enum direction vector_dirTan( int y, int x) {
 
 	enum direction result;
 	if( f1)
-		result = f2 ? dir_up : dir_right;
+		result = f2 ? dir_down : dir_left;
 	else
-		result = f2 ? dir_left : dir_down;
+		result = f2 ? dir_right : dir_up;
 	
 	return result;
 }
