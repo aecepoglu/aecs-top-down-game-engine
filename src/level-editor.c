@@ -553,7 +553,6 @@ void run0() {
 					continue;
 				}
 			case SDL_MOUSEBUTTONUP:
-				brush.isRepeat = false;
 				if( isMessageBoxOn) {
 					SDLGUI_Hide_Message();
 					isMessageBoxOn =false;
@@ -619,6 +618,7 @@ void run() {
 				}
 				continue;
 			case SDL_MOUSEBUTTONUP:
+				brush.isRepeat = false;
 				if( isMessageBoxOn) {
 					SDLGUI_Hide_Message();
 					isMessageBoxOn =false;
