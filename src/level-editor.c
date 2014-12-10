@@ -1,9 +1,9 @@
 #include "engine.h"
-#include "level-editor/brush.h"
+#include "editor-brushes/brush.h"
 
 #include "sdl2gui/sdl2gui.h"
 #include "stack.h"
-
+#include "templates.h"
 #include "error.h"
 
 bool running;
@@ -661,127 +661,6 @@ void draw() {
 
 
 
-#define TEMPLATES_PATH "templates.csv"
-#define DELIMETER ","
-#define MAX_NAME_LENGTH 10
-#define MAX_TEMPLATES_COUNT 8
-
-#define CHECK_STRTOK_RESULT( string, no, name) EXIT_IF( string == NULL, "Error at line %d. Line ended but was expeting %s\n", no, name)
-
-struct object *objectTemplates[MAX_TEMPLATES_COUNT];
-
-bool applyObjTemplate( unsigned int x, unsigned int y, int templateNo) {
-	struct object *to = myMap->objs[x][y];
-	struct object *from = objectTemplates[ templateNo];
-
-	if( from != NULL && to != NULL) {
-		if( from->id != 0)
-			to->id = 0;
-		to->type = from->type;
-		to->health = from->health;
-		to->maxHealth = from->maxHealth;
-		to->healthGiven = from->healthGiven;
-		to->isMovable = from->isMovable;
-		to->isPickable = from->isPickable;
-		to->attack = from->attack;
-		to->defence = from->defence;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-struct SDLGUI_Element* parseTemplateLine( char *line, int lineNo) {
-	char *string;
-	const char *delim = DELIMETER;
-
-	char *name;
-
-	struct object *template = (struct object*)malloc(sizeof(struct object));;
-
-	template->id = 0;
-
-	string = strtok( line, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "name");
-	EXIT_IF( strlen( string) > MAX_NAME_LENGTH, "template name %s is too long(%d) in line %d. Must be < %d\n", string, (int)strlen( string), lineNo, MAX_NAME_LENGTH);
-	name = string;
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "obj-type");
-	template->type = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "ai-type");
-	//template->aiType = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "health");
-	template->health = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "maxHealth");
-	template->maxHealth = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "healthGiven");
-	template->healthGiven = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "isMovable");
-	template->isMovable = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "isPickable");
-	template->isPickable = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "attack");
-	template->attack = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "defence");
-	template->defence = atoi( string);
-
-	char buttonText[32];
-	sprintf( buttonText, "%d. %s", lineNo+1, name);
-
-	objectTemplates[ lineNo] = template;
-	//return CREATE_LIST_BUTTON( lineNo, buttonText, CREATE_BRUSH_WRAPPER( SDLK_1 + lineNo, applyObjTemplate, lineNo, NO_CHILDREN));
-	return NULL;
-}
-
-
-struct SDLGUI_List* reloadBrushTemplates() {
-	struct SDLGUI_List *templateBrushes = SDLGUI_List_Create( MAX_TEMPLATES_COUNT/2);;
-
-	int i;
-	for( i=0; i<MAX_TEMPLATES_COUNT; i++)
-		objectTemplates[i] = NULL;
-
-	FILE *fp = fopen( TEMPLATES_PATH, "r");
-	if( fp == NULL)
-		return templateBrushes;
-
-	int lineNo = 0;
-	char line[BUFSIZ];
-
-	while( fgets( line, BUFSIZ, fp) ) {
-		if( lineNo > MAX_TEMPLATES_COUNT) {
-			fprintf( stderr, "Max %d templates supported.\n", MAX_TEMPLATES_COUNT);
-			break;
-		}
-
-		SDLGUI_List_Add( templateBrushes, parseTemplateLine( line, lineNo));
-
-		lineNo ++;
-	}
-
-	fclose( fp);
-
-	return templateBrushes;
-}
-
 void hideAll() { //TODO delete this function, and use focus-lost instead
 	brushOptionPanels.rotate->isVisible = false;
 	brushOptionPanels.terrain->isVisible = false;
@@ -1035,6 +914,7 @@ int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
 	brush.fun = editor_selectObj;
+    templates_load();
 
 	init( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, 1280, 960);
     log0("loading textures\n");

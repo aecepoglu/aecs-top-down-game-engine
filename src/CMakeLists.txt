@@ -32,7 +32,7 @@ set(MY_PF_SOURCES ${_tmp})
 
 unset(_tmp)
 foreach(x ${MY_BRUSH_SOURCES})
-	list(APPEND _tmp "level-editor/${x}.c")
+	list(APPEND _tmp "editor-brushes/${x}.c")
 endforeach(x ${MY_BRUSH_SOURCES})
 set(MY_BRUSH_SOURCES ${_tmp})
 
@@ -46,7 +46,7 @@ list(APPEND ALL_SOURCE_FILES ${MY_AI_SOURCES} ${MY_PF_SOURCES})
 
 
 
-add_executable(level-editor level-editor.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES} ${MY_BRUSH_SOURCES} )
+add_executable(level-editor level-editor.c templates.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES} ${MY_BRUSH_SOURCES} )
 target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
