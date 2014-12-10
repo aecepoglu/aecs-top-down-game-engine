@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "sdl2gui-check.h"
 #include "sdl2gui-text.h"
 

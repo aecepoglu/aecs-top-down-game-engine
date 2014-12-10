@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 
 #include "sdl2gui.h"
 #include "sdl2gui-text.h"

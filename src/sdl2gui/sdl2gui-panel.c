@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "sdl2gui.h"
 #include "sdl2gui-panel.h"
 #include "sdl2gui-list.h"
