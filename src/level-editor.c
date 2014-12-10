@@ -61,6 +61,7 @@ struct {
 bool editor_removeObject( unsigned int x, unsigned int y, int type) {
 	if( myMap->objs[x][y] != 0) {
 		objectFree( myMap->objs[x][y]);
+		myMap->objs[x][y] = NULL;
 		return true;
 	}
 	else
