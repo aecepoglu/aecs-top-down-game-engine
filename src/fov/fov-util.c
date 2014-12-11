@@ -42,9 +42,10 @@ struct FOVBase** init_fovBase( int range) {
 					sliceIndex = 3*n->distance + n->pos.i;
 				}
 				float slice = M_PI_4 / n->distance;
-				float angle = (M_PI_2 / n->distance )* sliceIndex;
-				n->maxLit[0] = fmodf_simple( angle - slice, TWO_PI);
-				n->maxLit[1] = fmodf_simple( angle + slice, TWO_PI);
+				n->maxLit[0] = fmodf_simple( (2*sliceIndex - 1)*slice, TWO_PI);
+				n->maxLit[1] = fmodf_simple( (2*sliceIndex + 1)*slice, TWO_PI);
+
+                printf("FOV_BASE %d,%d, %f, %f\n", n->pos.i, n->pos.j, n->maxLit[0], n->maxLit[1]);
 			}
 			else {
 				n->lit[0] = 0;
