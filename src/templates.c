@@ -69,16 +69,19 @@ void parseTemplateLine( char *line, int lineNo) {
 	template->obj->id = 0;
 
 	if(line[0] == ',') {
-		line[0] = '\0';
-		string = line;
+		templateName = "";
+
+		string = strtok( line, delim);
 	}
 	else {
 		string = strtok( line, delim);
 		CHECK_STRTOK_RESULT( string, lineNo, "name");
-	}
-    templateName = string;
+		templateName = string;
 
-	string = strtok( NULL, delim);
+		string = strtok( NULL, delim);
+	}
+
+	/* strtok of this token is done above */
 	CHECK_STRTOK_RESULT( string, lineNo, "obj-type");
 	obj.type = atoi( string);
 
