@@ -51,7 +51,7 @@ struct {
 	bool running;
 } createMapDialogData;
 
-#define SHOW_TOOLTIP( x, y, text) SDLGUI_Show_Tooltip( x*TILELEN + GUI_LEFTPANEL_WIDTH, y*TILELEN + GUI_TOPBAR_HEIGHT, text)
+#define SHOW_TOOLTIP( x, y, text) if(x>=viewPos.i && y>=viewPos.j && x<viewEnd.i && y<viewEnd.j) SDLGUI_Show_Tooltip( (x-viewPos.i)*TILELEN + GUI_LEFTPANEL_WIDTH, (y-viewPos.j)*TILELEN + GUI_TOPBAR_HEIGHT, text)
 
 
 /* ---------------------------
