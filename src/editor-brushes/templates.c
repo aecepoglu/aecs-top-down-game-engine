@@ -47,7 +47,11 @@ void addTemplate_clicked( struct SDLGUI_Element *e) {
 	int i;
 	for( i=0; i<MAX_TEMPLATES_COUNT; i++) {
 		if( objectTemplates[i] == NULL) {
-			struct ObjectTemplate *template = template_create( i, "", 0, *selectedObjectPtr);
+			enum AIType aiType = ai_none;
+			if( (*selectedObjectPtr)->ai != NULL)
+				aiType = (*selectedObjectPtr)->ai->type;
+
+			struct ObjectTemplate *template = template_create( i, "", aiType, *selectedObjectPtr);
 			
 			objectTemplates[i] = template;
 			SDLGUI_Params params = (SDLGUI_Params){

@@ -22,7 +22,11 @@ bool template_apply( struct object *to, int templateNo) {
 		to->isPickable = from->obj->isPickable;
 		to->attack = from->obj->attack;
 		to->defence = from->obj->defence;
-		//TODO copy AI
+
+		if( to->ai == NULL && from->aiType != ai_none)
+			to->ai = (struct AI*)malloc(sizeof(struct AI));
+		if( to->ai)
+			to->ai->type = from->aiType;
 
 		return true;
 	}
