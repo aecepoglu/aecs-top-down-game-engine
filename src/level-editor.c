@@ -124,7 +124,7 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 		}
 		else
 			SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.ai, aiNames[ai_none]);
-		
+
 		SDLGUI_Checkbox_SetValue( selectedObjStuff.checkboxes.movable, selectedObjStuff.obj->isMovable);
 
 		SDLGUI_Checkbox_SetValue( selectedObjStuff.checkboxes.pickable, selectedObjStuff.obj->isPickable);
@@ -193,7 +193,7 @@ bool editor_moveObject( unsigned int x, unsigned int y, int type) {
 	}
 	else {
 		selectedObjStuff.obj = myMap->objs[x][y];
-		
+
 		if( selectedObjStuff.obj != NULL)
 			brush.isRepeat = true;
 	}
@@ -210,7 +210,7 @@ bool setDirection( unsigned int x, unsigned int y, int type) {
 	}
 	else {
 		selectedObjStuff.obj = myMap->objs[x][y];
-		
+
 		if( selectedObjStuff.obj != NULL) {
 			brush.isRepeat = true;
 			return true;
@@ -820,17 +820,17 @@ void initGui() {
 
 	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h= buttonLeftMargin + ((sizeof(buttonTemplates) / sizeof(struct buttonTemplate) - 1) / buttonsPerRow + 1) * buttonSizeWithMargins}, panelParams);
 	SDLGUI_AddTo_Panel( leftPanel, buttonsContainer);
-	
+
 	int i;
 	for( i=0; i<sizeof(buttonTemplates) / sizeof(struct buttonTemplate); i++) {
 		struct buttonTemplate *template = &buttonTemplates[i];
 
 		SDL_Texture *texture = loadTexture( renderer, template->fileName);
-		
+
 		struct SDLGUI_Element *element = SDLGUI_Create_Texture( (SDL_Rect){.x=buttonLeftMargin + (i%buttonsPerRow) *buttonSizeWithMargins, .y= buttonLeftMargin + (i/buttonsPerRow) *buttonSizeWithMargins, .w=buttonSize, .h=buttonSize}, texture, iconSize, iconSize, buttonParams);
 
 		SDL_DestroyTexture( texture);
-		
+
 		element->clicked = template->onClick;
 		SDLGUI_AddTo_Panel( buttonsContainer, element);
 	}
@@ -844,7 +844,7 @@ void initGui() {
 
 	brushOptionPanels_init( brushOptionsContainer, textures->obj, textures->trn, &selectedObjStuff.obj);
 
-	
+
 	selectedObjStuff.panel = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=700, .w=buttonsContainer->rect.w, .h=200}, panelParams);
 	selectedObjStuff.panel->isVisible = false;
 	SDLGUI_AddTo_Panel( leftPanel, selectedObjStuff.panel);
@@ -890,7 +890,7 @@ void initGui() {
 
 		struct SDLGUI_Element *label = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=yVal, .w=80, .h=textboxPairHeight * template->numRows}, template->label, labelParams);
 		struct SDLGUI_Element *value;
-		
+
 		if ( template->checkboxChangedCallback == NULL) {
 			value = SDLGUI_Create_Textbox( (SDL_Rect){.x=90, .y=yVal, .w=80, .h=textboxPairHeight * template->numRows}, textboxParams);
 			if( template->isReadOnly != true)
@@ -904,7 +904,7 @@ void initGui() {
 
 		SDLGUI_AddTo_Panel( selectedObjStuff.panel, label);
 		SDLGUI_AddTo_Panel( selectedObjStuff.panel, value);
-		
+
 		*template->elementPtr = value;
 	}
 
@@ -992,28 +992,28 @@ int main( int argc, char *args[]) {
 		buttonParams.borderThickness = 2;
 
 		createMapDialogData.panel = SDLGUI_Create_Panel( (SDL_Rect){.x=100, .y=100, .w=300, .h=500}, (SDLGUI_Params){.bgColor=COLOR_BLACK} );
-		
+
 		struct SDLGUI_Element *button_createMap = SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=250, .w=200, .h=100}, "create", buttonParams);
 		struct SDLGUI_Element *button_quit = SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=400, .w=200, .h=50}, "quit", buttonParams);
 		button_createMap->clicked = editor_createMap_clicked;
 		button_quit->clicked = mapDialog_quit_clicked;
-		
+
 		createMapDialogData.textbox_width  = SDLGUI_Create_Textbox( (SDL_Rect){.x=100, .y=100, .w=100, .h=30}, labelParams);
 		createMapDialogData.textbox_height = SDLGUI_Create_Textbox( (SDL_Rect){.x=100, .y=130, .w=100, .h=30}, labelParams);
 		createMapDialogData.textbox_name   = SDLGUI_Create_Textbox( (SDL_Rect){.x=100, .y=170, .w=100, .h=30}, labelParams);
 		createMapDialogData.textbox_width->data.textData->acceptedChars  = TEXTBOX_INPUT_NUMERIC;
 		createMapDialogData.textbox_height->data.textData->acceptedChars = TEXTBOX_INPUT_NUMERIC;
 		createMapDialogData.textbox_name->data.textData->acceptedChars   = TEXTBOX_INPUT_NUMERIC | TEXTBOX_INPUT_ALPHABET;
-		
+
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y= 10, .h=30}, "Creating New Map\n----------------", labelParams) );
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=100, .h=30}, " width", labelParams) );
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=130, .h=30}, "height", labelParams) );
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=170, .h=30}, "  name", labelParams) );
-		
+
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, createMapDialogData.textbox_width );
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, createMapDialogData.textbox_height);
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, createMapDialogData.textbox_name);
-		
+
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, button_createMap );
 		SDLGUI_AddTo_Panel( createMapDialogData.panel, button_quit );
 
@@ -1032,7 +1032,6 @@ int main( int argc, char *args[]) {
     templates_save();
 
 	log0("Program over\nPeace\n");
-    freeMap( myMap);
     myMap = NULL;
 
 	SDLGUI_Destroy();
