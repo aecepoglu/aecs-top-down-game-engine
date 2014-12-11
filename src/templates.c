@@ -111,7 +111,7 @@ void parseTemplateLine( char *line, int lineNo) {
 	CHECK_STRTOK_RESULT( string, lineNo, "defence");
 	obj.defence = atoi( string);
 
-    objectTemplates[ lineNo] = template_create( lineNo, templateName, aiType, &obj);
+    objectTemplates[ lineNo-1] = template_create( lineNo, templateName, aiType, &obj);
 }
 
 
@@ -145,10 +145,7 @@ void templates_load() {
 
 void templates_save() {
 	FILE *fp = fopen( TEMPLATES_PATH, "w");
-	if( fp == NULL) {
-		printf("couldn't open template file. returning.\n");
-		return;
-    }
+	EXIT_IF( fp == NULL, "couldn't open template file. returning.\n")
 
 	int i;
 	for( i=0; i<MAX_TEMPLATES_COUNT; i++) {

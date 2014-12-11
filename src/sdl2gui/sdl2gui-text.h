@@ -6,3 +6,4 @@
 #define TEXT_SPAN_SIZE 0
 
 struct SDLGUI_Element* SDLGUI_Create_Text( SDL_Rect rect, const char *text, SDLGUI_Params params);
+void SDLGUI_Text_SetText( struct SDLGUI_Element *e, const char *text, SDLGUI_Params params);

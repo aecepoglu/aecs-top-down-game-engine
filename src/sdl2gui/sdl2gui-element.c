@@ -48,34 +48,28 @@ SDL_Texture *createElementTexture( int width, int height, SDLGUI_Color bgColor, 
 	return texture;
 }
 
+void SDLGUI_Texture_SetTextures( struct SDLGUI_Element *e, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params) {
+	e->textures.normal = e->textures.current = createElementTexture( e->rect.w, e->rect.h, params.bgColor, params.fgColor, params.borderThickness, texture, textureWidth, textureHeight);
+
+	e->textures.hover = createElementTexture( e->rect.w, e->rect.h, (SDLGUI_Color){
+			.r = (params.fgColor.r + params.bgColor.r) / 2,
+			.g = (params.fgColor.g + params.bgColor.g) / 2,
+			.b = (params.fgColor.b + params.bgColor.b) / 2,
+			.a = params.bgColor.a + (255 - params.bgColor.a) / 2
+		}, params.fgColor, params.borderThickness, texture, textureWidth, textureHeight);
+	
+	
+	e->textures.focused = createElementTexture( e->rect.w, e->rect.h, (SDLGUI_Color){
+			.r = (params.fgColor.r + 3*params.bgColor.r) / 4,
+			.g = (params.fgColor.g + 3*params.bgColor.g) / 4,
+			.b = (params.fgColor.b + 3*params.bgColor.b) / 4,
+			.a = params.bgColor.a + (255 - params.bgColor.a) / 4
+		}, params.fgColor, params.borderThickness +2, texture, textureWidth, textureHeight);
+}
 
 //TODO the texture should be const
 struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params) {
 	struct SDLGUI_Element *e = (struct SDLGUI_Element*) malloc( sizeof( struct SDLGUI_Element));
-
-	SDLGUI_Color bgColor = params.bgColor;
-	SDLGUI_Color fgColor = params.fgColor;
-	
-	
-	e->textures.normal = e->textures.current = createElementTexture( rect.w, rect.h, bgColor, fgColor, params.borderThickness, texture, textureWidth, textureHeight);
-
-	e->textures.hover = createElementTexture( rect.w, rect.h, (SDLGUI_Color){
-			.r = (fgColor.r + bgColor.r) / 2,
-			.g = (fgColor.g + bgColor.g) / 2,
-			.b = (fgColor.b + bgColor.b) / 2,
-			.a = bgColor.a + (255 - bgColor.a) / 2
-		}, fgColor, params.borderThickness, texture, textureWidth, textureHeight);
-	
-	
-	e->textures.focused = createElementTexture( rect.w, rect.h, (SDLGUI_Color){
-			.r = (fgColor.r + 3*bgColor.r) / 4,
-			.g = (fgColor.g + 3*bgColor.g) / 4,
-			.b = (fgColor.b + 3*bgColor.b) / 4,
-			.a = bgColor.a + (255 - bgColor.a) / 4
-		}, fgColor, params.borderThickness +2, texture, textureWidth, textureHeight);
-
-
-	
 	e->rect = rect;
 	e->clicked = NULL;
 	e->destructor = SDLGUI_Destroy_Texture;
@@ -84,6 +78,7 @@ struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Textur
 	e->textInputHandler = NULL;
 	e->isVisible = !params.isHidden;
 
+	SDLGUI_Texture_SetTextures( e, texture, textureWidth, textureHeight, params);
+
 	return e;
 }
-
