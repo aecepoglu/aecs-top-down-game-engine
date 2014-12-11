@@ -423,34 +423,28 @@ void textbox_defence_changed( struct SDLGUI_Element *textbox, const char *text) 
 }
 
 void handleKey( SDL_KeyboardEvent *e) {
-	bool matched = e->repeat != true;
-	if( matched) {
-		switch (e->keysym.sym) {
-			case SDLK_s:
-				buttonSave_clicked(NULL);
-				break;
-			case SDLK_q:
-				buttonQuit_clicked(NULL);
-				break;
-		};
-	}
-
-	if( matched) {
-		switch( e->keysym.sym) {
-			case SDLK_UP:
-				scrollScreen( dir_up);
-				break;
-			case SDLK_DOWN:
-				scrollScreen( dir_down);
-				break;
-			case SDLK_RIGHT:
-				scrollScreen( dir_right);
-				break;
-			case SDLK_LEFT:
-				scrollScreen( dir_left);
-				break;
-		};
-	}
+	switch( e->keysym.sym) {
+		case SDLK_s:
+	        if( e->repeat != true)
+			    buttonSave_clicked(NULL);
+			break;
+		case SDLK_q:
+	        if( e->repeat != true)
+			    buttonQuit_clicked(NULL);
+			break;
+		case SDLK_UP:
+			scrollScreen( dir_up);
+			break;
+		case SDLK_DOWN:
+			scrollScreen( dir_down);
+			break;
+		case SDLK_RIGHT:
+			scrollScreen( dir_right);
+			break;
+		case SDLK_LEFT:
+			scrollScreen( dir_left);
+			break;
+	};
 }
 
 /* The mouse button-event and motion-events are handled the same
