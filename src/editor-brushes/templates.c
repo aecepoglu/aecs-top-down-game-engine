@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "templates.h"
 #include "brush.h"
 #include "../templates.h"

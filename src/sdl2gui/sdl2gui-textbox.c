@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "sdl2gui-textbox.h"
 #include "sdl2gui-element.h"
 #include "../text.h"
