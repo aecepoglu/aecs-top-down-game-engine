@@ -749,7 +749,7 @@ void button_remove_clicked( struct SDLGUI_Element *e) {
 }
 
 void button_template_clicked( struct SDLGUI_Element *e) {
-    brush.fun = editor_applyTemplate;
+    brush.fun = editor_selectObj;
     brush.variant = 0;
     hideAll();
     brushOptionPanels.templates->isVisible = true;

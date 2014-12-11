@@ -5,7 +5,6 @@
 
 #define TEMPLATES_PATH "templates.csv"
 #define DELIMETER ","
-#define MAX_NAME_LENGTH 10
 
 #define CHECK_STRTOK_RESULT( string, no, name) EXIT_IF( string == NULL, "Error at line %d. Line ended but was expeting %s\n", no, name)
 
@@ -39,7 +38,7 @@ struct ObjectTemplate* template_create( int templateIndex, const char *name, int
 	template->obj = (struct object*)malloc(sizeof(struct object));
 
 	int nameLen = (int)strlen(name);
-	EXIT_IF( nameLen > MAX_NAME_LENGTH, "template name %s is too long(%d) in line %d. Must be < %d\n", name, nameLen, templateIndex, MAX_NAME_LENGTH);
+	EXIT_IF( nameLen > MAX_TEMPLATE_NAME_LENGTH, "template name %s is too long(%d) in line %d. Must be < %d\n", name, nameLen, templateIndex, MAX_TEMPLATE_NAME_LENGTH);
 	template->name = (char*)calloc( nameLen+1, sizeof(char));
 	memcpy( template->name, name, (strlen(name) + 1)*sizeof(char));
 
@@ -151,7 +150,7 @@ void templates_save() {
 	for( i=0; i<MAX_TEMPLATES_COUNT; i++) {
 		struct ObjectTemplate *t = objectTemplates[i];
 		if( t == NULL)
-			break;
+			continue;
 
 		fprintf( fp, "%s,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 			t->name,
@@ -181,4 +180,5 @@ void template_remove( int index) {
 	free( t->obj);
 	free( t->name);
 	free( t);
+    objectTemplates[index] = NULL;
 }

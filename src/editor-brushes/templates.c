@@ -21,6 +21,7 @@ void repositionTemplateButtons( struct SDLGUI_List *list, int offsetY) {
 }
 
 void template_clicked( struct SDLGUI_Element *e) {
+	brush.fun = editor_selectObj;
 	brush.variant = *((int*)(e->userData));
 }
 
@@ -38,13 +39,14 @@ void createTemplateButton( int templateIndex, const struct ObjectTemplate *t, SD
 
 
 void addTemplate_clicked( struct SDLGUI_Element *e) {
+    brush.fun = editor_selectObj;
 	if( *selectedObjectPtr == NULL)
 		return;
 	struct SDLGUI_Element *panel = panels.list;
 	int i;
 	for( i=0; i<MAX_TEMPLATES_COUNT; i++) {
 		if( objectTemplates[i] == NULL) {
-			struct ObjectTemplate *template = template_create( i, "my template", 0, *selectedObjectPtr);
+			struct ObjectTemplate *template = template_create( i, "", 0, *selectedObjectPtr);
 			
 			objectTemplates[i] = template;
 			SDLGUI_Params params = (SDLGUI_Params){
@@ -57,6 +59,7 @@ void addTemplate_clicked( struct SDLGUI_Element *e) {
 			createTemplateButton( i, template, &params);
 
 			repositionTemplateButtons( panel->data.elements, panel->rect.y);
+            brush.variant = i;
 			SHOW_DETAIL_PANEL();
 			break;
 		}
@@ -103,9 +106,12 @@ void editTemplate_clicked( struct SDLGUI_Element *from) {
 
 void applyTemplate_clicked( struct SDLGUI_Element *e) {
 	struct ObjectTemplate *currentTemplate = objectTemplates[brush.variant];
-    currentTemplate->name = strdup( SDLGUI_GetText_Textbox( textbox_templateName));
-    SDLGUI_Text_SetText( getSelectedBrushElement(), currentTemplate->name, templateBrushList_params);
-    SHOW_LIST_PANEL();
+    const char *newName = SDLGUI_GetText_Textbox( textbox_templateName);
+    if( strlen( newName) <= MAX_TEMPLATE_NAME_LENGTH) {
+        currentTemplate->name = strdup( newName);
+        SDLGUI_Text_SetText( getSelectedBrushElement(), currentTemplate->name, templateBrushList_params);
+        SHOW_LIST_PANEL();
+    }
 }
 
 struct SDLGUI_Element* brushOptionPanel_create_templates( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams, SDLGUI_Params *buttonParams, struct object **_selectedPtr) {

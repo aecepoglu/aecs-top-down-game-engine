@@ -15,6 +15,7 @@ struct {
 } brush;
 
 brushFun defaultBrush,
+	editor_selectObj,
 	drawObject,
 	drawTerrain,
 	drawPlayer,

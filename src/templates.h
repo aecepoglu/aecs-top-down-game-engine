@@ -5,6 +5,7 @@
 #include "basic.h"
 
 #define MAX_TEMPLATES_COUNT 8
+#define MAX_TEMPLATE_NAME_LENGTH 10
 
 struct ObjectTemplate {
     struct object *obj;
