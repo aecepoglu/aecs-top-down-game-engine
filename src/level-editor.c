@@ -60,7 +60,7 @@ struct {
 
 bool editor_removeObject( unsigned int x, unsigned int y, int type) {
 	if( myMap->objs[x][y] != 0) {
-		objectFree( myMap->objs[x][y]);
+		myMap->objs[x][y]->isDeleted = true;
 		myMap->objs[x][y] = NULL;
 		return true;
 	}
@@ -1038,6 +1038,9 @@ int main( int argc, char *args[]) {
     templates_save();
 
 	log0("Program over\nPeace\n");
+    freeMap( myMap);
+    myMap = NULL;
+
 	SDLGUI_Destroy();
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
