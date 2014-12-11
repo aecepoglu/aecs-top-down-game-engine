@@ -14,8 +14,6 @@ bool template_apply( struct object *to, int templateNo) {
         from = objectTemplates[ templateNo];
 
 	if( from != NULL && to != NULL) {
-		if( from->obj->id != 0)
-			to->id = 0;
 		to->type = from->obj->type;
 		to->health = from->obj->health;
 		to->maxHealth = from->obj->maxHealth;
@@ -70,8 +68,14 @@ void parseTemplateLine( char *line, int lineNo) {
 
 	template->obj->id = 0;
 
-	string = strtok( line, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "name");
+	if(line[0] == ',') {
+		line[0] = '\0';
+		string = line;
+	}
+	else {
+		string = strtok( line, delim);
+		CHECK_STRTOK_RESULT( string, lineNo, "name");
+	}
     templateName = string;
 
 	string = strtok( NULL, delim);
