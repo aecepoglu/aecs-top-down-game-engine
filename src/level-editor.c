@@ -171,7 +171,7 @@ bool drawAI( unsigned int x, unsigned int y, int type) {
 			ai->type = type;
 			myMap->objs[x][y]->ai = ai;
 		}
-
+		editor_selectObj( x, y, 0);
 		SHOW_TOOLTIP( x, y, "AI put");
 		return true;
 	}

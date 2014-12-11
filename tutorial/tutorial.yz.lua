@@ -20,7 +20,9 @@ lib.cutWrite( 10, 10, "You're going to use the cursor keys to move around.\n\t\x
 lib.cutRender()
 lib.cutReadKey()
 
-lib.startLevel( "level1.yz.map", "level1.yz.lua", 0)
+lib.startLevel( "1.yz.map", "level1.yz.lua", 0)
+lib.startLevel( "2.yz.map", "level1.yz.lua", 0)
+lib.startLevel( "3.yz.map", "3.yz.lua", 0)
 
 
 
