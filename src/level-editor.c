@@ -143,10 +143,13 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 
 bool editor_createObj( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
-	if( myMap->objs[x][y]!=NULL || myMap->tiles[x][y]==terrain_wall)
+	if( myMap->tiles[x][y]==terrain_wall)
 		return false;
 
-	//create and initialize a monster
+	if( myMap->objs[x][y]!=NULL ) {
+		myMap->objs[x][y]->type = type;
+		return true;
+	}
 	struct object *obj = createObject( type, x, y, objectCounter++);
 
 
