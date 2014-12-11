@@ -22,7 +22,7 @@ void repositionTemplateButtons( struct SDLGUI_List *list, int offsetY) {
 }
 
 void template_clicked( struct SDLGUI_Element *e) {
-	brush.fun = editor_selectObj;
+	brush.fun = editor_applyTemplate;
 	brush.variant = *((int*)(e->userData));
 }
 
