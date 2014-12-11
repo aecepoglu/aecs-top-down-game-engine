@@ -13,8 +13,16 @@ lib.cutReadKey()
 
 -- SCENE 2
 lib.cutClear( 0,0,0)
-lib.cutWrite( 10, 10, "You're going to use the cursor keys to move around.\n\t\x80 to move forward\n\t\x81 to turn right, \x83 to turn left\n\t\x82 to move backwards\n\n"
-    .. "Press 'u' key to interact with objects\nYou'll need to interact with the gate at the end\n of the level to finish it.\n\n"
+lib.cutWrite( 10, 10, "Use mouse to look around\n\n"
+
+    .. "    Press WASD to move,\n"
+	.. "        or ,AOE for Dvorak users\n\n"
+
+    .. "Click once to interact with objects\n\n\n"
+
+
+    .. "Interact with the gate to end the level.\n\n"
+
     .. "Press any key to start the level"
     )
 lib.cutRender()
@@ -76,8 +84,8 @@ lib.cutWrite( 10, 10, "Good job solving the puzzle.\n\n"
 
     .. "So you can push objects, interact with them; you can also \n"
     .. "  - hit them, by trying to move onto them\n"
-    .. "  - eat them, by pressing 'e' when they are dead\n"
-    .. "  - pick them to inventory, by pressing 'p'\n"
+    .. "  - eat them, by double-right-clicking\n"
+    .. "  - pick them to inventory, by double-clicking\n"
     .. "  - press number keys [1-6] to drop items from inventory\n\n"
 
     .. "Some objects give health when you eat them, but some damage you\n"

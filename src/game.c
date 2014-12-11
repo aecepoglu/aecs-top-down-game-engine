@@ -273,33 +273,30 @@ void handleKey( SDL_KeyboardEvent *e) {
 		case SDLK_q:
             quit("pressed 'q'. Quitting");
 			break;
-		case SDLK_UP:
+		case SDLK_COMMA:
+		case SDLK_w:
 			movePlayer( ( e->keysym.mod & KMOD_LSHIFT) ? pushForward : moveForward );
 			break;
-		case SDLK_DOWN:
+		case SDLK_o:
+		case SDLK_s:
 			movePlayer( moveBackward);
 			break;
-		case SDLK_LEFT:
-			movePlayer( (e->keysym.mod & KMOD_LSHIFT)
-				? strafeLeft
-				: turnLeft
-			);
-			break;
-		case SDLK_RIGHT:
-			movePlayer( (e->keysym.mod & KMOD_LSHIFT)
-				? strafeRight
-				: turnRight
-			);
+		case SDLK_a:
+			movePlayer( strafeLeft);
 			break;
 		case SDLK_e:
-			movePlayer( eat);
+		case SDLK_d:
+			movePlayer( strafeRight);
 			break;
-        case SDLK_u:
-			movePlayer( interact);
-            break;
-		case SDLK_p:
-			movePlayer( pickUp);
-			break;
+		//case SDLK_e:
+		//	movePlayer( eat);
+		//	break;
+        //case SDLK_u:
+		//	movePlayer( interact);
+        //    break;
+		//case SDLK_p:
+		//	movePlayer( pickUp);
+		//	break;
 		case SDLK_1:
 			dropItem( myMap, player, 0);
 			break;
@@ -453,6 +450,7 @@ int run() {
 	CALL_FOV_FCN();
 
 	SDL_Event e;
+	SDL_MouseMotionEvent motionEvent;
 	while( true) {
 		SDL_WaitEvent( &e);
 		switch (e.type) {
@@ -509,14 +507,34 @@ int run() {
 			case SDL_KEYDOWN:
 				handleKey( (SDL_KeyboardEvent*)&e);
 				break;
+			case SDL_MOUSEMOTION: 
+			if( playerMoved != true) {
+				motionEvent = e.motion;
+				enum direction newDir = vector_dirTan( motionEvent.y/TILELEN - viewSize.j/2, motionEvent.x/TILELEN - viewSize.i/2);
+				if( player->dir == newDir)
+					continue;
+				player->dir = newDir;
+				playerMoved = true;
+				CALL_FOV_FCN();
+				break;
+			}
 			case SDL_MOUSEBUTTONDOWN:
-			case SDL_MOUSEMOTION:
+				if( e.button.state == SDL_PRESSED) {
+					if( e.button.button == SDL_BUTTON_LEFT) {
+						if( e.button.clicks >= 2)
+							movePlayer( pickUp);
+						else
+							movePlayer( interact);
+					}
+					else {
+						if( e.button.clicks >= 2)
+							movePlayer( eat);
+					}
+					break;
+				}
 			case SDL_KEYUP:
 			case SDL_MOUSEBUTTONUP:
-				/*don't do anything for these events*/
-				continue;
 			default:
-				log1("unhandled event type: %d\n", e.type);
 				continue;
 		};
 		draw();
