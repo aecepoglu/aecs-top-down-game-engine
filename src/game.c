@@ -288,15 +288,10 @@ void handleKey( SDL_KeyboardEvent *e) {
 		case SDLK_d:
 			movePlayer( strafeRight);
 			break;
-		//case SDLK_e:
-		//	movePlayer( eat);
-		//	break;
-        //case SDLK_u:
-		//	movePlayer( interact);
-        //    break;
-		//case SDLK_p:
-		//	movePlayer( pickUp);
-		//	break;
+        case SDLK_u:
+        case SDLK_f:
+			movePlayer( ( e->keysym.mod & KMOD_LSHIFT) ? eat : pickUp );
+            break;
 		case SDLK_1:
 			dropItem( myMap, player, 0);
 			break;
@@ -521,14 +516,7 @@ int run() {
 			case SDL_MOUSEBUTTONDOWN:
 				if( e.button.state == SDL_PRESSED) {
 					if( e.button.button == SDL_BUTTON_LEFT) {
-						if( e.button.clicks >= 2)
-							movePlayer( pickUp);
-						else
-							movePlayer( interact);
-					}
-					else {
-						if( e.button.clicks >= 2)
-							movePlayer( eat);
+						movePlayer( interact);
 					}
 					break;
 				}
