@@ -32,35 +32,17 @@ lib.startLevel( "1.yz.map", "level1.yz.lua", 0)
 lib.startLevel( "2.yz.map", "level1.yz.lua", 0)
 lib.startLevel( "3.yz.map", "3.yz.lua", 0)
 
-
-
--- SCENE 3
-lib.cutClear( 0, 0, 0)
-lib.cutWrite( 10, 10, "So that's how you move around the map.\n\n"
-    .. "You can interact with more than just gates.\n"
-    .. "This next level will have a few more\n"
-    .. " interactable objects\n\n"
-    .. "Press any key to start the level\n"
-    )
+lib.cutClear(0,0,0)
+lib.cutWrite( 10,200, "Press 'F' or 'U' to pick up an item");
 lib.cutRender()
 lib.cutReadKey()
 
+lib.startLevel("lockedDoor.yz.map", "lockedDoor.yz.lua", 0)
 
 
-lib.startLevel( "level2.yz.map", "level2.yz.lua", 0)
-
-
-
--- SCENE 4
 lib.cutClear(0,0,0)
-lib.cutWrite( 10, 10, "I loved playing Sokoban growing up,\n"
-    .. " so I couldn't not put a similar mechanic in this-\n\n"
-    .. "In the next level, you need to push the boxes onto-\n"
-    .. " highlit tiles to unlock the gate\n\n"
-    .. "You need to press 'SHIFT-\x80' when standing against an object to push it forward\n\n"
-    .. "If you fail to solve the puzzle, press the button in the level\n\n"
-    .. "Press any key to start the level"
-    )
+lib.cutWrite( 10, 100, "Press Shift-\x80 to push objects")
+lib.cutWrite( 10, 300, "Push boxes onto marked tiles")
 lib.cutRender()
 lib.cutReadKey()
 
