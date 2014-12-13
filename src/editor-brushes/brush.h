@@ -39,6 +39,6 @@ struct {
 #define BUTTON_SIZE 32
 #define ICON_SIZE 16
 
-void brushOptionPanels_init( struct SDLGUI_Element *parentPanel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures, struct object **selectedObjPtr);
+void brushOptionPanels_init( struct SDLGUI_Element *parentPanel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures, struct object **selectedObjPtr, SDL_Renderer *renderer);
 
 #endif /* BRUSH_H */

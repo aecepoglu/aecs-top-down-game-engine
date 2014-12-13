@@ -6,7 +6,7 @@
 #include "templates.h"
 #include "move.h"
 
-void brushOptionPanels_init( struct SDLGUI_Element *panel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures, struct object **selectedObjPtr) {
+void brushOptionPanels_init( struct SDLGUI_Element *panel, struct TextureSheet **objTextureSheets, SDL_Texture **trnTextures, struct object **selectedObjPtr, SDL_Renderer *renderer) {
 	SDLGUI_Params panelParams = (SDLGUI_Params) {
 		.bgColor = (SDLGUI_Color){255, 255, 0, 64},
 		.fgColor = COLOR_BLACK,
@@ -28,6 +28,6 @@ void brushOptionPanels_init( struct SDLGUI_Element *panel, struct TextureSheet *
 	brushOptionPanels.terrain = brushOptionPanel_create_terrain( panel, &panelParams, &buttonParams, trnTextures);
 	brushOptionPanels.object = brushOptionPanel_create_object( panel, &panelParams, &buttonParams, objTextureSheets);
 	brushOptionPanels.ai = brushOptionPanel_create_ai( panel, &panelParams, &textButtonParams);
-	brushOptionPanels.templates = brushOptionPanel_create_templates( panel, &panelParams, &buttonParams, selectedObjPtr);
+	brushOptionPanels.templates = brushOptionPanel_create_templates( panel, &panelParams, &buttonParams, selectedObjPtr, renderer);
 	brushOptionPanels.move = brushOptionPanel_create_move( panel, &panelParams);
 }

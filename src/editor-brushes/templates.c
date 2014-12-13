@@ -3,6 +3,7 @@
 #include "templates.h"
 #include "brush.h"
 #include "../templates.h"
+#include "../texture.h"
 
 struct object **selectedObjectPtr;
 struct {
@@ -52,7 +53,7 @@ void addTemplate_clicked( struct SDLGUI_Element *e) {
 				aiType = (*selectedObjectPtr)->ai->type;
 
 			struct ObjectTemplate *template = template_create( i, "", aiType, *selectedObjectPtr);
-			
+
 			objectTemplates[i] = template;
 			SDLGUI_Params params = (SDLGUI_Params){
 				.bgColor = COLOR_BLACK,
@@ -81,14 +82,14 @@ struct SDLGUI_Element* getSelectedBrushElement() {
 		if( *variantPtr == brush.variant) {
 			return e;
 		}
-	}; 
+	};
 	return NULL;
 }
 
 void removeTemplate_clicked( struct SDLGUI_Element *from) {
 	struct SDLGUI_Element *panel = panels.list;
 	struct SDLGUI_List *elements = panel->data.elements;
-    
+
     struct SDLGUI_Element *e = getSelectedBrushElement();
     if( e ) {
 		SDLGUI_List_Remove( elements, e);
@@ -119,7 +120,7 @@ void applyTemplate_clicked( struct SDLGUI_Element *e) {
     }
 }
 
-struct SDLGUI_Element* brushOptionPanel_create_templates( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams, SDLGUI_Params *buttonParams, struct object **_selectedPtr) {
+struct SDLGUI_Element* brushOptionPanel_create_templates( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams, SDLGUI_Params *buttonParams, struct object **_selectedPtr, SDL_Renderer *renderer) {
 	selectedObjectPtr = _selectedPtr;
 	templateBrushList_params = *buttonParams;
 
@@ -136,8 +137,13 @@ struct SDLGUI_Element* brushOptionPanel_create_templates( struct SDLGUI_Element 
 	SDLGUI_AddTo_Panel( containerPanel, panels.detail);
 
 	/* List Panel */
-	struct SDLGUI_Element *button_add = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=10, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, "+", *buttonParams);
-	struct SDLGUI_Element *button_edit = SDLGUI_Create_Text( (SDL_Rect){.x=52, .y=10, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, "E", *buttonParams);
+	SDL_Texture *texture_add = loadTexture(renderer, "res/editor/saveTemplate.png");
+	SDL_Texture *texture_edit = loadTexture(renderer, "res/editor/edit.png");
+	SDL_Texture *texture_delete = loadTexture(renderer, "res/editor/delete.png");
+	SDL_Texture *texture_ok = loadTexture(renderer, "res/editor/ok.png");
+	struct SDLGUI_Element *button_add = SDLGUI_Create_Texture( (SDL_Rect){.x=10, .y=10, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, texture_add, ICON_SIZE, ICON_SIZE, *buttonParams);
+	struct SDLGUI_Element *button_edit = SDLGUI_Create_Texture( (SDL_Rect){.x=52, .y=10, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, texture_edit, ICON_SIZE, ICON_SIZE, *buttonParams);
+
 	SDLGUI_AddTo_Panel( panels.list, button_add);
 	SDLGUI_AddTo_Panel( panels.list, button_edit);
 
@@ -167,16 +173,23 @@ struct SDLGUI_Element* brushOptionPanel_create_templates( struct SDLGUI_Element 
 
 	struct SDLGUI_Element *label = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=10}, "Template Name:", textParams);
 	textbox_templateName = SDLGUI_Create_Textbox( (SDL_Rect){.x=10, .y=30, .w=panels.detail->rect.w - 20}, textParams);
-	struct SDLGUI_Element *button_apply = SDLGUI_Create_Text( (SDL_Rect){.x=10, .y=50, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, "O", *buttonParams);
-	struct SDLGUI_Element *button_remove = SDLGUI_Create_Text( (SDL_Rect){.x=52, .y=50, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, "X", *buttonParams);
+	struct SDLGUI_Element *button_apply = SDLGUI_Create_Texture( (SDL_Rect){.x=10, .y=50, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, texture_ok, ICON_SIZE, ICON_SIZE, *buttonParams);
+	struct SDLGUI_Element *button_remove = SDLGUI_Create_Texture( (SDL_Rect){.x=52, .y=50, .w=BUTTON_SIZE, .h=BUTTON_SIZE}, texture_delete, ICON_SIZE, ICON_SIZE, *buttonParams);
 	SDLGUI_AddTo_Panel( panels.detail, label );
 	SDLGUI_AddTo_Panel( panels.detail, textbox_templateName );
 	SDLGUI_AddTo_Panel( panels.detail, button_apply );
 	SDLGUI_AddTo_Panel( panels.detail, button_remove );
-	
+
 	button_apply->clicked = applyTemplate_clicked;
 	button_remove->clicked = removeTemplate_clicked;
     textbox_templateName->data.textData->acceptedChars = TEXTBOX_INPUT_ALPHABET | TEXTBOX_INPUT_NUMERIC;
+
+
+    SDL_DestroyTexture(texture_add);
+	SDL_DestroyTexture(texture_edit);
+	SDL_DestroyTexture(texture_delete);
+	SDL_DestroyTexture(texture_ok);
+
 
 	return containerPanel;
 }

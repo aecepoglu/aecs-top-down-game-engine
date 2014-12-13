@@ -845,7 +845,7 @@ void initGui() {
 	);
 	SDLGUI_AddTo_Panel( leftPanel, brushOptionsContainer);
 
-	brushOptionPanels_init( brushOptionsContainer, textures->obj, textures->trn, &selectedObjStuff.obj);
+	brushOptionPanels_init( brushOptionsContainer, textures->obj, textures->trn, &selectedObjStuff.obj, renderer);
 
 
 	selectedObjStuff.panel = SDLGUI_Create_Panel( (SDL_Rect){.x=buttonsContainer->rect.x, .y=700, .w=buttonsContainer->rect.w, .h=200}, panelParams);

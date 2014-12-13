@@ -11,9 +11,9 @@
 SDL_Texture *loadTexture( SDL_Renderer *ren, const char *path){
     log1( "\tLoading %s\n", path);
 	SDL_Surface *img = IMG_Load( path);
-	assert( img);
+	EXIT_IF(img == NULL, "Img %s not found", path);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface( ren, img);
-	assert( tex);
+	EXIT_IF( tex == NULL, "Texture is null");
 	SDL_FreeSurface( img);
 
 	return tex;
@@ -27,7 +27,7 @@ SDL_Texture** loadTextureSheet( SDL_Renderer *ren, SDL_Surface *sheet, int inNum
 	SDL_Texture **result = (SDL_Texture**)calloc( inNumRows * inNumCols, sizeof( SDL_Texture **));
 
 	SDL_Surface *blitSurf = SDL_CreateRGBSurface(0, unitWidth, unitHeight, sheet->format->BitsPerPixel, sheet->format->Rmask, sheet->format->Gmask, sheet->format->Bmask, sheet->format->Amask);
-	
+
 	SDL_Rect surfRect;
 	surfRect.w = unitWidth;
 	surfRect.h = unitHeight;
@@ -78,7 +78,7 @@ struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const char *path) {
 	log1( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 
 	struct TextureSheet *result = (struct TextureSheet*)malloc( sizeof( struct TextureSheet));
-	
+
 	SDL_Texture **texturesList = loadTextureSheet( ren, img, numStates, numRotations, SPRITE_TILE_LEN, SPRITE_TILE_LEN);
 
 	result->numStates = numStates;
@@ -110,9 +110,9 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 
 struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	log1("Loading textures\n");
-	
+
 	struct GameTextures *result = malloc( sizeof(struct GameTextures));
-	
+
 
 	char *trnPaths[terrain_NUM_ITEMS] = {
 		[ terrain_dark 	] = "res/empty.png",
@@ -153,7 +153,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->unidentifiedObj = loadTexture( ren, "res/qmark.png");
 	result->emptyHeart = loadTexture( ren, "res/heart_empty.png");
 	result->fullHeart = loadTexture( ren, "res/heart.png");
-	
+
 	return result;
 }
 
