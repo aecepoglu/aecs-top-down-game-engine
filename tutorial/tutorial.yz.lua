@@ -60,32 +60,6 @@ end
 
 
 
--- SCENE 5
-lib.cutClear(0, 50, 0)
-lib.cutWrite( 10, 10, "Good job solving the puzzle.\n\n"
-
-    .. "So you can push objects, interact with them; you can also \n"
-    .. "  - hit them, by trying to move onto them\n"
-    .. "  - eat them, by double-right-clicking\n"
-    .. "  - pick them to inventory, by double-clicking\n"
-    .. "  - press number keys [1-6] to drop items from inventory\n\n"
-
-    .. "Some objects give health when you eat them, but some damage you\n"
-    .. "Different objects have different amount of defence.\n"
-    .. " You might not be able to destroy them all\n"
-    .. "You cannot pick every object into your inventory\n\n."
-
-    .. "This next level will have you use these mechanics\n\n"
-
-    .. "Press any key to start the level"
-    )
-lib.cutRender()
-lib.cutReadKey()
-
-lib.startLevel( "level4.yz.map", "level4.yz.lua", 0)
-
-
-
 -- SCENE 6
 lib.cutClear(0,0,0)
 lib.cutWrite( 10, 10, "Of course, the main reason why I started this\n"
