@@ -590,6 +590,7 @@ lua_State* initLua() {
 	luaL_openlibs( L ); 
 
 	lua_newtable( L);
+
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
 		{"use", dsl_useObject},
 		{"onInteract", dsl_onInteract},
@@ -614,6 +615,11 @@ lua_State* initLua() {
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);
+	
+	lua_pushstring( L, "DIR_PATH");
+	lua_pushstring( L, dirPath);
+	lua_settable( L, -3);
+	
 	lua_setglobal( L, "lib");
 
 	return L;
@@ -645,6 +651,8 @@ int main( int argc, char *args[]) {
 		fprintf( stderr, "Usage: %s map-file (without .yz.* extensions)", args[0]);
         return 0;
 	}
+    dirPath = getDirPath( args[1]);
+
 	lua = initLua();
 	setDefaults();
 	
@@ -653,7 +661,6 @@ int main( int argc, char *args[]) {
 	audio_init();
 	cutscene_init();
 	textConsole_texture = textConsole_init( renderer);
-    dirPath = getDirPath( args[1]);
     
     if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {
         fprintf(stderr, "Error loading script '%s'\n%s\n", args[1], lua_tostring(lua, -1));
