@@ -11,4 +11,5 @@ char *aiNames[] = {
 	"door",
 	"line sensor",
 	"switch",
+	"escaper",
 };

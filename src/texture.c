@@ -135,6 +135,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 		[ go_box] 	        = "res/box.png",
 		[ go_gate]			= "res/gate.png",
 		[ go_key]			= "res/key.png",
+		[ go_escaper]		= "res/escaper.png",
 	};
 
 	result->trn = calloc( terrain_NUM_ITEMS, sizeof(SDL_Texture*));

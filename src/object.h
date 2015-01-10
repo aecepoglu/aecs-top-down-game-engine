@@ -26,6 +26,7 @@ enum objType {
 	go_box,
 	go_gate,
 	go_key,
+	go_escaper,
 	go_NUM_ITEMS
 };
 

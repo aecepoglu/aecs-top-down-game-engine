@@ -1,5 +1,6 @@
 #include "vector.h"
 #include <stdlib.h>
+#include <math.h>
 
 
 struct Vector dirVectors[] = {
@@ -67,4 +68,8 @@ enum direction vector_dirTan( int y, int x) {
 		result = f2 ? dir_right : dir_up;
 	
 	return result;
+}
+
+unsigned int vector_length( struct Vector *v) {
+	return abs( v->i) + abs( v->j);
 }

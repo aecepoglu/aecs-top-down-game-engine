@@ -17,6 +17,7 @@ enum AIType {
 	ai_door,
 	ai_lineSensor,
 	ai_switch,
+	ai_escaper,
 	ai_NUM_ITEMS
 };
 

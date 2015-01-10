@@ -31,6 +31,7 @@ struct Vector* readVector( FILE *fp);
 void readToVector( FILE *fp, struct Vector*);
 void writeVector( FILE *fp, struct Vector*);
 enum direction vector_dirTan( int y, int x);
+unsigned int vector_length( struct Vector *v);
 
 extern struct Vector dirVectors[4];
 extern uint8_t dirFlags[4];

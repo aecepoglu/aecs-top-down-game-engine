@@ -16,6 +16,7 @@ void clicked_obj_lineSensor		( struct SDLGUI_Element *e) { brush.variant = go_li
 void clicked_obj_box			( struct SDLGUI_Element *e) { brush.variant = go_box			; }
 void clicked_obj_gate			( struct SDLGUI_Element *e) { brush.variant = go_gate			; }
 void clicked_obj_key			( struct SDLGUI_Element *e) { brush.variant = go_key			; }
+void clicked_obj_escaper		( struct SDLGUI_Element *e) { brush.variant = go_escaper		; }
 
 struct SDLGUI_Element* brushOptionPanel_create_object( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams, SDLGUI_Params *buttonParams, struct TextureSheet **objTextureSheets) {
 	struct SDLGUI_Element *panel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=parentPanel->rect.w, .h=160}, *panelParams);
@@ -36,6 +37,7 @@ struct SDLGUI_Element* brushOptionPanel_create_object( struct SDLGUI_Element *pa
 		&clicked_obj_box,
 		&clicked_obj_gate,
 		&clicked_obj_key,
+		&clicked_obj_escaper,
 	};
 
 	const int buttonsPerRow = 4;

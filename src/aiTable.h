@@ -10,6 +10,7 @@
 #include "ai/door.h"
 #include "ai/lineSensor.h"
 #include "ai/switch.h"
+#include "ai/escaper.h"
 
 #include "ai.h"
 #include "aiFun.h"
@@ -35,6 +36,7 @@ static struct aiTableItem aiTable[] = {
 	[ai_door] = 			{ door_create, 				NULL,						door_destroy,				NULL,					door_use	},
 	[ai_lineSensor] = 		{ lineSensor_create, 		lineSensor_update,			common_ai_destroy,			NULL,					NULL		},
 	[ai_switch] = 			{ switch_create, 			NULL,						common_ai_destroy,			NULL,					switch_use	},
+	[ai_escaper] = 			{ escaper_create, 			escaper_update,				escaper_destroy,			NULL,					NULL		},
 };
 
 /* table interface */

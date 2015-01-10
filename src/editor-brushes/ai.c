@@ -14,6 +14,7 @@ void clicked_ai_weepingAngel		( struct SDLGUI_Element *e) { brush.variant = ai_w
 void clicked_ai_door				( struct SDLGUI_Element *e) { brush.variant = ai_door				; }
 void clicked_ai_lineSensor			( struct SDLGUI_Element *e) { brush.variant = ai_lineSensor			; }
 void clicked_ai_sw					( struct SDLGUI_Element *e) { brush.variant = ai_switch				; }
+void clicked_ai_escaper				( struct SDLGUI_Element *e) { brush.variant = ai_escaper			; }
 
 struct SDLGUI_Element* brushOptionPanel_create_ai( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams, SDLGUI_Params *buttonParams) {
 	struct SDLGUI_Element *panel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=parentPanel->rect.w, .h=230}, *panelParams);
@@ -31,6 +32,7 @@ struct SDLGUI_Element* brushOptionPanel_create_ai( struct SDLGUI_Element *parent
 		clicked_ai_door,
 		clicked_ai_lineSensor,
 		clicked_ai_sw,
+		clicked_ai_escaper,
 	};
 
 	int i;
