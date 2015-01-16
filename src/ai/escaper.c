@@ -41,7 +41,6 @@ struct object* escaper_findTarget( struct Map *map, struct Vector *pos, enum dir
 }
 
 void escaper_update( struct Map *map, struct object *obj, void *data) {
-	printf("updating\n");
 	struct EscaperData *aiData = (struct EscaperData*)data;
 
 	if( aiData->targetObject == NULL) {
