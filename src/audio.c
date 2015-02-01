@@ -9,19 +9,19 @@ void audio_init() {
 
 	char *fxPaths[AUDIO_NUM_ITEMS] = {
 		[AUDIO_MOVE] 		= "res/audio/move.wav",
-		[AUDIO_NO_MOVE] 	= "res/audio/noMove.wav",
+		[AUDIO_NO_MOVE] 	= "res/audio/noAction.wav",
 		[AUDIO_INTERACT] 	= "res/audio/interact.wav",
-		[AUDIO_NO_INTERACT] = "res/audio/noInteract.wav",
+		[AUDIO_NO_INTERACT] = "res/audio/noAction.wav",
 		[AUDIO_PUSH] 		= "res/audio/push.wav",
-		[AUDIO_NO_PUSH] 	= "res/audio/noPush.wav",
+		[AUDIO_NO_PUSH] 	= "res/audio/noAction.wav",
 		[AUDIO_HIT]			= "res/audio/hit.wav",
-		[AUDIO_NO_HIT]		= "res/audio/noHit.wav",
+		[AUDIO_NO_HIT]		= "res/audio/noAction.wav",
 		[AUDIO_EAT]			= "res/audio/eat.wav",
-		[AUDIO_NO_EAT]		= "res/audio/noEat.wav",
+		[AUDIO_NO_EAT]		= "res/audio/noAction.wav",
 		[AUDIO_PICK]		= "res/audio/pick.wav",
-		[AUDIO_NO_PICK]		= "res/audio/noPick.wav",
+		[AUDIO_NO_PICK]		= "res/audio/noAction.wav",
 		[AUDIO_DROP]		= "res/audio/drop.wav",
-		[AUDIO_NO_DROP]		= "res/audio/noDrop.wav",
+		[AUDIO_NO_DROP]		= "res/audio/noAction.wav",
 		[AUDIO_CONSOLE] 	= "res/audio/console.wav",
 	};
 
