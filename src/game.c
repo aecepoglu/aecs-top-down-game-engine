@@ -91,10 +91,7 @@ bool pickUp( struct Map *map, struct object *obj) {
 	struct Vector *pos = GET_PF_POS( nextNode);
 	
 	struct object *pickedObj = map->objs[ pos->i][ pos->j];
-	if( pickedObj == NULL || pickedObj->isPickable != true)
-		return false;
-	if( pos != NULL && pickedObj != NULL && inventory_add( pickedObj, lua) ) {
-		
+	if( pos != NULL && pickedObj != NULL && pickedObj->isPickable && inventory_add( pickedObj, lua) ) {
 		ARRAY_REMOVE( myMap->objList, pickedObj, myMap->objListCount);
 		myMap->objs[ pos->i][ pos->j] = NULL;
 		PLAY_AUDIO_FX( AUDIO_PICK, PLAYER_DISTANCE( pos));
