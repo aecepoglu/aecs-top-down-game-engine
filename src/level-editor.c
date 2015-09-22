@@ -1,10 +1,10 @@
-#include "engine.h"
+#include "core/engine.h"
 #include "editor-brushes/brush.h"
 
 #include "sdl2gui/sdl2gui.h"
-#include "stack.h"
+#include "collection/stack.h"
 #include "templates.h"
-#include "error.h"
+#include "util/error.h"
 
 bool running;
 unsigned int objectCounter = 1;

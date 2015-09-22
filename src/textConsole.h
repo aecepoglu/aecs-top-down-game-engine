@@ -13,6 +13,10 @@
 #define CONSOLE_WIDTH 480 /* CONSOLE_NUM_COLS * CONSOLE_FONT_WIDTH */
 #define CONSOLE_HEIGHT 80 /* CONSOLE_NUM_ROWS * CONSOLE_FONT_HEIGHT */
 
+
+SDL_Texture *textConsole_texture;
+
+
 void textConsole_write( SDL_Renderer *renderer, SDL_Texture **fontMap, SDL_Texture *consoleTexture);
 void textConsole_add( const char *text);
 SDL_Texture* textConsole_init( SDL_Renderer *renderer);

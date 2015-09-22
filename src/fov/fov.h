@@ -1,6 +1,6 @@
 #ifndef FOV_H
 
-#include "../map.h"
+#include "../core/map.h"
 #include "../vector.h"
 
 struct FOVBase {

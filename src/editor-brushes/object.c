@@ -1,6 +1,6 @@
-#include "object.h"
+#include "../core/object.h"
 #include "brush.h"
-#include "../map.h"
+#include "../core/map.h"
 
 void clicked_obj_player			( struct SDLGUI_Element *e) { brush.variant = go_player			; }
 void clicked_obj_monster		( struct SDLGUI_Element *e) { brush.variant = go_leftTurner		; }

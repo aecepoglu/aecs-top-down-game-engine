@@ -8,5 +8,7 @@
 
 lua_State *lua;
 
+lua_State* initLua();
+void dsl_gameOver();
 
 #endif /*DSL_H*/

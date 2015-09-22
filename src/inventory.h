@@ -2,7 +2,7 @@
 #define INVENTORY_H
 
 #include "basic.h"
-#include "object.h"
+#include "core/object.h"
 
 struct {
 	int onAdd;

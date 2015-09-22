@@ -1,7 +1,56 @@
-/* This code is injected into game.c */
+#include "dsl.h"
 
 #include "text.h"
+#include "textConsole.h"
 #include "cutscene.h"
+#include "util/log.h"
+#include "core/engine.h"
+#include "core/audio.h"
+#include "ai/aiTable.h"
+#include "inventory.h"
+#include "vector.h"
+#include "game.h"
+
+
+#define MAX_PATH_LEN 256
+
+#define FOREACH_OBJ_WITH_ID( objId, itI, itObj, closure) for( itI=0; itI<myMap->objListCount ;itI++) {\
+	if( myMap->objList[itI]->id == objId) {\
+		itObj = myMap->objList[itI];\
+		closure\
+	}\
+}
+
+int loadLevel( const char* relMapPath, const char* relScriptPath, int levelOption, lua_State *L) {
+    char fullPath[MAX_PATH_LEN];
+	
+    sprintf( fullPath, "%s/%s", dirPath, relMapPath);
+
+	if( myMap != NULL && strcmp( fullPath, myMap->filePath) != 0) {
+		freeMap( myMap);
+		myMap = NULL;
+	}
+
+	level_startTimer();
+
+	myMap = readMapFile( fullPath);
+
+	player = createObject( go_player, 0, 0, 0);
+
+    sprintf( fullPath, "%s/%s", dirPath, relScriptPath);
+    if (luaL_loadfile(L, fullPath) || lua_pcall( L, 0, 0, 0)) {
+        fprintf(stderr, "Error loading script '%s'\n%s\n", fullPath, lua_tostring(L, -1));
+        exit(1);
+	}
+
+	lua_getglobal( L, "init");
+	if( lua_isnil( L, -1) != true) {
+		lua_pushinteger( L, levelOption);
+		lua_pcall( L, 1, 0, 0 );
+	}
+
+    return run();
+}
 
 /* this is available for debug reasons only */
 int luaStackDump(lua_State* l)
@@ -312,4 +361,46 @@ int dsl_getObjAtPos( lua_State *l) {
 		lua_pushinteger( l, obj != NULL ? obj->id : -1 );
 	}
 	return 1;
+}
+
+lua_State* initLua() {
+	lua_State * L;
+	
+	L = luaL_newstate();
+	luaL_openlibs( L ); 
+
+	lua_newtable( L);
+
+	luaL_setfuncs( L, (struct luaL_Reg[]) {
+		{"use", dsl_useObject},
+		{"onInteract", dsl_onInteract},
+		{"startLevel", dsl_startLevel},
+		{"endLevel", dsl_endLevel},
+		{"setStartGate", dsl_setStartGate},
+		{"write", dsl_writeConsole},
+		{"clear", dsl_clearConsole},
+		{"listInventory", dsl_listInventory},
+		{"onInventoryAdd", dsl_onInventoryAdd},
+		{"onInventoryRemove", dsl_onInventoryRemove},
+		{"setObjTextures", dsl_setObjTextures},
+		{"setTileTextures", dsl_setTileTextures},
+		{"changeAIStatus", dsl_changeAIStatus},
+		{"cutClear", dsl_cutsceneClear},
+		{"cutWrite", dsl_cutsceneWrite},
+		{"cutImg", dsl_cutsceneImg},
+		{"cutRender", dsl_cutsceneRender},
+		{"cutWait", dsl_cutsceneWait},
+		{"cutReadKey", dsl_cutsceneReadKey},
+		{"objAtPos", dsl_getObjAtPos},
+		{"printStack", luaStackDump},
+		{NULL, NULL}
+	}, 0);
+	
+	lua_pushstring( L, "DIR_PATH");
+	lua_pushstring( L, dirPath);
+	lua_settable( L, -3);
+	
+	lua_setglobal( L, "lib");
+
+	return L;
 }

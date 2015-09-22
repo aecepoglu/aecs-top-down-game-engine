@@ -4,7 +4,7 @@
 #include "sdl2gui.h"
 #include "sdl2gui-text.h"
 #include "../text.h"
-#include "../log.h"
+#include "../util/log.h"
 
 
 void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font) {

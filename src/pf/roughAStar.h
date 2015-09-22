@@ -1,6 +1,6 @@
-#include "../map.h"
+#include "../core/map.h"
 #include "../vector.h"
-#include "../linkedList.h"
+#include "../collection/linkedList.h"
 
 struct RoughPfNode {
 	int gValue;

@@ -1,34 +1,26 @@
-#include "engine.h"
-#include "aiTable.h"
+#include "game.h"
+
+#include "core/engine.h"
+#include "ai/aiTable.h"
 #include "fov/fov.h"
 #include "definitions.h"
 #include "textConsole.h"
 #include "inventory.h"
-#include "array.h"
+#include "collection/array.h"
 #include "dsl.h"
-#include "audio.h"
+#include "core/audio.h"
 #include "customEventTypes.h"
-
-#define FOREACH_OBJ_WITH_ID( objId, itI, itObj, closure) for( itI=0; itI<myMap->objListCount ;itI++) {\
-	if( myMap->objList[itI]->id == objId) {\
-		itObj = myMap->objList[itI];\
-		closure\
-	}\
-}
+#include "cutscene.h"
 
 SDL_Event timerPushEvent = {
 	.type= SDL_USEREVENT,
 };
-const Uint32 timerDelay = 100 /*miliseconds*/;
+SDL_TimerID levelTimer;
 
-struct object *player;
 
 /* The player is allowed to play only once per tick.
 	This variable shows whether the player has moved or not */
 bool playerMoved = false;
-/* when a level is read, player position needs to be set from within the level script.
-	until then, this variable stays false */
-bool isPlayerPosSet = false;
 
 //FIXME The program will crash if the window is too small (test if this is still happening). Render window un-usable and show a notification message about it.
 
@@ -37,12 +29,9 @@ enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
 
-SDL_Texture *textConsole_texture;
 
-char *dirPath;
-SDL_TimerID levelTimer;
+const Uint32 timerDelay = 100 /*miliseconds*/;
 
-#define MAX_PATH_LEN 256
 #define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 #define PLAYER_DISTANCE( pos1) (abs( (pos1)->i - player->pos.i) + abs( (pos1)->j - player->pos.j))
 
@@ -52,9 +41,23 @@ struct {
 } guiMeasurements;
 
 
+Uint32 timerCallback( Uint32 interval, void *param) {
+	log3("tick\n");
+	SDL_PushEvent( &timerPushEvent);
+	return interval;
+}
+
+void level_startTimer() {
+	levelTimer = SDL_AddTimer( timerDelay, timerCallback, 0);
+}
+
+void level_endTimer() {
+	SDL_RemoveTimer( levelTimer);
+}
+
 void gameOver( int levelEndValue) {
 	isPlayerPosSet = false;
-	SDL_RemoveTimer( levelTimer);
+	level_endTimer();
 
 	SDL_Event event = {
 		.type = SDL_USEREVENT,
@@ -312,11 +315,6 @@ void handleKey( SDL_KeyboardEvent *e) {
 			break;
 	};
 }
-Uint32 timerCallback( Uint32 interval, void *param) {
-	log3("tick\n");
-	SDL_PushEvent( &timerPushEvent);
-	return interval;
-}
 
 void draw() {
 	log3("draw here\n");
@@ -532,6 +530,8 @@ int run() {
 void setDefaults() {
 	log1("setting defaults\n");
 
+	isPlayerPosSet = false;
+
 	timerPushEvent.user.code = CUSTOM_EVENT_UPDATE;
 
 	playerVisibleTiles = (enum terrainType**) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType*));
@@ -547,80 +547,7 @@ void setDefaults() {
 	inventory_reset( false);
 }
 
-int loadLevel( const char* relMapPath, const char* relScriptPath, int levelOption, lua_State *L) {
-    char fullPath[MAX_PATH_LEN];
-	
-    sprintf( fullPath, "%s/%s", dirPath, relMapPath);
-
-	if( myMap != NULL && strcmp( fullPath, myMap->filePath) != 0) {
-		freeMap( myMap);
-		myMap = NULL;
-	}
-	
-	levelTimer = SDL_AddTimer( timerDelay, timerCallback, 0);
-
-	myMap = readMapFile( fullPath);
-
-	player = createObject( go_player, 0, 0, 0);
-
-    sprintf( fullPath, "%s/%s", dirPath, relScriptPath);
-    if (luaL_loadfile(L, fullPath) || lua_pcall( L, 0, 0, 0)) {
-        fprintf(stderr, "Error loading script '%s'\n%s\n", fullPath, lua_tostring(L, -1));
-        exit(1);
-	}
-
-	lua_getglobal( L, "init");
-	if( lua_isnil( L, -1) != true) {
-		lua_pushinteger( L, levelOption);
-		lua_pcall( L, 1, 0, 0 );
-	}
-
-    return run();
-}
-
-#include "dsl.c"
-
-lua_State* initLua() {
-	lua_State * L;
-	
-	L = luaL_newstate();
-	luaL_openlibs( L ); 
-
-	lua_newtable( L);
-
-	luaL_setfuncs( L, (struct luaL_Reg[]) {
-		{"use", dsl_useObject},
-		{"onInteract", dsl_onInteract},
-		{"startLevel", dsl_startLevel},
-		{"endLevel", dsl_endLevel},
-		{"setStartGate", dsl_setStartGate},
-		{"write", dsl_writeConsole},
-		{"clear", dsl_clearConsole},
-		{"listInventory", dsl_listInventory},
-		{"onInventoryAdd", dsl_onInventoryAdd},
-		{"onInventoryRemove", dsl_onInventoryRemove},
-		{"setObjTextures", dsl_setObjTextures},
-		{"setTileTextures", dsl_setTileTextures},
-		{"changeAIStatus", dsl_changeAIStatus},
-		{"cutClear", dsl_cutsceneClear},
-		{"cutWrite", dsl_cutsceneWrite},
-		{"cutImg", dsl_cutsceneImg},
-		{"cutRender", dsl_cutsceneRender},
-		{"cutWait", dsl_cutsceneWait},
-		{"cutReadKey", dsl_cutsceneReadKey},
-		{"objAtPos", dsl_getObjAtPos},
-		{"printStack", luaStackDump},
-		{NULL, NULL}
-	}, 0);
-	
-	lua_pushstring( L, "DIR_PATH");
-	lua_pushstring( L, dirPath);
-	lua_settable( L, -3);
-	
-	lua_setglobal( L, "lib");
-
-	return L;
-}
+//#include "dsl.c"
 
 char* getDirPath( const char *file) {
 	char *result;

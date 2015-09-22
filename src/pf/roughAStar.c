@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include "roughAStar.h"
-
-#include "../aiFun.h"
+#include "../ai/aiFun.h"
 
 
 #define HEURISTICS( pos1, pos2) ( abs( pos1.i - pos2->i) + abs( pos1.j - pos2->j) + (pos1.i != pos2->i) + (pos1.j != pos2->j) )

@@ -1,6 +1,6 @@
 #include "ai.h"
 #include "brush.h"
-#include "../ai.h"
+#include "../ai/ai.h"
 
 #define BUTTON_SIZE 32
 

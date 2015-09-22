@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../log.h"
+#include "../util/log.h"
 
 float fmodf_simple( float x, float mod) {
 	if( x < 0)

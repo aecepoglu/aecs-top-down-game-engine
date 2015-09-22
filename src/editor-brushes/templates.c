@@ -3,7 +3,7 @@
 #include "templates.h"
 #include "brush.h"
 #include "../templates.h"
-#include "../texture.h"
+#include "../core/texture.h"
 
 struct object **selectedObjectPtr;
 struct {

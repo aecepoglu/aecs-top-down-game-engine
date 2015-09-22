@@ -14,7 +14,7 @@ set(MY_PF_SOURCES roughAStar roughAStar_depthLimited)
 
 
 foreach(x ${MY_AI_SOURCES})
-	list(APPEND _tmp "ai/${x}.c")
+	list(APPEND _tmp "ai/modules/${x}.c")
 endforeach(x ${MY_AI_SOURCES})
 set(MY_AI_SOURCES ${_tmp})
 
@@ -36,7 +36,7 @@ foreach(x ${MY_BRUSH_SOURCES})
 endforeach(x ${MY_BRUSH_SOURCES})
 set(MY_BRUSH_SOURCES ${_tmp})
 
-set(MY_SOURCE_FILES engine.c texture.c map.c map.h object.c vector.c linkedList.c text.c textConsole.c inventory.c cutscene.c ai.c)
+set(MY_SOURCE_FILES core/engine.c core/texture.c core/map.c core/object.c vector.c collection/linkedList.c text.c textConsole.c inventory.c cutscene.c ai/ai.c)
 
 set(SDLGUI_SOURCE_FILES sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c sdl2gui/sdl2gui-text.c sdl2gui/sdl2gui-element.c sdl2gui/sdl2gui-panel.c sdl2gui/sdl2gui-textbox.c sdl2gui/sdl2gui-check.c)
 
@@ -50,7 +50,7 @@ add_executable(level-editor level-editor.c templates.c ${ALL_SOURCE_FILES} ${SDL
 target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 
-add_executable(aec-game game.c audio.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
+add_executable(aec-game game.c dsl.c core/audio.c ${ALL_SOURCE_FILES} ${MY_FOV_SOURCES})
 target_link_libraries(aec-game ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${SDL2_MIXER_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(aec-game ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 

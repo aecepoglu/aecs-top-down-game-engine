@@ -1,5 +1,5 @@
 #include "fov.h"
-#include "../log.h"
+#include "../util/log.h"
 
 #include <assert.h>
 

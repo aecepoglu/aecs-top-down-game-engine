@@ -1,7 +1,7 @@
 #include <math.h>
 #include "fov.h"
-#include "../log.h"
-#include "../queue.h"
+#include "../util/log.h"
+#include "../collection/queue.h"
 #include "../definitions.h"
 
 #define QUEUE_SIZE VIEW_BOX_PERIMETER

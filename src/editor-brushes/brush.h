@@ -3,8 +3,8 @@
 
 #include "../sdl2gui/sdl2gui.h"
 #include "../basic.h"
-#include "../texture.h"
-#include "../object.h"
+#include "../core/texture.h"
+#include "../core/object.h"
 
 typedef bool (brushFun)(unsigned int, unsigned int, int);
 

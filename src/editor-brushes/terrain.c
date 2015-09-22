@@ -1,6 +1,6 @@
 #include "terrain.h"
 #include "brush.h"
-#include "../map.h"
+#include "../core/map.h"
 
 void wall( struct SDLGUI_Element *e) {
 	brush.variant = terrain_wall;

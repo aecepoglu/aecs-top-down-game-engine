@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include "array.h"
+#include "collection/array.h"
 
 struct CutsceneElement {
 	SDL_Rect rect;
