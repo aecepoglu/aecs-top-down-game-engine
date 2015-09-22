@@ -1,5 +1,5 @@
 #include "audio.h"
-#include "log.h"
+#include "../util/log.h"
 #include <stdlib.h>
 
 void audio_init() {

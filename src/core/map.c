@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "array.h"
+#include "../collection/array.h"
 
 #include "map.h"
-#include "log.h"
-#include "error.h"
+#include "../util/log.h"
+#include "../util/error.h"
 
 #define MAP_VERSION 3
 

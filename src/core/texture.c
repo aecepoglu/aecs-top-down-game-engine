@@ -4,7 +4,7 @@
 
 #include "texture.h"
 #include "object.h"
-#include "log.h"
+#include "../util/log.h"
 
 #define SPRITE_TILE_LEN 16
 

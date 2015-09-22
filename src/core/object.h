@@ -6,10 +6,11 @@
 #define OBJECT_H
 
 #include <stdio.h>
-#include "ai.h"
-#include "basic.h"
-#include "vector.h"
 #include <lua.h>
+
+#include "../ai/ai.h"
+#include "../basic.h"
+#include "../vector.h"
 
 enum objType {
 	go_player,

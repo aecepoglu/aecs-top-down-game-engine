@@ -1,5 +1,5 @@
 #include "lineSensor.h"
-#include "../dsl.h"
+#include "../../dsl.h"
 #include <stdlib.h>
 
 #define TURNS_PER_MOVE 1

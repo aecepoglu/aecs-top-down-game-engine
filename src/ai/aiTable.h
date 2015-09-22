@@ -1,16 +1,16 @@
 #ifndef AITABLE_H
 #define AITABLE_H
 
-#include "ai/leftTurner.h"
-#include "ai/hungryLeftTurner.h"
-#include "ai/simpleFlower.h"
-#include "ai/creeperPlant.h"
-#include "ai/peekaboo.h"
-#include "ai/weepingAngel.h"
-#include "ai/door.h"
-#include "ai/lineSensor.h"
-#include "ai/switch.h"
-#include "ai/escaper.h"
+#include "modules/leftTurner.h"
+#include "modules/hungryLeftTurner.h"
+#include "modules/simpleFlower.h"
+#include "modules/creeperPlant.h"
+#include "modules/peekaboo.h"
+#include "modules/weepingAngel.h"
+#include "modules/door.h"
+#include "modules/lineSensor.h"
+#include "modules/switch.h"
+#include "modules/escaper.h"
 
 #include "ai.h"
 #include "aiFun.h"

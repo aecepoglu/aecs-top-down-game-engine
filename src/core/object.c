@@ -1,8 +1,8 @@
 #include "object.h"
-#include "log.h"
-#include "aiTable.h"
-#include <stdlib.h>
+#include "../util/log.h"
+#include "../ai/aiTable.h"
 
+#include <stdlib.h>
 #include <lua.h>
 #include <lauxlib.h>
 

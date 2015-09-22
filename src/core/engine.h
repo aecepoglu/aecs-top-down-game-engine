@@ -19,7 +19,7 @@
 #include "object.h"
 #include "texture.h"
 #include "map.h"
-#include "log.h"
+#include "../util/log.h"
 
 /* ----------------------------------
  *  		VARIABLES

@@ -1,5 +1,5 @@
 #include "peekaboo.h"
-#include "../pf/roughAStar.h"
+#include "../../pf/roughAStar.h"
 #include <stdlib.h>
 
 #define TURNSPERMOVE 4

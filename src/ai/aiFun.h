@@ -2,9 +2,9 @@
 #define AIFUN_H
 
 #include "ai.h"
-#include "object.h"
-#include "map.h"
-#include "log.h"
+#include "../core/object.h"
+#include "../core/map.h"
+#include "../util/log.h"
 
 /*AI-utility functions*/
 typedef void (aiUpdateFun)(struct Map*, struct object*, void*);

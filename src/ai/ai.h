@@ -1,9 +1,9 @@
 #ifndef AI_H
 #define AI_H
 
-#include "basic.h"
-#include "object.h"
-#include "map.h"
+#include "../basic.h"
+#include "../core/object.h"
+#include "../core/map.h"
 
 
 enum AIType {

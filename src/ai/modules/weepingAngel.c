@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "weepingAngel.h"
-#include "../pf/roughAStar_depthLimited.h"
-#include "../stack.h"
+#include "../../pf/roughAStar_depthLimited.h"
+#include "../../collection/stack.h"
 
 #define TURNSPERMOVE 2
 

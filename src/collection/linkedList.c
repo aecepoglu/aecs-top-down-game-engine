@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "linkedList.h"
-#include "log.h"
+#include "../util/log.h"
 
 void linkedList_remove( struct LinkedListNode **head, struct LinkedListNode *node) {
 	if( node->next != NULL)
