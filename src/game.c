@@ -372,7 +372,8 @@ void draw() {
 			AI_SEEN( vo->obj->ai);
 	}
 
-	drawTexture( renderer, textConsole_texture, 20, 20, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+	drawTexture( renderer, textConsole_texture, (windowW - CONSOLE_WIDTH)/2, windowH - CONSOLE_HEIGHT, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+
 	j = 20 + CONSOLE_HEIGHT;
 	for( i=0; i<INVENTORY_SIZE; i++) {
 		drawTexture( renderer, 
@@ -584,7 +585,7 @@ int main( int argc, char *args[]) {
 	textures = loadAllTextures( renderer);
 	audio_init();
 	cutscene_init();
-	textConsole_texture = textConsole_init( renderer);
+	textConsole_init( renderer);
     
     if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {
         fprintf(stderr, "Error loading script '%s'\n%s\n", args[1], lua_tostring(lua, -1));
@@ -593,6 +594,7 @@ int main( int argc, char *args[]) {
 	
 	log0("Program over\nDeallocating because I'm just OCD like that\n");
 	freeTextures( textures);
+	textConsole_destroy( renderer);
 	SDL_RenderClear( renderer);
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
