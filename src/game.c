@@ -32,7 +32,8 @@ int objsSeenCount;
 
 const Uint32 timerDelay = 100 /*miliseconds*/;
 
-#define CALL_FOV_FCN() fov_raycast( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
+
+#define CALL_FOV_FCN() currentFov( myMap, &player->pos, player->dir, VIEW_RANGE, playerVisibleTiles, objsSeen, &objsSeenCount)
 #define PLAYER_DISTANCE( pos1) (abs( (pos1)->i - player->pos.i) + abs( (pos1)->j - player->pos.j))
 
 struct {
@@ -532,6 +533,7 @@ void setDefaults() {
 	log1("setting defaults\n");
 
 	isPlayerPosSet = false;
+	currentFov = fov_diamond;
 
 	timerPushEvent.user.code = CUSTOM_EVENT_UPDATE;
 

@@ -363,6 +363,26 @@ int dsl_getObjAtPos( lua_State *l) {
 	return 1;
 }
 
+int dsl_setFov( lua_State *l) {
+	luaL_checkinteger( l, 1);
+
+	int fovOption = lua_tointeger( l, 1);
+
+	switch (fovOption) {
+		case 0:
+			currentFov = fov_line;
+			break;
+		case 1:
+			currentFov = fov_raycast;
+			break;
+		case 2:
+			currentFov = fov_diamond;
+			break;
+	};
+
+	return 0;
+}
+
 lua_State* initLua() {
 	lua_State * L;
 	
@@ -392,6 +412,7 @@ lua_State* initLua() {
 		{"cutWait", dsl_cutsceneWait},
 		{"cutReadKey", dsl_cutsceneReadKey},
 		{"objAtPos", dsl_getObjAtPos},
+		{"setFov", dsl_setFov},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

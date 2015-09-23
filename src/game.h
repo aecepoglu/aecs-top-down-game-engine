@@ -3,6 +3,7 @@
 /* not to be included everywhere. Only used by the very core files */
 
 #include "basic.h"
+#include "fov/fov.h"
 
 /* when a level is read, player position needs to be set from within the level script.
 	until then, this variable stays false */
@@ -10,7 +11,7 @@ bool isPlayerPosSet;
 struct object *player;
 
 char *dirPath;
-
+fovFun *currentFov;
 
 void level_startTimer();
 void level_endTimer();

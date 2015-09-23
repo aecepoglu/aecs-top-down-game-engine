@@ -1,4 +1,5 @@
 #ifndef FOV_H
+#define FOV_H
 
 #include "../core/map.h"
 #include "../vector.h"
