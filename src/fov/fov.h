@@ -48,4 +48,9 @@ fovFun fov_rough;
 */
 fovFun fov_raycast;
 
+/* Diamond shape.
+	Sees through walls and objects
+*/
+fovFun fov_diamond;
+
 #endif /* FOV_H */
