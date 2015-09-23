@@ -52,6 +52,7 @@ struct object {
 
     struct {
 		int onInteract;
+		int onSeen;
 	} callbacks;
 };
 
@@ -64,6 +65,7 @@ struct object* readObject( FILE *fp);
 void writeObject( FILE *fp, struct object *obj);
 
 bool objectInteract( struct object *obj1, struct object *obj2, lua_State *lua);
+bool objectSee( struct object *obj1, struct object *obj2, lua_State *lua);
 bool objectSwallow( struct object *obj1, struct object *obj2);
 bool objectHit( struct object *obj1, struct object *obj2);
 

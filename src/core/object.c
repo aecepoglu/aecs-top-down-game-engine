@@ -28,6 +28,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 	obj->isDeleted=false;
 	obj->visualState = 1;
     obj->callbacks.onInteract = LUA_NOREF;
+	obj->callbacks.onSeen = LUA_NOREF;
 
 	return obj;
 }
@@ -72,6 +73,7 @@ struct object* readObject( FILE *fp) {
 	obj->visualState = 1;
 	obj->isDeleted=false;
     obj->callbacks.onInteract = LUA_NOREF;
+    obj->callbacks.onSeen = LUA_NOREF;
 
 	return obj;
 }
@@ -86,6 +88,25 @@ bool objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->callbacks.onInteract);
 
 		lua_pushboolean( lua, obj == NULL ? true : obj->dir == DIR_REVERSE(obj2->dir));
+
+		if( lua_pcall( lua, 1, 0, 0) != 0) {
+			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));
+			return false;
+		}
+		return true;
+	}
+	else
+		return false;
+}
+
+bool objectSee( struct object *obj, struct object *obj2, lua_State *lua) {
+	if( obj2->callbacks.onSeen != LUA_NOREF) {
+		if( obj2->ai)
+			AI_SEEN( obj2->ai);
+
+		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->callbacks.onSeen);
+
+		lua_pushinteger( lua, obj->id);
 
 		if( lua_pcall( lua, 1, 0, 0) != 0) {
 			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));

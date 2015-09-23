@@ -368,8 +368,7 @@ void draw() {
 		);
 		#endif
 		
-		if( vo->obj->ai)
-			AI_SEEN( vo->obj->ai);
+		objectSee( player, vo->obj, lua);
 	}
 
 	drawTexture( renderer, textConsole_texture, (windowW - CONSOLE_WIDTH)/2, windowH - CONSOLE_HEIGHT, CONSOLE_WIDTH, CONSOLE_HEIGHT);

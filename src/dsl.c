@@ -106,6 +106,28 @@ static int dsl_onInteract( lua_State *l) {
 	return 0;
 }
 
+static int dsl_onSeen( lua_State *l) {
+	luaL_checkinteger(l, 1);
+	luaL_checktype( l, 2, LUA_TFUNCTION);
+
+	int objId = lua_tointeger( l, 1);
+
+	log1("Setting onSeen trigger for objs with id %d.\n", objId);
+
+	int i;
+	struct object *o;
+	int count = 0;
+	int ref = luaL_ref( l, LUA_REGISTRYINDEX);
+	FOREACH_OBJ_WITH_ID( objId, i, o, {
+		o->callbacks.onSeen = ref;
+		count ++;
+	});
+
+	log1("Set on-seen-trigger for %d objects\n", count);
+
+	return 0;
+}
+
 int dsl_startLevel( lua_State *l) {
 	luaL_checkstring( l, 1);
 	luaL_checkstring( l, 2);
@@ -374,6 +396,7 @@ lua_State* initLua() {
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
 		{"use", dsl_useObject},
 		{"onInteract", dsl_onInteract},
+		{"onSeen", dsl_onSeen},
 		{"startLevel", dsl_startLevel},
 		{"endLevel", dsl_endLevel},
 		{"setStartGate", dsl_setStartGate},
