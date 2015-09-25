@@ -21,7 +21,7 @@ void textConsole_write( SDL_Renderer *renderer, SDL_Texture **fontMap, SDL_Textu
 
 	int i,j;
 	for( i=consoleY, j=0; j<CONSOLE_NUM_COLS; i = (i+1)%CONSOLE_NUM_ROWS, j++) {
-		drawText( renderer, fontMap, consoleBuf[i], /*xPos*/CONSOLE_BORDER_THICKNESS + 0, /*yPos*/CONSOLE_BORDER_THICKNESS + j*CONSOLE_FONT_HEIGHT, CONSOLE_FONT_WIDTH, CONSOLE_FONT_HEIGHT);
+		drawText( renderer, fontMap, consoleBuf[i], /*xPos*/CONSOLE_BORDER_THICKNESS, /*yPos*/CONSOLE_BORDER_THICKNESS + j*CONSOLE_FONT_HEIGHT, CONSOLE_FONT_WIDTH, CONSOLE_FONT_HEIGHT);
 	}
 
 	SDL_SetRenderTarget( renderer, NULL);
@@ -70,6 +70,8 @@ void textConsole_init( SDL_Renderer *renderer) {
 	SDL_SetRenderTarget( renderer, textConsole_texture);
 	SDL_SetRenderDrawColor( renderer, CONSOLE_BG_R, CONSOLE_BG_G, CONSOLE_BG_B, CONSOLE_BG_A);
 	SDL_RenderClear( renderer);
+
+	textConsole_write( renderer, NULL, textConsole_texture);
 
 	SDL_SetRenderTarget( renderer, NULL);
 }

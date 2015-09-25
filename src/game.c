@@ -373,21 +373,23 @@ void draw() {
 			AI_SEEN( vo->obj->ai);
 	}
 
-	drawTexture( renderer, textConsole_texture, (windowW - CONSOLE_WIDTH)/2, windowH - CONSOLE_HEIGHT, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+	int xStart = (windowW - CONSOLE_WIDTH) /2;
+	int xEnd = (windowW + CONSOLE_WIDTH) /2;
 
-	j = 20 + CONSOLE_HEIGHT;
+	drawTexture( renderer, textConsole_texture, xStart, windowH - CONSOLE_HEIGHT, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+
+	/* the inventory */
+	drawTexture( renderer, textures->inventory, xEnd - 7*TILELEN, 0, 7*TILELEN, TILELEN);
 	for( i=0; i<INVENTORY_SIZE; i++) {
-		drawTexture( renderer, 
-			inventory[i] != NULL
-				? textures->obj[ inventory[i]->type]->textures[ 1][0]
-				: textures->highlitObjIndicator,
-			0, j + i*TILELEN, TILELEN, TILELEN);
+		if( inventory[i] != NULL)
+			drawTexture( renderer, textures->obj[ inventory[i]->type]->textures[ 1][0], xEnd - (7-i)*TILELEN, 0, TILELEN, TILELEN);
 	}
 
+	/* the health bar */
 	for( i=0; i<player->health; i++)
-		drawTexture( renderer, textures->fullHeart, TILELEN + i*TILELEN, j, TILELEN, TILELEN);
+		drawTexture( renderer, textures->fullHeart, xStart + i*TILELEN, 0, TILELEN, TILELEN);
 	for( ; i<player->maxHealth; i++)
-		drawTexture( renderer, textures->emptyHeart, TILELEN + i*TILELEN, j, TILELEN, TILELEN);
+		drawTexture( renderer, textures->emptyHeart, xStart + i*TILELEN, 0, TILELEN, TILELEN);
 
 	SDL_RenderPresent( renderer);
 }

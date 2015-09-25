@@ -154,6 +154,7 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->unidentifiedObj = loadTexture( ren, "res/qmark.png");
 	result->emptyHeart = loadTexture( ren, "res/heart_empty.png");
 	result->fullHeart = loadTexture( ren, "res/heart.png");
+	result->inventory = loadTexture( ren, "res/inventory.png");
 
 	return result;
 }

@@ -19,7 +19,8 @@ struct GameTextures {
 	SDL_Texture *highlitObjIndicator,
 				*unidentifiedObj,
 				*fullHeart,
-				*emptyHeart;
+				*emptyHeart,
+				*inventory;
 };
 
 
