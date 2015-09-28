@@ -310,14 +310,14 @@ void handleKey( SDL_KeyboardEvent *e) {
 			break;
 		case SDLK_o:
 		case SDLK_s:
-			movePlayerPos( dir_down, false);
+			movePlayerPos( dir_down, e->keysym.mod & KMOD_LSHIFT);
 			break;
 		case SDLK_a:
-			movePlayerPos( dir_left, false);
+			movePlayerPos( dir_left, e->keysym.mod & KMOD_LSHIFT);
 			break;
 		case SDLK_e:
 		case SDLK_d:
-			movePlayerPos( dir_right, false);
+			movePlayerPos( dir_right, e->keysym.mod & KMOD_LSHIFT);
 			break;
         case SDLK_u:
         case SDLK_f:
