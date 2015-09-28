@@ -83,25 +83,21 @@ while lib.startLevel( "level5.yz.map", "level5.yz.lua", 0) == 0 do
         .. "So just stay out of his sight, and if he sees you, escape\n"
         .. " towards his right side\n\n"
         
-        .. "Here we go again!\n"
-        .. "Press any key to start the level"
+        .. "Here we go again!\n\n"
+
+        .. "Press <Enter> key to start the level"
     )
     lib.cutRender()
-    lib.cutReadKey()
+
+	key = lib.cutReadKey()
+	while key ~= 13 do
+		key = lib.cutReadKey()
+	end
 end
 
 
 
 -- SCENE 7
-lib.cutClear(0,0,0)
-lib.cutWrite(10,10, "I'm not going to bother showing you every single AI\n\n"
-    
-    .. "Press any key to continue"
-    )
-lib.cutRender()
-lib.cutReadKey()
-
--- SCENE 8
 lib.cutClear(0,0,0)
 lib.cutWrite(10,10, "So... This is the end of the tutorial\n\n"
     
