@@ -157,10 +157,15 @@ bool moveForward( struct Map *map, struct object* obj) {
 			return true;
 		}
 		else {
-			if (objectHit( obj, objAtPos) && objAtPos == player && objAtPos->health == 0 ) {
-				gameOver( 0);
+			if (objectHit( obj, objAtPos)) {
+				if (objAtPos == player && objAtPos->health == 0 ) {
+					gameOver( 0);
+				}
+				PLAY_AUDIO_FX( AUDIO_HIT, PLAYER_DISTANCE( &obj->pos));
 			}
-			PLAY_AUDIO_FX( AUDIO_HIT, PLAYER_DISTANCE( &obj->pos));
+			else {
+				PLAY_AUDIO_FX( AUDIO_NO_MOVE, PLAYER_DISTANCE( &obj->pos));
+			}
 			return false;
 		}
 	}
