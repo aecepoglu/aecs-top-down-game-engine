@@ -39,11 +39,6 @@ typedef void (fovFun)( struct Map *map, struct Vector *pos, enum direction dir, 
 */
 fovFun fov_line;
 
-/* FOV covered by a half circle
-	Sees through walls and objects
-*/
-fovFun fov_rough;
-
 /* Ray casting half a circle.
 	Penetrating through objects but not walls
 */

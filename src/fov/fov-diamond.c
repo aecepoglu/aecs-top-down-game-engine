@@ -1,5 +1,6 @@
 #include "fov.h"
 #include "../util/log.h"
+#include "../definitions.h"
 
 void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount) {
 	log2("fov_diamond\n");
@@ -10,11 +11,11 @@ void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int 
 
 	*objsSeenCount=0;
 	bool tileSeen = false;
-	for( i=0; i<2*range + 1; i++) {
-		for( j=0; j<2*range + 1; j++) {
-			distance = abs( range - i) + abs( range - j);
-			mapX = i + pos->i - range;
-			mapY = j + pos->j - range;
+	for( i=0; i<VIEW_BOX_LENGTH; i++) {
+		for( j=0; j<VIEW_BOX_LENGTH; j++) {
+			distance = abs( VIEW_RANGE - i) + abs( VIEW_RANGE - j);
+			mapX = i + pos->i - VIEW_RANGE;
+			mapY = j + pos->j - VIEW_RANGE;
 
 			if( distance <= range && mapX >= 0 && mapY >= 0 && mapX < map->width && mapY < map->height) {
 				tiles[i][j] = map->tiles[mapX][mapY];

@@ -12,6 +12,7 @@ struct object *player;
 
 char *dirPath;
 fovFun *currentFov;
+int viewRange;
 
 void level_startTimer();
 void level_endTimer();

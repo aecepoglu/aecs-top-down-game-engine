@@ -10,6 +10,7 @@
 #include "inventory.h"
 #include "vector.h"
 #include "game.h"
+#include "definitions.h"
 
 
 #define MAX_PATH_LEN 256
@@ -383,6 +384,18 @@ int dsl_setFov( lua_State *l) {
 	return 0;
 }
 
+int dsl_setFovRange( lua_State *l) {
+	luaL_checkinteger( l, 1);
+
+	int range = lua_tointeger( l, 1);
+
+	if (range >= 0 && range <= VIEW_RANGE) {
+		viewRange = range;
+	}
+
+	return 0;
+}
+
 lua_State* initLua() {
 	lua_State * L;
 	
@@ -413,6 +426,7 @@ lua_State* initLua() {
 		{"cutReadKey", dsl_cutsceneReadKey},
 		{"objAtPos", dsl_getObjAtPos},
 		{"setFov", dsl_setFov},
+		{"setFovRange", dsl_setFovRange},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

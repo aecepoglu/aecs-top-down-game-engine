@@ -1,11 +1,12 @@
 #include "fov.h"
 #include "../util/log.h"
+#include "../definitions.h"
 
 void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount) {
 	log2("fov_line\n");
 	int i,j;
-	for( i=0; i<2*range + 1; i++) {
-		for( j=0; j<2*range + 1; j++) {
+	for( i=0; i<VIEW_BOX_LENGTH; i++) {
+		for( j=0; j<VIEW_BOX_LENGTH; j++) {
 			tiles[i][j] = terrain_dark;
 			fovBase[i][j].lowerLimVisible = false;
 			fovBase[i][j].upperLimVisible = false;
@@ -15,7 +16,7 @@ void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int ran
 
 	*objsSeenCount=0;
 
-	struct Vector tilesPos = { range, range};
+	struct Vector tilesPos = { VIEW_RANGE, VIEW_RANGE};
 	struct Vector mapPos;
 	vectorClone( &mapPos, pos);
 	struct Vector *dPos = & dirVectors[ dir];

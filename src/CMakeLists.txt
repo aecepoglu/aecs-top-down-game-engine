@@ -9,7 +9,7 @@ find_package(Lua 5.2 REQUIRED)
 
 set(MY_BRUSH_SOURCES brushes move rotate terrain object ai templates)
 set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel door lineSensor switch escaper)
-set(MY_FOV_SOURCES fov-util fov-raycast fov-line fov-rough fov-diamond)
+set(MY_FOV_SOURCES fov-util fov-raycast fov-line fov-diamond)
 set(MY_PF_SOURCES roughAStar roughAStar_depthLimited)
 
 

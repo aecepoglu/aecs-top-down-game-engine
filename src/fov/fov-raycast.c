@@ -31,8 +31,8 @@ void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, in
 	int i,j,dir;
 
 	// clear
-	for( i=0; i<=2*range; i++)
-		for( j=0; j<=2*range; j++) {
+	for( i=0; i<VIEW_BOX_LENGTH; i++)
+		for( j=0; j<VIEW_BOX_LENGTH; j++) {
 			tiles[i][j] = terrain_dark;
 			fovBase[i][j].lowerLimVisible = false;
 			fovBase[i][j].upperLimVisible = false;
@@ -40,7 +40,7 @@ void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, in
 
 	log3("cleared\n");
 	
-	struct Vector centerPos = { range, range};
+	struct Vector centerPos = { VIEW_RANGE, VIEW_RANGE};
 	struct Vector tilePos, mapPos;
 	
 	struct FOVBase *node = &fovBase[ centerPos.i][ centerPos.j];
@@ -81,7 +81,7 @@ void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, in
 				if( node->grows[ dir]) {
 					neighbourNode = node->neighbours[ dir];
 					log3(" Checking neighbour at dir %d: %d,%d, lowVis: %d, upVis: %d\n", dir, neighbourNode->pos.i, neighbourNode->pos.j, neighbourNode->lowerLimVisible, neighbourNode->upperLimVisible);
-					if( (neighbourNode->lowerLimVisible && neighbourNode->upperLimVisible) != true && neighbourNode->distance < range) {
+					if( (neighbourNode->lowerLimVisible && neighbourNode->upperLimVisible) != true && neighbourNode->distance <= range) {
 
 						if( neighbourNode->lowerLimVisible) {
 							bool upperLimVisible = fov_inAngleLimits( neighbourNode->maxLit[1], node->lit[0], node->lit[1]);
