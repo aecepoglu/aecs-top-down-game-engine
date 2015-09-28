@@ -268,6 +268,36 @@ void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
 	}
 }
 
+void movePlayerPos( enum direction dir, bool shift) {
+	if( ! playerMoved) {
+		playerMoved = true;
+
+		if (moveMode == MOVE_MODE_SIMPLE) {
+			dir = (dir - player->dir)%4;
+		}
+
+		moveFun *moveFunction;
+
+		switch (dir) {
+			case 0:
+				moveFunction = shift ? pushForward : moveForward;
+				break;
+			case 1:
+				moveFunction = strafeRight;
+				break;
+			case 2:
+				moveFunction = moveBackward;
+				break;
+			case 3:
+				moveFunction = strafeLeft;
+				break;
+		};
+
+		moveFunction( myMap, player);
+		CALL_FOV_FCN();
+	}
+}
+
 
 void handleKey( SDL_KeyboardEvent *e) {
 	switch (e->keysym.sym) {
@@ -276,18 +306,18 @@ void handleKey( SDL_KeyboardEvent *e) {
 			break;
 		case SDLK_COMMA:
 		case SDLK_w:
-			movePlayer( ( e->keysym.mod & KMOD_LSHIFT) ? pushForward : moveForward );
+			movePlayerPos( dir_up, e->keysym.mod & KMOD_LSHIFT);
 			break;
 		case SDLK_o:
 		case SDLK_s:
-			movePlayer( moveBackward);
+			movePlayerPos( dir_down, false);
 			break;
 		case SDLK_a:
-			movePlayer( strafeLeft);
+			movePlayerPos( dir_left, false);
 			break;
 		case SDLK_e:
 		case SDLK_d:
-			movePlayer( strafeRight);
+			movePlayerPos( dir_right, false);
 			break;
         case SDLK_u:
         case SDLK_f:

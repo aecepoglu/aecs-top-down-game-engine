@@ -7,4 +7,8 @@
 
 //#define GOD_VISION
 
+#define MOVE_MODE_SIMPLE 0
+#define MOVE_MODE_DIRECTIONAL 1
+#define moveMode MOVE_MODE_SIMPLE
+
 #endif
