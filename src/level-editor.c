@@ -702,10 +702,10 @@ void initGui() {
 		.borderThickness=1
 	};
 
-	leftPanel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH, .h=960}, panelParams);
+	leftPanel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH, .h=SDLGUI_SIZE_FILL}, panelParams);
 
 	/* top bar */
-	topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=1280-GUI_LEFTPANEL_WIDTH, .h=GUI_TOPBAR_HEIGHT}, panelParams);
+	topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=SDLGUI_SIZE_FILL, .h=GUI_TOPBAR_HEIGHT}, panelParams);
 
 	struct SDLGUI_Element *canvas = SDLGUI_Create_Virtual(&drawCanvas);
 

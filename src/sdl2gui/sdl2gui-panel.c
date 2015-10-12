@@ -31,6 +31,18 @@ struct SDLGUI_Element* SDLGUI_MouseHandler_Panel( struct SDLGUI_Element *panel, 
 
 struct SDLGUI_Element* SDLGUI_Create_Panel( SDL_Rect rect, SDLGUI_Params params) {
 	struct SDLGUI_Element *panel = (struct SDLGUI_Element*)malloc( sizeof( struct SDLGUI_Element));
+
+	if( rect.w == SDLGUI_SIZE_FILL || rect.h == SDLGUI_SIZE_FILL) {
+		int winWidth, winHeight;
+
+		SDL_GetWindowSize( guiCore.window, &winWidth, &winHeight);
+
+		if( rect.w == SDLGUI_SIZE_FILL)
+			rect.w = winWidth - rect.x;
+
+		if( rect.h == SDLGUI_SIZE_FILL)
+			rect.h = winHeight - rect.y;
+	}
     
     panel->textures.current = panel->textures.normal = createElementTexture( rect.w, rect.h, params.bgColor, params.fgColor, params.borderThickness, 0, 0, 0);
 	panel->textures.hover = panel->textures.focused = NULL;
