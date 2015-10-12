@@ -19,7 +19,7 @@ void SDLGUI_Draw_Panel( struct SDLGUI_Element *element) {
 }
 
 void SDLGUI_Destroy_Panel( struct SDLGUI_Element *element) {
-    SDLGUI_List_Destroy( element->data.elements, 1);
+    SDLGUI_List_Destroy( element->data.elements);
     SDL_DestroyTexture( element->textures.normal);
     free( element);
 }

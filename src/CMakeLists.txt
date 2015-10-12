@@ -38,7 +38,7 @@ set(MY_BRUSH_SOURCES ${_tmp})
 
 set(MY_SOURCE_FILES core/engine.c core/texture.c core/map.c core/object.c vector.c collection/linkedList.c text.c textConsole.c inventory.c cutscene.c ai/ai.c)
 
-set(SDLGUI_SOURCE_FILES sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c sdl2gui/sdl2gui-text.c sdl2gui/sdl2gui-element.c sdl2gui/sdl2gui-panel.c sdl2gui/sdl2gui-textbox.c sdl2gui/sdl2gui-check.c)
+set(SDLGUI_SOURCE_FILES sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c sdl2gui/sdl2gui-text.c sdl2gui/sdl2gui-element.c sdl2gui/sdl2gui-panel.c sdl2gui/sdl2gui-textbox.c sdl2gui/sdl2gui-check.c sdl2gui/sdl2gui-virtual.c)
 
 
 set(ALL_SOURCE_FILES ${MY_SOURCE_FILES})
@@ -46,7 +46,7 @@ list(APPEND ALL_SOURCE_FILES ${MY_AI_SOURCES} ${MY_PF_SOURCES})
 
 
 
-add_executable(level-editor level-editor.c templates.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES} ${MY_BRUSH_SOURCES} )
+add_executable(level-editor level-editor.c templates.c mapCreator.c guiHelpers.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES} ${MY_BRUSH_SOURCES} )
 target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 

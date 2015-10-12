@@ -6,33 +6,42 @@
 #include "../text.h"
 #include "../util/log.h"
 
+struct SDLGUI_Layer {
+	struct SDLGUI_List *list;
+	struct SDLGUI_Layer *prev;
+};
 
-void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font) {
+struct SDLGUI_Layer *topLayer = 0;
+
+
+void SDLGUI_Init( SDL_Window *window, SDL_Renderer *renderer, SDL_Texture **font) {
+	guiCore.window = window;
 	guiCore.renderer = renderer;
 	guiCore.font = font;
 	guiCore.mouseDownElement = 0;
 	guiCore.mouseHoverElement = 0;
-	guiCore.messageBox = 0;
 	guiCore.tooltip = 0;
 	guiCore.focusedElement = 0;
-
-	SDLGUI_List_Init( &guiCore.elements, 4);
+	topLayer = 0;
 }
 
 void SDLGUI_Destroy() {
-	SDLGUI_List_Destroy( &guiCore.elements, 0);
+	while(topLayer != 0) {
+		SDLGUI_Layer_Remove( topLayer);
+	}
+
 	guiCore.renderer = 0;
 	guiCore.font = 0;
-
-	if( guiCore.messageBox) {
-		SDLGUI_Destroy_Element( guiCore.messageBox);
-	}
 }
 
 void SDLGUI_Draw() {
+	if (topLayer == 0)
+		return;
+
+	struct SDLGUI_List *elements = topLayer->list;
 	int i;
-	for( i=0; i<guiCore.elements.count; i++) {
-		guiCore.elements.list[i]->drawFun( guiCore.elements.list[i]);
+	for( i=0; i<elements->count; i++) {
+		elements->list[i]->drawFun( elements->list[i]);
 	}
 
 	if( guiCore.messageBox)
@@ -43,7 +52,10 @@ void SDLGUI_Draw() {
 }
 
 int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
-	struct SDLGUI_Element *mouseDownElement = SDLGUI_List_findItemAtPos( &guiCore.elements, e->x, e->y);
+	if( topLayer == 0)
+		return 0;
+
+	struct SDLGUI_Element *mouseDownElement = SDLGUI_List_findItemAtPos( topLayer->list, e->x, e->y);
 	if( mouseDownElement != 0) {
 		guiCore.mouseDownElement = mouseDownElement;
 		return 1;
@@ -53,8 +65,8 @@ int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
 }
 
 int SDLGUI_Handle_MouseHover( SDL_MouseMotionEvent *e) {
-	if( ! e->state ) {
-		struct SDLGUI_Element *hoverElement = SDLGUI_List_findItemAtPos( &guiCore.elements, e->x, e->y);
+	if( ! e->state && topLayer == 0) {
+		struct SDLGUI_Element *hoverElement = SDLGUI_List_findItemAtPos( topLayer->list, e->x, e->y);
 		if( hoverElement != 0 && guiCore.mouseHoverElement != hoverElement) {
 			if( guiCore.mouseHoverElement != 0) {
 				guiCore.mouseHoverElement->textures.current = (guiCore.mouseHoverElement == guiCore.focusedElement)
@@ -111,22 +123,12 @@ int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e) {
 	return 0;
 };
 
-void SDLGUI_Add_Element( struct SDLGUI_Element *element) {
-	SDLGUI_List_Add( &guiCore.elements, element);
-}
-
-void SDLGUI_Remove_Element( struct SDLGUI_Element *element) {
-	SDLGUI_List_Remove( &guiCore.elements, element);
-}
-
-/* ------------------
-	SDLGUI Elements
-*/
 
 /* Message Box
 */
 
-void SDLGUI_Show_Message( int xPos, int yPos, int width, int height, enum SDLGUI_Message_Type msgType, const char *text) {
+
+void SDLGUI_Show_Message( enum SDLGUI_Message_Type msgType, const char *text) {
 	SDLGUI_Color color = {.r=0, .g=0, .b=0, .a=192};
 
 	switch(msgType) {
@@ -142,18 +144,19 @@ void SDLGUI_Show_Message( int xPos, int yPos, int width, int height, enum SDLGUI
 			break;
 	};
 
-	if( guiCore.messageBox) {
-		SDLGUI_Destroy_Element( guiCore.messageBox);
-	}
-		
-	guiCore.messageBox = SDLGUI_Create_Text ( (SDL_Rect){.x=xPos, .y=yPos, .w=width, .h=height}, text, (SDLGUI_Params){.bgColor=color, .fgColor=COLOR_WHITE, .fontWidth=18, .fontHeight= 30, .borderThickness=5 });
+	SDLGUI_Hide_Message();
+
+	int width, height;
+	SDL_GetWindowSize( guiCore.window, &width, &height);
+
+	guiCore.messageBox = SDLGUI_Create_Text ( (SDL_Rect){.x=0, .y=0, .w=width, .h=height}, text, (SDLGUI_Params){.bgColor=color, .fgColor=COLOR_WHITE, .fontWidth=18, .fontHeight= 30, .borderThickness=5 });
 }
 
 void SDLGUI_Hide_Message() {
-	if( guiCore.messageBox) {
-		SDLGUI_Destroy_Element( guiCore.messageBox);
-		guiCore.messageBox = 0;
-	}
+//	if( guiCore.messageBox) {
+//		SDLGUI_Destroy_Element( guiCore.messageBox);
+//		guiCore.messageBox = 0;
+//	}
 }
 
 /* Tooltip
@@ -212,4 +215,24 @@ void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text) {
 	guiCore.tooltip->textures.focused = guiCore.tooltip->textures.hover = 0;
 
 	guiCore.tooltipTimer = SDL_AddTimer(1000, mycallback, 0);
+}
+
+/* Layer
+*/
+
+void SDLGUI_Layer_Add( struct SDLGUI_List *list) {
+	struct SDLGUI_Layer *layer = (struct SDLGUI_Layer*)malloc(sizeof(struct SDLGUI_Layer));
+
+	layer->prev = topLayer;
+	layer->list = list;
+
+	topLayer = layer;
+}
+
+void SDLGUI_Layer_Remove() {
+	struct SDLGUI_Layer *prev = topLayer->prev;
+
+	SDLGUI_List_Destroy( topLayer->list);
+
+	topLayer = prev;
 }

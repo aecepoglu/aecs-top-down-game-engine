@@ -1,10 +1,12 @@
-#include "core/engine.h"
+#include "levelEditor.h"
 #include "editor-brushes/brush.h"
 
 #include "sdl2gui/sdl2gui.h"
 #include "collection/stack.h"
 #include "templates.h"
 #include "util/error.h"
+#include "mapCreator.h"
+#include "guiHelpers.h"
 
 bool running;
 unsigned int objectCounter = 1;
@@ -45,11 +47,6 @@ struct {
 } selectedObjStuff = {
 	.obj = NULL,
 };
-
-struct {
-	struct SDLGUI_Element *panel, *textbox_width, *textbox_height, *textbox_name;
-	bool running;
-} createMapDialogData;
 
 #define SHOW_TOOLTIP( x, y, text) if(x>=viewPos.i && y>=viewPos.j && x<viewEnd.i && y<viewEnd.j) SDLGUI_Show_Tooltip( (x-viewPos.i)*TILELEN + GUI_LEFTPANEL_WIDTH, (y-viewPos.j)*TILELEN + GUI_TOPBAR_HEIGHT, text)
 
@@ -297,14 +294,7 @@ void buttonSave_clicked( struct SDLGUI_Element *from) {
 		msgText = "Map saved";
 	}
 	isMessageBoxOn = true;
-	SDLGUI_Show_Message(0, 0, windowW, windowH, msgType, msgText);
-}
-
-int parseText( const char *text) {
-	if( strlen(text) == 0)
-		return 0;
-	else
-		return atoi( text);
+	SDLGUI_Show_Message(msgType, msgText);
 }
 
 void textbox_id_changed( struct SDLGUI_Element *textbox, const char *text) {
@@ -314,7 +304,7 @@ void textbox_id_changed( struct SDLGUI_Element *textbox, const char *text) {
 			selectedObjStuff.obj->id = newId;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "You must give id >= 1");
+			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "You must give id >= 1");
 			isMessageBoxOn = true;
 		}
 	}
@@ -327,12 +317,12 @@ void textbox_health_changed( struct SDLGUI_Element *textbox, const char *text) {
 			selectedObjStuff.obj->health = newHealth;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health should be <= 256");
+			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "Health should be <= 256");
 			isMessageBoxOn = true;
 		}
 	}
 	else {
-		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
 		isMessageBoxOn = true;
 	}
 }
@@ -344,12 +334,12 @@ void textbox_maxHealth_changed( struct SDLGUI_Element *textbox, const char *text
 			selectedObjStuff.obj->maxHealth = newHealth;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Max-Health should be <= 256");
+			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "Max-Health should be <= 256");
 			isMessageBoxOn = true;
 		}
 	}
 	else {
-		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
 		isMessageBoxOn = true;
 	}
 }
@@ -361,12 +351,12 @@ void textbox_healthGiven_changed( struct SDLGUI_Element *textbox, const char *te
 			selectedObjStuff.obj->healthGiven = newValue;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Health-Given must be >= -128 and <= 127");
+			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "Health-Given must be >= -128 and <= 127");
 			isMessageBoxOn = true;
 		}
 	}
 	else {
-		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
 		isMessageBoxOn = true;
 	}
 }
@@ -376,7 +366,7 @@ void checkbox_movable_changed( struct SDLGUI_Element *checkbox, int value) {
 		selectedObjStuff.obj->isMovable = value;
 	}
 	else {
-		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
 		isMessageBoxOn = true;
 	}
 }
@@ -386,7 +376,7 @@ void checkbox_pickable_changed( struct SDLGUI_Element *checkbox, int value) {
 		selectedObjStuff.obj->isPickable = value;
 	}
 	else {
-		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
 		isMessageBoxOn = true;
 	}
 }
@@ -398,12 +388,12 @@ void textbox_attack_changed( struct SDLGUI_Element *textbox, const char *text) {
 			selectedObjStuff.obj->attack = newValue;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Attack can be <= 256");
+			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "Attack can be <= 256");
 			isMessageBoxOn = true;
 		}
 	}
 	else {
-		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
 		isMessageBoxOn = true;
 	}
 }
@@ -415,12 +405,12 @@ void textbox_defence_changed( struct SDLGUI_Element *textbox, const char *text) 
 			selectedObjStuff.obj->defence = newValue;
 		}
 		else {
-			SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Defence can be <= 256");
+			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "Defence can be <= 256");
 			isMessageBoxOn = true;
 		}
 	}
 	else {
-		SDLGUI_Show_Message( 0, 0, windowW, windowH, SDLGUI_MESSAGE_WARNING, "No object selected");
+		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
 		isMessageBoxOn = true;
 	}
 }
@@ -508,72 +498,7 @@ void handleWindowEvent( SDL_WindowEvent *e) {
 	};
 }
 
-void run0() {
-	SDL_RenderClear( renderer);
-	SDLGUI_Draw();
-	SDL_RenderPresent( renderer);
-
-	SDL_Event e;
-	while( createMapDialogData.running) {
-		SDL_WaitEvent( &e);
-		switch (e.type) {
-			case SDL_WINDOWEVENT: {
-				SDL_WindowEvent *e2 = &e.window;
-				if( e2->event == SDL_WINDOWEVENT_RESIZED)
-					resizeView( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, e2->data1, e2->data2);
-				break;
-			}
-			case SDL_QUIT:
-				createMapDialogData.running = false;
-				buttonQuit_clicked( NULL);
-				break;
-			case SDL_KEYDOWN:
-				if( isMessageBoxOn) {
-					SDLGUI_Hide_Message();
-					isMessageBoxOn =false;
-				}
-				else if ( SDLGUI_Handle_TextInput( (SDL_KeyboardEvent*)&e) != true) {
-					if( ((SDL_KeyboardEvent*)&e)->keysym.sym == SDLK_q) {
-						createMapDialogData.running = false;
-						buttonQuit_clicked( NULL);
-					}
-				}
-				continue;
-			case SDL_MOUSEBUTTONDOWN:
-				if( isMessageBoxOn) {
-					SDLGUI_Hide_Message();
-					isMessageBoxOn =false;
-					break;
-				}
-				else {
-					SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e);
-					continue;
-				}
-			case SDL_MOUSEBUTTONUP:
-				if( isMessageBoxOn) {
-					SDLGUI_Hide_Message();
-					isMessageBoxOn =false;
-				}
-				else {
-					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
-				}
-				break;
-			case SDL_MOUSEMOTION:
-				if (SDLGUI_Handle_MouseHover( (SDL_MouseMotionEvent*)&e))
-					break;
-				else
-					continue;
-		};
-		SDL_SetRenderDrawColor( renderer, 0,0,0,255);
-		SDL_RenderClear( renderer);
-		SDLGUI_Draw();
-		SDL_RenderPresent( renderer);
-	}
-}
-
 void run() {
-	drawBackground();
-	draw();
 	SDL_Event e;
 	while( running) {
 		SDL_WaitEvent( &e);
@@ -683,12 +608,13 @@ void drawObjects() {
 
 }
 
+void drawCanvas() {
+	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, viewSize.i*TILELEN, viewSize.j*TILELEN);
+	drawObjects( );
+}
 
 void draw() {
 	SDL_RenderClear( renderer);
-
-	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, viewSize.i*TILELEN, viewSize.j*TILELEN);
-	drawObjects( );
 
 	SDLGUI_Draw();
 
@@ -781,8 +707,16 @@ void initGui() {
 	/* top bar */
 	topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=1280-GUI_LEFTPANEL_WIDTH, .h=GUI_TOPBAR_HEIGHT}, panelParams);
 
-	SDLGUI_Add_Element( leftPanel);
-	SDLGUI_Add_Element( topBar);
+	struct SDLGUI_Element *canvas = SDLGUI_Create_Virtual(&drawCanvas);
+
+	struct SDLGUI_List *list = SDLGUI_List_Create( 3);
+
+	SDLGUI_List_Add( list, leftPanel);
+	SDLGUI_List_Add( list, topBar);
+	SDLGUI_List_Add( list, canvas);
+
+	SDLGUI_Layer_Add( list);
+
 
 
 	SDLGUI_AddTo_Panel( leftPanel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=10, .w=GUI_LEFTPANEL_WIDTH}, " YZ-01 \n-------", (SDLGUI_Params){
@@ -852,6 +786,7 @@ void initGui() {
 	selectedObjStuff.panel->isVisible = false;
 	SDLGUI_AddTo_Panel( leftPanel, selectedObjStuff.panel);
 
+
 	SDLGUI_AddTo_Panel( selectedObjStuff.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH - 20, .h=20}, "Selected Obj", (SDLGUI_Params){
 		.fontWidth = 12,
 		.fontHeight = 16,
@@ -859,9 +794,8 @@ void initGui() {
 		.fgColor = COLOR_BLACK
 	}));
 
-	char mapText[256];
-	sprintf( mapText, "map: %s", myMap->filePath);
-	SDLGUI_AddTo_Panel( topBar, SDLGUI_Create_Text( (SDL_Rect){.x= 150, .y=0, .w=TEXT_SPAN_SIZE, .h=GUI_TOPBAR_HEIGHT}, mapText, labelParams));
+	SDLGUI_AddTo_Panel( topBar, SDLGUI_Create_Text( (SDL_Rect){.x= 150, .y=0, .w=TEXT_SPAN_SIZE, .h=GUI_TOPBAR_HEIGHT}, "TODO: map name", labelParams));
+
 
 	struct itemTemplate {
 		char *label;
@@ -885,6 +819,7 @@ void initGui() {
 	SDLGUI_Params textboxParams = labelParams;
 	textboxParams.bgColor = COLOR_WHITE;
 	textboxParams.borderThickness = 1;
+
 
 	const int textboxPairHeight = 15;
 	for( i=0; i<sizeof(itemsToCreate) / sizeof(struct itemTemplate); i++) {
@@ -923,47 +858,7 @@ void initGui() {
 	SDLGUI_AddTo_Panel( topBar, selectedObjStuff.textboxes.pos_y );
 }
 
-void editor_createMap_clicked( struct SDLGUI_Element *from) {
-	int width = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_width  ) );
-	int height = parseText( SDLGUI_GetText_Textbox( createMapDialogData.textbox_height) );
-	const char *text = SDLGUI_GetText_Textbox( createMapDialogData.textbox_name);
-	if( width <= 0 || height <= 0) {
-		isMessageBoxOn = true;
-		SDLGUI_Show_Message(0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Width & height must be >= 0");
-	}
-	else if (strlen(text) < 1) {
-		isMessageBoxOn = true;
-		SDLGUI_Show_Message(0, 0, windowW, windowH, SDLGUI_MESSAGE_ERROR, "Need a longer map name");
-	}
-	else {
-		createMapDialogData.running = false;
-		//TODO I could just dynamically allocate createMapDialogData, then deallocate it here aswell
-
-		myMap = createNewMap( width, height);
-		char fileNameBuf[20];
-		sprintf( fileNameBuf, "%s.yz.map", text);
-		myMap->filePath = strdup( fileNameBuf);
-
-		running = true;
-	}
-}
-
-int setCounter() {
-	int maxId = 1;
-	int i;
-	for( i=0; i<myMap->objListCount; i++) {
-		if( myMap->objList[i]->id > maxId)
-			maxId = myMap->objList[i]->id;
-	}
-
-	return maxId;
-}
-
-void mapDialog_quit_clicked( struct SDLGUI_Element *from) {
-	//createMapDialogData.running = false;
-	printf("click callback\n");
-}
-
+//TODO remove if unused
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
@@ -974,63 +869,26 @@ int main( int argc, char *args[]) {
 	init( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, 1280, 960);
     log0("loading textures\n");
 	textures = loadAllTextures( renderer);
-	SDLGUI_Init( renderer, textures->font);
-
-	running = false;
-	createMapDialogData.running = true;
+	SDLGUI_Init( window, renderer, textures->font);
+	initGui();
 
 	if( argc > 1) {
 		myMap = readMapFile( args[1]);
 		myMap->filePath = args[1];
-		running = true;
 
 		if( myMap->objListCount > 0) {
 			objectCounter = myMap->objList[ myMap->objListCount-1 ]->id + 1;
 		}
+
+		drawBackground();
+		draw();
 	}
 	else {
-		SDLGUI_Params labelParams = (SDLGUI_Params){ .bgColor=COLOR_TRANSPARENT, .fgColor=COLOR_WHITE, .fontWidth=12, .fontHeight=16 };
-
-		SDLGUI_Params buttonParams = labelParams;
-		buttonParams.borderThickness = 2;
-
-		createMapDialogData.panel = SDLGUI_Create_Panel( (SDL_Rect){.x=100, .y=100, .w=300, .h=500}, (SDLGUI_Params){.bgColor=COLOR_BLACK} );
-
-		struct SDLGUI_Element *button_createMap = SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=250, .w=200, .h=100}, "create", buttonParams);
-		struct SDLGUI_Element *button_quit = SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=400, .w=200, .h=50}, "quit", buttonParams);
-		button_createMap->clicked = editor_createMap_clicked;
-		button_quit->clicked = mapDialog_quit_clicked;
-
-		createMapDialogData.textbox_width  = SDLGUI_Create_Textbox( (SDL_Rect){.x=100, .y=100, .w=100, .h=30}, labelParams);
-		createMapDialogData.textbox_height = SDLGUI_Create_Textbox( (SDL_Rect){.x=100, .y=130, .w=100, .h=30}, labelParams);
-		createMapDialogData.textbox_name   = SDLGUI_Create_Textbox( (SDL_Rect){.x=100, .y=170, .w=100, .h=30}, labelParams);
-		createMapDialogData.textbox_width->data.textData->acceptedChars  = TEXTBOX_INPUT_NUMERIC;
-		createMapDialogData.textbox_height->data.textData->acceptedChars = TEXTBOX_INPUT_NUMERIC;
-		createMapDialogData.textbox_name->data.textData->acceptedChars   = TEXTBOX_INPUT_NUMERIC | TEXTBOX_INPUT_ALPHABET;
-
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y= 10, .h=30}, "Creating New Map\n----------------", labelParams) );
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=100, .h=30}, " width", labelParams) );
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=130, .h=30}, "height", labelParams) );
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=170, .h=30}, "  name", labelParams) );
-
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, createMapDialogData.textbox_width );
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, createMapDialogData.textbox_height);
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, createMapDialogData.textbox_name);
-
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, button_createMap );
-		SDLGUI_AddTo_Panel( createMapDialogData.panel, button_quit );
-
-		SDLGUI_Add_Element( createMapDialogData.panel);
-
-		run0();
+		createMapCreator();
 	}
 
-	if( running) {
-		SDLGUI_Destroy();
-		SDLGUI_Init( renderer, textures->font);
-		initGui();
-		run();
-	}
+	running = true;
+	run();
 
     templates_save();
 

@@ -14,7 +14,7 @@ struct SDLGUI_List {
 void SDLGUI_List_Add( struct SDLGUI_List *list, struct SDLGUI_Element *item);
 void SDLGUI_List_Remove( struct SDLGUI_List *list, struct SDLGUI_Element *item);
 void SDLGUI_List_Clear( struct SDLGUI_List *list, int freeItems);
-void SDLGUI_List_Destroy( struct SDLGUI_List *list, int freeSelf);
+void SDLGUI_List_Destroy( struct SDLGUI_List *list);
 struct SDLGUI_List* SDLGUI_List_Create( int initSize);
 struct SDLGUI_List* SDLGUI_List_Create_From_Array( struct SDLGUI_Element **items, int count);
 void SDLGUI_List_Init( struct SDLGUI_List *list, int initSize);

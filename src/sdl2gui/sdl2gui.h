@@ -9,6 +9,7 @@
 #include "sdl2gui-panel.h"
 #include "sdl2gui-textbox.h"
 #include "sdl2gui-check.h"
+#include "sdl2gui-virtual.h"
 
 /*
 */
@@ -27,10 +28,9 @@ enum SDLGUI_Message_Type {
 };
 
 struct {
+	SDL_Window *window;
 	SDL_Renderer *renderer;
 	SDL_Texture **font;
-
-	struct SDLGUI_List elements;
 
 	struct SDLGUI_Element *mouseDownElement;
 	struct SDLGUI_Element *mouseHoverElement;
@@ -41,9 +41,7 @@ struct {
 } guiCore;
 
 
-void SDLGUI_Init( SDL_Renderer *renderer, SDL_Texture **font);
-void SDLGUI_Add_Element( struct SDLGUI_Element *element);
-void SDLGUI_Remove_Element( struct SDLGUI_Element *element);
+void SDLGUI_Init( SDL_Window *window, SDL_Renderer *renderer, SDL_Texture **font);
 void SDLGUI_Draw();
 void SDLGUI_Destroy();
 int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e);
@@ -54,9 +52,12 @@ int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e);
 
 void SDLGUI_Destroy_Texture( struct SDLGUI_Element *element);
 
-void SDLGUI_Show_Message( int xPos, int yPos, int width, int height, enum SDLGUI_Message_Type msgType, const char *text);
+void SDLGUI_Show_Message( enum SDLGUI_Message_Type msgType, const char *text);
 void SDLGUI_Hide_Message();
 
 void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text);
+
+void SDLGUI_Layer_Add( struct SDLGUI_List *list);
+void SDLGUI_Layer_Remove();
 
 #endif /*SDL2GUI_H*/

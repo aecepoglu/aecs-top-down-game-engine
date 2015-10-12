@@ -6,6 +6,8 @@ struct LinkedListNode {
 	void *data;
 };
 
+#define LINKED_LIST_CREATE() NULL;
+
 /* remove node from head */
 void linkedList_remove( struct LinkedListNode **head, struct LinkedListNode *node) ;
 

@@ -44,14 +44,13 @@ void SDLGUI_List_Clear( struct SDLGUI_List *list, int freeItems) {
 	list->count = 0;
 }
 
-void SDLGUI_List_Destroy( struct SDLGUI_List *list, int freeSelf) {
+void SDLGUI_List_Destroy( struct SDLGUI_List *list) {
 	int i;
 	for( i=0; i<list->count; i++) {
 		SDLGUI_Destroy_Element( list->list[i]);
 	}
 	free( list->list);
-	if( freeSelf)
-		free( list);
+	free( list);
 }
 
 struct SDLGUI_List* SDLGUI_List_Create( int initSize) {
