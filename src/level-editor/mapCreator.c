@@ -1,5 +1,5 @@
 #include "mapCreator.h"
-#include "sdl2gui/sdl2gui.h"
+#include "../sdl2gui/sdl2gui.h"
 #include "guiHelpers.h"
 #include "levelEditor.h"
 

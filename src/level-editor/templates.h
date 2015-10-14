@@ -1,8 +1,8 @@
 #ifndef BRUSH_TEMPLATE_H
 #define BRUSH_TEMPLATE_H
 
-#include "core/object.h"
-#include "basic.h"
+#include "../core/object.h"
+#include "../basic.h"
 
 #define MAX_TEMPLATES_COUNT 8
 #define MAX_TEMPLATE_NAME_LENGTH 10

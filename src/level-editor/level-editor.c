@@ -1,13 +1,12 @@
 #include "levelEditor.h"
 #include "editor-brushes/brush.h"
 
-#include "sdl2gui/sdl2gui.h"
-#include "collection/stack.h"
+#include "../collection/stack.h"
 #include "templates.h"
-#include "util/error.h"
+#include "../util/error.h"
 #include "mapCreator.h"
 #include "guiHelpers.h"
-#include "texture/textureScheduler.h"
+#include "../texture/textureScheduler.h"
 
 bool running;
 unsigned int objectCounter = 1;
