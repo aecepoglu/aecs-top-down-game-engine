@@ -1,7 +1,6 @@
 #include "brush.h"
 #include "rotate.h"
 #include "terrain.h"
-#include "object.h"
 #include "ai.h"
 #include "templates.h"
 #include "move.h"
@@ -26,7 +25,6 @@ void brushOptionPanels_init( struct SDLGUI_Element *panel, struct TextureSheet *
 
 	brushOptionPanels.rotate = brushOptionPanel_create_rotate( panel, &panelParams, &buttonParams);
 	brushOptionPanels.terrain = brushOptionPanel_create_terrain( panel, &panelParams, &buttonParams, trnTextures);
-	brushOptionPanels.object = brushOptionPanel_create_object( panel, &panelParams, &buttonParams, objTextureSheets);
 	brushOptionPanels.ai = brushOptionPanel_create_ai( panel, &panelParams, &textButtonParams);
 	brushOptionPanels.templates = brushOptionPanel_create_templates( panel, &panelParams, &buttonParams, selectedObjPtr, renderer);
 	brushOptionPanels.move = brushOptionPanel_create_move( panel, &panelParams);

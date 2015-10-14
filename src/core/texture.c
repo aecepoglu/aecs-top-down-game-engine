@@ -108,7 +108,7 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 
 
 
-struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
+struct GameTextures* loadOrdinaryTextures( SDL_Renderer *ren) {
 	log1("Loading textures\n");
 
 	struct GameTextures *result = malloc( sizeof(struct GameTextures));
@@ -120,33 +120,14 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 		[ terrain_gnd 	] = "res/ground.png",
 		[ terrain_marked] = "res/specialGround.png",
 	};
-	char *resPaths[go_NUM_ITEMS] = {
-		[ go_player] 		= "res/player.png",
-		[ go_leftTurner] 	= "res/left-turner.png",
-		[ go_flower] 		= "res/flower.png",
-		[ go_creeperPlant] 	= "res/creeper.png",
-		[ go_peekaboo] 		= "res/peekaboo.png",
-		[ go_weepingAngel] 	= "res/weepingAngel.png",
-		[ go_apple] 		= "res/apple.png",
-		[ go_door] 			= "res/door.png",
-		[ go_button] 		= "res/but.png",
-		[ go_switch] 		= "res/sw.png",
-		[ go_lineSensor] 	= "res/lineSensor.png",
-		[ go_box] 	        = "res/box.png",
-		[ go_gate]			= "res/gate.png",
-		[ go_key]			= "res/key.png",
-		[ go_escaper]		= "res/escaper.png",
-	};
 
 	result->trn = calloc( terrain_NUM_ITEMS, sizeof(SDL_Texture*));
-	result->obj = calloc( go_NUM_ITEMS, sizeof(struct TextureSheet*));
 
 	int i;
 	for( i=0; i<terrain_NUM_ITEMS; i++)
 		result->trn[ i] = loadTexture( ren, trnPaths[ i]);
-
-	for( i=0; i<go_NUM_ITEMS; i++)
-		result->obj[ i] = loadObjTextures( ren, resPaths[ i]);
+	
+	result->obj = NULL;
 
 	result->font = loadFontSheet( ren, "res/font-sheet.png");
 
@@ -157,6 +138,21 @@ struct GameTextures* loadAllTextures( SDL_Renderer *ren) {
 	result->inventory = loadTexture( ren, "res/inventory.png");
 
 	return result;
+}
+
+void loadObjectTextures( SDL_Renderer *ren, struct GameTextures *textures, const struct TexturePaths *texturePaths) {
+	log1("Loading obj textures\n");
+
+	textures->obj = calloc( texturePaths->size, sizeof(struct TextureSheet*));
+
+	int i;
+	for( i=0; i<texturePaths->size; i++)
+		if( texturePaths->array[i] != NULL)
+			textures->obj[i] = loadObjTextures( ren, texturePaths->array[i]);
+		else
+			textures->obj[i] = NULL;
+	
+	textures->objsCount = texturePaths->size;
 }
 
 void texture_freeTextureSheet( struct TextureSheet *sheet) {
@@ -182,10 +178,15 @@ void texture_freeTextureSheet( struct TextureSheet *sheet) {
 
 void freeTextures( struct GameTextures* textures) {
 	int i;
-	for( i=0; i<go_NUM_ITEMS; i++) {
-		texture_freeTextureSheet( textures->obj[i]);
+
+	if( textures->obj) {
+		printf("freeing textures\n");
+		for( i=0; i<textures->objsCount; i++)
+			if( textures->obj[i] != NULL)
+				texture_freeTextureSheet( textures->obj[i]);
+
+		free( textures->obj);
 	}
-	free( textures->obj);
 
 	for( i=0; i<terrain_NUM_ITEMS; i++) {
 		SDL_DestroyTexture( textures->trn[ i]);

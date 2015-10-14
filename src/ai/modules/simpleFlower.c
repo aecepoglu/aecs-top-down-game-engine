@@ -41,13 +41,11 @@ void simpleFlower_update( struct Map *map, struct object *obj, void *data) {
 			int yPos = obj->pos.j + rand()%yMod - yMod/2;
 
 			if( TILE_CLEAR(map, xPos, yPos) ) {
-				struct object *newFlower = createObject(go_flower, xPos, yPos, obj->id);
+				struct object *newFlower = createObject(go_npc, xPos, yPos, obj->id, obj->textureId);
 				newFlower->ai = simpleFlower_create();
 				addObject( newFlower, map, xPos, yPos);
 			}
 		}
-		//TODO change
-		//obj->timerCounter = TURNS_PER_MOVE_GROWN;
-		obj->timerCounter = 5;
+		obj->timerCounter = TURNS_PER_MOVE_GROWN;
 	}
 }

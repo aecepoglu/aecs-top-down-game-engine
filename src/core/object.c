@@ -6,7 +6,7 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-struct object* createObject( enum objType type, unsigned int x, unsigned int y, unsigned int id) {
+struct object* createObject( enum objType type, unsigned int x, unsigned int y, unsigned int id, int textureId) {
 	struct object *obj = (struct object*)malloc(sizeof(struct object));
     obj->id = id;
 
@@ -14,6 +14,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 	obj->pos.j = y;
 
 	obj->type = type;
+	obj->textureId = textureId;
 	obj->dir = dir_up;
 	obj->ai = 0;
 	obj->health = 3;
@@ -34,7 +35,7 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 
 void writeObject( FILE *fp, struct object *obj) {
 	writeVector( fp, &obj->pos);
-	fwrite( &obj->type, sizeof(enum objType),   1, fp);
+	fwrite( &obj->textureId, sizeof(int),   1, fp);
 	fwrite( &obj->dir,  sizeof(enum direction), 1, fp);
 	enum AIType tmp = obj->ai == 0 ? ai_none : obj->ai->type;
 	fwrite( &tmp, 		sizeof(enum AIType),     1, fp);
@@ -52,7 +53,7 @@ void writeObject( FILE *fp, struct object *obj) {
 struct object* readObject( FILE *fp) {
 	struct object *obj = (struct object*)malloc(sizeof(struct object));
 	readToVector( fp, &obj->pos);
-	fread( &obj->type, sizeof(enum objType),   1, fp);
+	fread( &obj->textureId, sizeof(int),   1, fp);
 	fread( &obj->dir,  sizeof(enum direction), 1, fp);
 	enum AIType type;
 	fread( &type,      sizeof(enum AIType),    1, fp);
@@ -68,6 +69,7 @@ struct object* readObject( FILE *fp) {
 	fread( &obj->attack,		sizeof(uint8_t),	1, fp);
 	fread( &obj->defence,		sizeof(uint8_t),	1, fp);
 
+	obj->type = go_npc;
 	obj->timerCounter= 0;
 	obj->visualState = 1;
 	obj->isDeleted=false;

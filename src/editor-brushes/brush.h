@@ -29,7 +29,6 @@ struct {
 	struct SDLGUI_Element
 		*terrain,
 		*rotate,
-		*object,
 		*ai,
 		*templates,
 		*move;

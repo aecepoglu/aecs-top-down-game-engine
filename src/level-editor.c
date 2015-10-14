@@ -7,6 +7,7 @@
 #include "util/error.h"
 #include "mapCreator.h"
 #include "guiHelpers.h"
+#include "texture/textureScheduler.h"
 
 bool running;
 unsigned int objectCounter = 1;
@@ -22,6 +23,7 @@ struct SDLGUI_Element *leftPanel;
 struct SDLGUI_Element *topBar;
 bool mouseDownInGui;
 bool isMessageBoxOn = false;
+struct TexturePaths *texturePaths = NULL;
 
 
 struct {
@@ -144,10 +146,11 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 		return false;
 
 	if( myMap->objs[x][y]!=NULL ) {
-		myMap->objs[x][y]->type = type;
+		myMap->objs[x][y]->type = go_npc;
 		return true;
 	}
-	struct object *obj = createObject( type, x, y, objectCounter++);
+
+	struct object *obj = createObject( go_npc, x, y, objectCounter++, -1);
 
 
 	addObject( obj, myMap, x, y);
@@ -240,6 +243,7 @@ void drawBackground() {
     			);
 
 	SDL_SetRenderTarget( renderer, 0); //reset
+	log3("generate background end\n");
 }
 
 bool scrollScreen( enum direction dir) {
@@ -511,21 +515,10 @@ void run() {
 				running =0;
 				break;
 			case SDL_KEYDOWN:
-				if( isMessageBoxOn) {
-					log2("msg box on\n");
-					SDLGUI_Hide_Message();
-					isMessageBoxOn =false;
-					break;
-				}
-				else if(SDLGUI_Handle_TextInput( (SDL_KeyboardEvent*)&e) != true)
+				if(SDLGUI_Handle_TextInput( (SDL_KeyboardEvent*)&e) != true)
 					handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if( isMessageBoxOn) {
-					SDLGUI_Hide_Message();
-					isMessageBoxOn =false;
-					break;
-				}
 				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
 					log2("mouse down - gui\n");
 					mouseDownInGui = true;
@@ -541,11 +534,7 @@ void run() {
 				continue;
 			case SDL_MOUSEBUTTONUP:
 				brush.isRepeat = false;
-				if( isMessageBoxOn) {
-					SDLGUI_Hide_Message();
-					isMessageBoxOn =false;
-				}
-				else if( mouseDownInGui) {
+				if( mouseDownInGui) {
 					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
 				}
 				break;
@@ -593,8 +582,11 @@ void drawObjects() {
 			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
 			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
 				drawTexture( renderer,
-					textures->obj[obj->type]->textures[ obj->visualState][obj->dir],
+					obj->textureId >= 0
+						? textures->obj[obj->textureId]->textures[ obj->visualState][obj->dir]
+						: textures->unidentifiedObj,
 					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN );
+
 				if( obj == selectedObjStuff.obj) {
 					drawTexture( renderer, textures->highlitObjIndicator, screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN);
 				}
@@ -627,7 +619,6 @@ void hideAll() {
 	brushOptionPanels.move->isVisible = false;
 	brushOptionPanels.rotate->isVisible = false;
 	brushOptionPanels.terrain->isVisible = false;
-	brushOptionPanels.object->isVisible = false;
 	brushOptionPanels.ai->isVisible = false;
 	brushOptionPanels.templates->isVisible = false;
 }
@@ -660,9 +651,8 @@ void button_terrain_clicked( struct SDLGUI_Element *e) {
 
 void button_object_clicked( struct SDLGUI_Element *e) {
 	brush.fun = editor_createObj;
-	brush.variant = go_apple;
+	brush.variant = go_npc;
 	hideAll();
-	brushOptionPanels.object->isVisible = true;
 }
 
 void button_ai_clicked( struct SDLGUI_Element *e) {
@@ -858,7 +848,6 @@ void initGui() {
 	SDLGUI_AddTo_Panel( topBar, selectedObjStuff.textboxes.pos_y );
 }
 
-//TODO remove if unused
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
@@ -868,23 +857,36 @@ int main( int argc, char *args[]) {
 
 	init( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, 1280, 960);
     log0("loading textures\n");
-	textures = loadAllTextures( renderer);
+	textures = loadOrdinaryTextures( renderer);
 	SDLGUI_Init( window, renderer, textures->font);
 	initGui();
 
 	if( argc > 1) {
 		myMap = readMapFile( args[1]);
+
+		printf("read map file\n");
 		myMap->filePath = args[1];
 
 		if( myMap->objListCount > 0) {
 			objectCounter = myMap->objList[ myMap->objListCount-1 ]->id + 1;
 		}
 
+		printf("file path: %s\n", myMap->filePath);
+		char *schedulePath = getTextureSchedulePath( myMap->filePath);
+		printf("schedule path: %s\n", schedulePath);
+		texturePaths = readTextureSchedule( schedulePath);
+		free( schedulePath);
+
 		drawBackground();
 		draw();
 	}
 	else {
+		printf("creating map creator\n");
 		createMapCreator();
+	}
+
+	if( texturePaths) {
+		loadObjectTextures( renderer, textures, texturePaths);
 	}
 
 	running = true;

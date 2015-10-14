@@ -7,10 +7,11 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(Lua 5.2 REQUIRED)
 
-set(MY_BRUSH_SOURCES brushes move rotate terrain object ai templates)
+set(MY_BRUSH_SOURCES brushes move rotate terrain ai templates)
 set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel door lineSensor switch escaper)
 set(MY_FOV_SOURCES fov-util fov-raycast fov-line fov-diamond)
 set(MY_PF_SOURCES roughAStar roughAStar_depthLimited)
+set(MY_SDLGUI_SOURCES sdl2gui sdl2gui-list sdl2gui-text sdl2gui-element sdl2gui-panel sdl2gui-textbox sdl2gui-check sdl2gui-virtual)
 
 
 foreach(x ${MY_AI_SOURCES})
@@ -36,9 +37,14 @@ foreach(x ${MY_BRUSH_SOURCES})
 endforeach(x ${MY_BRUSH_SOURCES})
 set(MY_BRUSH_SOURCES ${_tmp})
 
-set(MY_SOURCE_FILES core/engine.c core/texture.c core/map.c core/object.c vector.c collection/linkedList.c text.c textConsole.c inventory.c cutscene.c ai/ai.c)
+unset(_tmp)
+foreach(x ${MY_SDLGUI_SOURCES})
+	list(APPEND _tmp "sdl2gui/${x}.c")
+endforeach(x ${MY_SDLGUI_SOURCES})
+set(MY_SDLGUI_SOURCES ${_tmp})
 
-set(SDLGUI_SOURCE_FILES sdl2gui/sdl2gui.c sdl2gui/sdl2gui-list.c sdl2gui/sdl2gui-text.c sdl2gui/sdl2gui-element.c sdl2gui/sdl2gui-panel.c sdl2gui/sdl2gui-textbox.c sdl2gui/sdl2gui-check.c sdl2gui/sdl2gui-virtual.c)
+set(MY_SOURCE_FILES core/engine.c core/texture.c core/map.c core/object.c vector.c collection/linkedList.c text.c textConsole.c inventory.c cutscene.c ai/ai.c util/util.c texture/textureScheduler.c)
+
 
 
 set(ALL_SOURCE_FILES ${MY_SOURCE_FILES})
@@ -46,7 +52,7 @@ list(APPEND ALL_SOURCE_FILES ${MY_AI_SOURCES} ${MY_PF_SOURCES})
 
 
 
-add_executable(level-editor level-editor.c templates.c mapCreator.c guiHelpers.c ${ALL_SOURCE_FILES} ${SDLGUI_SOURCE_FILES} ${MY_BRUSH_SOURCES} )
+add_executable(level-editor level-editor.c templates.c mapCreator.c guiHelpers.c ${ALL_SOURCE_FILES} ${MY_SDLGUI_SOURCES} ${MY_BRUSH_SOURCES} )
 target_link_libraries(level-editor ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES} ${LUA_LIBRARIES})
 include_directories(level-editor ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIRS})
 

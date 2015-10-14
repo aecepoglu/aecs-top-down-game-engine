@@ -8,7 +8,7 @@
 #include "../util/log.h"
 #include "../util/error.h"
 
-#define MAP_VERSION 3
+#define MAP_VERSION 4
 
 /* -----------
  *	FUNCTIONS
@@ -171,7 +171,6 @@ bool checkMapValidity( struct Map *map) {
 
 	unsigned int x,y;
 
-	int playerCount = 0;
 	int groundCount = 0;
 
 	int **connectedTiles = (int**)calloc( map->width, sizeof(int*));
@@ -191,17 +190,9 @@ bool checkMapValidity( struct Map *map) {
 			}
 			else
 				connectedTiles[x][y] = -1;
-
-			if( map->objs[x][y] != 0 && map->objs[x][y]->type == go_player)
-				playerCount ++;
 		}
 	}
 
-	if( playerCount != 0) {
-		ERROR("player count is %d. must be 0.\n", playerCount);
-		goto freeConnectedTiles;
-	}
-	
 	if( groundCount == 0) {
 		ERROR("groundCount is %d. must be > 0.\n", groundCount);
 		goto freeConnectedTiles;

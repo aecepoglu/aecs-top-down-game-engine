@@ -54,6 +54,10 @@ void SDLGUI_Draw() {
 int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
 	if( topLayer == 0)
 		return 0;
+	else if( guiCore.messageBox) {
+		SDLGUI_Hide_Message();
+		return 1;
+	}
 
 	struct SDLGUI_Element *mouseDownElement = SDLGUI_List_findItemAtPos( topLayer->list, e->x, e->y);
 	if( mouseDownElement != 0) {
@@ -65,7 +69,7 @@ int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
 }
 
 int SDLGUI_Handle_MouseHover( SDL_MouseMotionEvent *e) {
-	if( ! e->state && topLayer == 0) {
+	if( ! e->state && topLayer != 0 && guiCore.messageBox == 0) {
 		struct SDLGUI_Element *hoverElement = SDLGUI_List_findItemAtPos( topLayer->list, e->x, e->y);
 		if( hoverElement != 0 && guiCore.mouseHoverElement != hoverElement) {
 			if( guiCore.mouseHoverElement != 0) {
@@ -153,10 +157,10 @@ void SDLGUI_Show_Message( enum SDLGUI_Message_Type msgType, const char *text) {
 }
 
 void SDLGUI_Hide_Message() {
-//	if( guiCore.messageBox) {
-//		SDLGUI_Destroy_Element( guiCore.messageBox);
-//		guiCore.messageBox = 0;
-//	}
+	if( guiCore.messageBox) {
+		SDLGUI_Destroy_Element( guiCore.messageBox);
+		guiCore.messageBox = 0;
+	}
 }
 
 /* Tooltip

@@ -14,21 +14,7 @@
 
 enum objType {
 	go_player,
-	go_leftTurner,
-	go_apple,
-	go_door,
-	go_flower,
-	go_creeperPlant,
-	go_peekaboo,
-	go_weepingAngel,
-	go_button,
-	go_switch,
-	go_lineSensor,
-	go_box,
-	go_gate,
-	go_key,
-	go_escaper,
-	go_NUM_ITEMS
+	go_npc
 };
 
 /*struct AI defined in ai.h*/
@@ -36,6 +22,7 @@ struct object {
     unsigned int id;
 	struct Vector pos;
 	enum objType type;
+	int textureId;
 	enum direction dir;
 	struct AI *ai;
 	unsigned int timerCounter;
@@ -59,7 +46,7 @@ struct object {
 
 
 /* Creates and returns an Object of given type */
-struct object* createObject( enum objType type, unsigned int x, unsigned int y, unsigned int id);
+struct object* createObject( enum objType type, unsigned int x, unsigned int y, unsigned int id, int textureId);
 struct object* readObject( FILE *fp);
 void writeObject( FILE *fp, struct object *obj);
 
