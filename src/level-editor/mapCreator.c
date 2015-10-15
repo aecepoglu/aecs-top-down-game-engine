@@ -29,10 +29,13 @@ void editor_createMap_clicked( struct SDLGUI_Element *from) {
 		draw();
 
 		SDLGUI_Layer_Remove();
+
+		void (*callback)() = from->userData;
+		callback();
 	}
 }
 
-void createMapCreator() {
+void createMapCreator(void (*callback)()) {
 	SDLGUI_Params labelParams = (SDLGUI_Params){ .bgColor=COLOR_TRANSPARENT, .fgColor=COLOR_WHITE, .fontWidth=12, .fontHeight=16 };
 
 	SDLGUI_Params buttonParams = labelParams;
@@ -42,6 +45,7 @@ void createMapCreator() {
 
 	struct SDLGUI_Element *button_createMap = SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=250, .w=200, .h=100}, "create", buttonParams);
 	button_createMap->clicked = editor_createMap_clicked;
+	button_createMap->userData = callback;
 
 	struct SDLGUI_Element *button_quit = SDLGUI_Create_Text( (SDL_Rect){.x=0, .y=400, .w=200, .h=50}, "quit", buttonParams);
 	button_quit->clicked = buttonQuit_clicked;

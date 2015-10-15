@@ -31,8 +31,11 @@ struct {
 		*rotate,
 		*ai,
 		*templates,
+		*texture,
 		*move;
 } brushOptionPanels;
+
+extern SDLGUI_Params editorMiniButtonParams;
 
 
 #define BUTTON_SIZE 32

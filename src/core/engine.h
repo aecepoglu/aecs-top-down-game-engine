@@ -24,15 +24,15 @@
 /* ----------------------------------
  *  		VARIABLES
  */
-SDL_Window *window;
-SDL_Renderer *renderer;
-struct GameTextures *textures;
-SDL_Texture *bgroundTexture;
+extern SDL_Window *window;
+extern SDL_Renderer *renderer;
+extern struct GameTextures *textures;
+extern SDL_Texture *bgroundTexture;
 
-struct Map *myMap;
+extern struct Map *myMap;
 
-struct Vector viewPos, viewSize, viewEnd;
-int windowW, windowH;
+extern struct Vector viewPos, viewSize, viewEnd;
+extern int windowW, windowH;
 
 /* ---------------------------------
  *			DEFINITIONS

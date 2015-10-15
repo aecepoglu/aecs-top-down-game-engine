@@ -27,8 +27,10 @@ void unsetTexturePaths(struct TexturePaths *texturePaths, int from, int to) {
 }
 
 struct TexturePaths *readTextureSchedule( const char *path) {
+	log1("loading texture-spec file \"%s\"\n", path);
 	FILE *fp = fopen( path, "r");
 	if( fp == 0) {
+		log1("  file not found\n");
 		return NULL;
 	}
 

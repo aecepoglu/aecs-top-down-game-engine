@@ -7,7 +7,7 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(Lua 5.2 REQUIRED)
 
-set(MY_BRUSH_SOURCES brushes move rotate terrain ai templates)
+set(MY_BRUSH_SOURCES brushes move rotate terrain ai templates texture)
 set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel door lineSensor switch escaper)
 set(MY_FOV_SOURCES fov-util fov-raycast fov-line fov-diamond)
 set(MY_PF_SOURCES roughAStar roughAStar_depthLimited)

@@ -1,5 +1,16 @@
 #include "engine.h"
 
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
+struct GameTextures *textures = NULL;
+SDL_Texture *bgroundTexture;
+
+struct Map *myMap = NULL;
+
+struct Vector viewPos, viewSize, viewEnd;
+int windowW, windowH;
+
+
 void quit( const char *msg) {
 	//TODO handle the termination properly.
 	fprintf(stderr, "Error msg: \"%s\"\n", msg);

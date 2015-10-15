@@ -128,6 +128,7 @@ struct GameTextures* loadOrdinaryTextures( SDL_Renderer *ren) {
 		result->trn[ i] = loadTexture( ren, trnPaths[ i]);
 	
 	result->obj = NULL;
+	result->objsCount = 0;
 
 	result->font = loadFontSheet( ren, "res/font-sheet.png");
 

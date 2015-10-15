@@ -1,5 +1,6 @@
 #include "levelEditor.h"
 #include "editor-brushes/brush.h"
+#include "editor-brushes/texture.h"
 
 #include "../collection/stack.h"
 #include "templates.h"
@@ -158,6 +159,16 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 	char tooltipText[8];
 	sprintf( tooltipText, "#%d", obj->id);
 	SHOW_TOOLTIP( x, y, tooltipText);
+
+	return true;
+}
+
+bool editor_setTexture( unsigned int x, unsigned int y, int textureId){
+	if( myMap->objs[x][y] == NULL) {
+		return false;
+	}
+
+	myMap->objs[x][y]->textureId = textureId;
 
 	return true;
 }
@@ -484,7 +495,7 @@ void handleWindowEvent( SDL_WindowEvent *e) {
 			resizeView( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, e->data1, e->data2);
 			leftPanel->rect.h = e->data2;
 			topBar->rect.w = e->data1 - GUI_LEFTPANEL_WIDTH;
-			drawBackground();
+			//FIXME drawBackground();
 		    break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		    log1("Window %d minimized\n", e->windowID);
@@ -673,6 +684,14 @@ void button_template_clicked( struct SDLGUI_Element *e) {
     brushOptionPanels.templates->isVisible = true;
 }
 
+void button_texture_clicked( struct SDLGUI_Element *e) {
+	brush.fun = editor_setTexture;
+	brush.variant = -1;
+	hideAll();
+	brushOptionPanels.texture->isVisible = true;
+}
+
+
 void initGui() {
     /* The left panel */
 	SDLGUI_Color panelsBgColor = (SDLGUI_Color){.r=170, .g=180, .b=190, .a=255};
@@ -742,6 +761,7 @@ void initGui() {
 		{"res/editor/ai.png", 		button_ai_clicked},
 		{"res/editor/delete.png", 	button_remove_clicked},
 		{"res/editor/template.png", button_template_clicked},
+		{"res/editor/object.png", 	button_texture_clicked},
 	};
 
 	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h= buttonLeftMargin + ((sizeof(buttonTemplates) / sizeof(struct buttonTemplate) - 1) / buttonsPerRow + 1) * buttonSizeWithMargins}, panelParams);
@@ -847,6 +867,23 @@ void initGui() {
 	SDLGUI_AddTo_Panel( topBar, selectedObjStuff.textboxes.pos_y );
 }
 
+void mapLoaded() {
+	if(texturePaths == NULL) {
+		char *schedulePath = getTextureSchedulePath( myMap->filePath);
+		texturePaths = readTextureSchedule( schedulePath);
+		free( schedulePath);
+
+		drawBackground();
+		draw();
+
+		reloadTextureButtons();
+
+		if(texturePaths) {
+			loadObjectTextures( renderer, textures, texturePaths);
+		}
+	}
+}
+
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
@@ -870,22 +907,10 @@ int main( int argc, char *args[]) {
 			objectCounter = myMap->objList[ myMap->objListCount-1 ]->id + 1;
 		}
 
-		printf("file path: %s\n", myMap->filePath);
-		char *schedulePath = getTextureSchedulePath( myMap->filePath);
-		printf("schedule path: %s\n", schedulePath);
-		texturePaths = readTextureSchedule( schedulePath);
-		free( schedulePath);
-
-		drawBackground();
-		draw();
+		mapLoaded();
 	}
 	else {
-		printf("creating map creator\n");
-		createMapCreator();
-	}
-
-	if( texturePaths) {
-		loadObjectTextures( renderer, textures, texturePaths);
+		createMapCreator(&mapLoaded);
 	}
 
 	running = true;
