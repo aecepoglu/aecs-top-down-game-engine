@@ -237,6 +237,7 @@ void SDLGUI_Layer_Remove() {
 	struct SDLGUI_Layer *prev = topLayer->prev;
 
 	SDLGUI_List_Destroy( topLayer->list);
+	free(topLayer);
 
 	topLayer = prev;
 }

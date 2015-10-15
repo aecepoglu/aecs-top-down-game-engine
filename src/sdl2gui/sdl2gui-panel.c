@@ -3,13 +3,17 @@
 #include "sdl2gui-panel.h"
 #include "sdl2gui-list.h"
 
+struct SDLGUI_List* SDLGUI_Get_Panel_Elements( struct SDLGUI_Element *e) {
+	return e->data.elements;
+}
+
 void SDLGUI_Draw_Panel( struct SDLGUI_Element *element) {
 	if( ! element->isVisible) 
 		return;
 
 	SDL_RenderCopy( guiCore.renderer, element->textures.normal, NULL, &element->rect);
 
-	struct SDLGUI_List *elements = element->data.elements;
+	struct SDLGUI_List *elements = SDLGUI_Get_Panel_Elements(element);
     int i;
     for( i=0; i<elements->count; i++) {
         struct SDLGUI_Element *e = elements->list[i];
@@ -19,9 +23,9 @@ void SDLGUI_Draw_Panel( struct SDLGUI_Element *element) {
 }
 
 void SDLGUI_Destroy_Panel( struct SDLGUI_Element *element) {
-    SDLGUI_List_Destroy( element->data.elements);
-    SDL_DestroyTexture( element->textures.normal);
-    free( element);
+	SDLGUI_List_Destroy( element->data.elements);
+	SDL_DestroyTexture( element->textures.normal);
+	free( element);
 }
 
 struct SDLGUI_Element* SDLGUI_MouseHandler_Panel( struct SDLGUI_Element *panel, int x, int y) {

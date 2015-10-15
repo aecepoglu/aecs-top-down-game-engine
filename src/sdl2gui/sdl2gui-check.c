@@ -28,6 +28,14 @@ void SDLGUI_Checkbox_Clicked( struct SDLGUI_Element *e) {
 		data->checkChanged( e, data->value);
 }
 
+void SDLGUI_Destroy_Checkbox( struct SDLGUI_Element *e) {
+	struct SDLGUI_Checkbox_Data *data = e->data.check;
+
+	free(data);
+
+	SDLGUI_Destroy_Texture(e);
+}
+
 struct SDLGUI_Element* SDLGUI_Create_Checkbox( SDL_Rect rect, SDLGUI_Params params) {
 	if( rect.w == TEXT_SPAN_SIZE) {
 		rect.w = params.fontWidth * 2 + params.borderThickness;
@@ -45,6 +53,7 @@ struct SDLGUI_Element* SDLGUI_Create_Checkbox( SDL_Rect rect, SDLGUI_Params para
 
 	uncheckedElement->clicked = SDLGUI_Checkbox_Clicked;
 	uncheckedElement->data.check = data;
+	uncheckedElement->destructor = SDLGUI_Destroy_Checkbox;
 
 	free( checkedElement);
 
