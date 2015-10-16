@@ -592,9 +592,9 @@ void drawObjects() {
 			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
 			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
 				drawTexture( renderer,
-					obj->textureId >= 0
-						? textures->obj[obj->textureId]->textures[ obj->visualState][obj->dir]
-						: textures->unidentifiedObj,
+					(obj->textureId < 0 || obj->textureId >= textures->objsCount || textures->obj[obj->textureId] == NULL)
+						? textures->unidentifiedObj
+						: textures->obj[obj->textureId]->textures[ obj->visualState][obj->dir],
 					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN );
 
 				if( obj == selectedObjStuff.obj) {
@@ -877,11 +877,11 @@ void mapLoaded() {
 		drawBackground();
 		draw();
 
-		reloadTextureButtons();
-
 		if(texturePaths) {
 			loadObjectTextures( renderer, textures, texturePaths);
 		}
+
+		reloadTextureButtons();
 	}
 }
 
@@ -901,7 +901,6 @@ int main( int argc, char *args[]) {
 	if( argc > 1) {
 		myMap = readMapFile( args[1]);
 
-		printf("read map file\n");
 		myMap->filePath = args[1];
 
 		if( myMap->objListCount > 0) {
