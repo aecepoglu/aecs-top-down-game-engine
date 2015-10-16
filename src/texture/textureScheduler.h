@@ -2,6 +2,7 @@
 #define TEXTURE_SCHEDULER_H
 
 #include <stdio.h>
+#include "../basic.h"
 
 struct TexturePaths {
 	char **array;
@@ -18,5 +19,7 @@ void destroyTextureSchedule( struct TexturePaths *texturePaths);
 
 void clearTexturePaths(struct TexturePaths *t);
 void loadTexturePaths(struct TexturePaths *t, FILE *fp);
+
+bool validateTexturePaths(const struct TexturePaths *t);
 
 #endif /*TEXTURE_SCHEDULER_H*/

@@ -11,6 +11,8 @@
 #include "core/audio.h"
 #include "customEventTypes.h"
 #include "cutscene.h"
+#include "texture/textureScheduler.h"
+#include "util/util.h"
 
 SDL_Event timerPushEvent = {
 	.type= SDL_USEREVENT,
@@ -28,6 +30,7 @@ bool playerMoved = false;
 enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
+struct TexturePaths *texturePaths;
 
 
 const Uint32 timerDelay = 100 /*miliseconds*/;
@@ -398,7 +401,7 @@ void draw() {
 		#ifndef GOD_VISION
 		drawTexture( renderer, 
 			vo->isFullySeen
-				? textures->obj[ vo->obj->type ]->textures[ vo->obj->visualState][ vo->obj->dir]
+				? textures->obj[ vo->obj->textureId ]->textures[ vo->obj->visualState][ vo->obj->dir]
 				: textures->unidentifiedObj, 
 			(vi_padding + vo->pos.i)*TILELEN, (vj_padding + vo->pos.j)*TILELEN, TILELEN, TILELEN
 		);
@@ -588,39 +591,34 @@ void setDefaults() {
 	inventory_reset( false);
 }
 
-char* getDirPath( const char *file) {
-	char *result;
-
-	char *slashPos = strrchr( file, '/');
-	if( slashPos == NULL) {
-		result = strdup( ".");
-	}
-	else {
-		/* result = strndup( file, slashPos - file);
-			This is not available on non-gnu systems. I have to do it manually
-		*/
-		int len = slashPos - file;
-		result = calloc( len+1, sizeof(char));
-		memcpy( result, file, len);
-		result[len] = '\0';
-	}
-
-	return result;
-}
-
 int main( int argc, char *args[]) {
 	
 	if( argc != 2) {
 		fprintf( stderr, "Usage: %s map-file (without .yz.* extensions)", args[0]);
-        return 0;
+        return 1;
 	}
-    dirPath = getDirPath( args[1]);
+
+	dirPath = getDirPath( args[1]);
+
+	char *schedulePath = getTextureSchedulePath( args[1]);
+	texturePaths = readTextureSchedule( schedulePath);
+	if(texturePaths == NULL) {
+		fprintf(stderr, "Texture-Specification-File at '%s' couldn't be loaded\n", schedulePath);
+		return 1;
+	}
+	free( schedulePath);
+
+	if(validateTexturePaths(texturePaths) != true) {
+		fprintf(stderr, "Ending program because of errors in texture-scheduler specification\n");
+		return 1;
+	}
 
 	lua = initLua();
 	setDefaults();
 	
 	init( 0, 0, 1280, 960);
-	textures = loadAllTextures( renderer);
+	textures = loadOrdinaryTextures( renderer);
+	loadObjectTextures( renderer, textures, texturePaths);
 	audio_init();
 	cutscene_init();
 	textConsole_init( renderer);
@@ -631,6 +629,7 @@ int main( int argc, char *args[]) {
 	}
 	
 	log0("Program over\nDeallocating because I'm just OCD like that\n");
+	audio_free();
 	freeTextures( textures);
 	textConsole_destroy( renderer);
 	SDL_RenderClear( renderer);

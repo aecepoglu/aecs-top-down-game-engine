@@ -36,7 +36,7 @@ int loadLevel( const char* relMapPath, const char* relScriptPath, int levelOptio
 
 	myMap = readMapFile( fullPath);
 
-	player = createObject( go_player, 0, 0, 0);
+	player = createObject( go_player, 0, 0, 0, PLAYER_TEXTURE_ID);
 
     sprintf( fullPath, "%s/%s", dirPath, relScriptPath);
     if (luaL_loadfile(L, fullPath) || lua_pcall( L, 0, 0, 0)) {
@@ -220,29 +220,6 @@ int dsl_onInventoryRemove( lua_State *l) {
 	return 0;
 }
 
-int dsl_setObjTextures( lua_State *l) {
-	luaL_checktype( l, 1, LUA_TTABLE);
-
-	lua_pushnil(l);
-	while( lua_next( l, 1) ) {
-		enum objType type = lua_tointeger( l, -2);
-		const char *texturePath = lua_tostring( l, -1);
-		if( type >= 0 && type < go_NUM_ITEMS) {
-			struct TextureSheet* newSheet = loadObjTextures( renderer, texturePath);
-			if( newSheet->numStates == textures->obj[ type]->numStates) {
-				texture_freeTextureSheet( textures->obj[ type]);
-				textures->obj[ type] = newSheet;
-			}
-			else {
-				fprintf( stderr, "Cannot set texture for object with type :%d because the texture-sheet at given path: '%s' has %d states only. It should be %d\n", type, texturePath, newSheet->numStates, textures->obj[ type]->numStates);
-				texture_freeTextureSheet( newSheet);
-			}
-		}
-		lua_pop( l, 1);
-	}
-	return 0;
-}
-
 int dsl_setTileTextures( lua_State *l) {
 	luaL_checktype( l, 1, LUA_TTABLE);
 
@@ -415,7 +392,6 @@ lua_State* initLua() {
 		{"listInventory", dsl_listInventory},
 		{"onInventoryAdd", dsl_onInventoryAdd},
 		{"onInventoryRemove", dsl_onInventoryRemove},
-		{"setObjTextures", dsl_setObjTextures},
 		{"setTileTextures", dsl_setTileTextures},
 		{"changeAIStatus", dsl_changeAIStatus},
 		{"cutClear", dsl_cutsceneClear},

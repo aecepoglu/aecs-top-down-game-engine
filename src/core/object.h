@@ -12,6 +12,8 @@
 #include "../basic.h"
 #include "../vector.h"
 
+#define PLAYER_TEXTURE_ID 0
+
 enum objType {
 	go_player,
 	go_npc

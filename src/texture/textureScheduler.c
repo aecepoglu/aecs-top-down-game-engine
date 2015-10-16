@@ -2,6 +2,7 @@
 #include "../basic.h"
 #include "../util/util.h"
 #include "../util/log.h"
+#include "../core/object.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -132,4 +133,18 @@ void destroyTextureSchedule( struct TexturePaths *t) {
 	free(t->array);
 	free(t->filePath);
 	free(t);
+}
+
+bool validateTexturePaths(const struct TexturePaths *t) {
+	if(t->size < 1) {
+		fprintf(stderr, "The texture-spec file is empty\n");
+		return false;
+	}
+
+	if(t->array[PLAYER_TEXTURE_ID] == NULL) {
+		fprintf(stderr, "Texture-spec file must contain a texture with id %d for player\n", PLAYER_TEXTURE_ID);
+		return false;
+	}
+
+	return true;
 }
