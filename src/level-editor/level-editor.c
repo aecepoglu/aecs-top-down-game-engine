@@ -901,8 +901,6 @@ int main( int argc, char *args[]) {
 	if( argc > 1) {
 		myMap = readMapFile( args[1]);
 
-		myMap->filePath = args[1];
-
 		if( myMap->objListCount > 0) {
 			objectCounter = myMap->objList[ myMap->objListCount-1 ]->id + 1;
 		}
@@ -919,9 +917,11 @@ int main( int argc, char *args[]) {
     templates_save();
 
 	log0("Program over\nPeace\n");
-    myMap = NULL;
 
 	SDLGUI_Destroy();
+	freeMap( myMap);
+	freeTextures( textures);
+	destroyTextureSchedule( texturePaths);
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
 	SDL_Quit();

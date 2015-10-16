@@ -17,7 +17,7 @@ void texture_clicked( struct SDLGUI_Element *e) {
 
 void destroyTextureButton( struct SDLGUI_Element *e) {
 	free((int*)e->userData);
-	SDLGUI_Destroy_Element( e);
+	SDLGUI_Destroy_Texture( e);
 }
 
 void reloadTextureButtons() {
@@ -117,9 +117,6 @@ struct SDLGUI_Element* brushOptionPanel_create_texture( struct SDLGUI_Element *p
 		(SDL_Rect){.x=0, .y=BUTTON_SIZE + 20, .w=parentPanel->rect.w, .h=170},
 		(SDLGUI_Params){
 			.bgColor = COLOR_TRANSPARENT,
-			.isVisible = VISIBLE,
-			.isHidden = 0,
-			.borderThickness = 0
 		}
 	);
 

@@ -20,6 +20,7 @@ struct SDLGUI_Element* SDLGUI_Create_Virtual( void (*drawCallback)() ) {
 	
 	struct SDLGUI_Element *element = (struct SDLGUI_Element*)malloc(sizeof(struct SDLGUI_Element));
 	
+	element->rect = (SDL_Rect){.x = -1, .y = -1, .w = 0, .h = 0};
 	element->clicked = 0;
 	element->destructor = SDLGUI_Destroy_Virtual;
 	element->drawFun = SDLGUI_Draw_Virtual;
