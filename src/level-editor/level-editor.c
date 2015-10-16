@@ -631,6 +631,7 @@ void hideAll() {
 	brushOptionPanels.terrain->isVisible = false;
 	brushOptionPanels.ai->isVisible = false;
 	brushOptionPanels.templates->isVisible = false;
+	brushOptionPanels.texture->isVisible = false;
 }
 
 void button_select_clicked( struct SDLGUI_Element *e) {

@@ -2,11 +2,13 @@
 #include "brush.h"
 #include "../core/texture.h"
 #include "../levelEditor.h"
+#include <stdio.h>
 
-#define BUTTONS_PER_ROW 3
+#define BUTTONS_PER_ROW 4
+#define BUTTON_MARGIN 9
 
 
-struct SDLGUI_List *buttons;
+struct SDLGUI_Element *panel_buttons;
 
 
 void texture_clicked( struct SDLGUI_Element *e) {
@@ -19,17 +21,18 @@ void destroyTextureButton( struct SDLGUI_Element *e) {
 }
 
 void reloadTextureButtons() {
-	SDLGUI_List_Clear( buttons, 1);
+	SDLGUI_Clear_Panel( panel_buttons);
 
 	int i;
+	int count = 0;
 	for (i=0; i<textures->objsCount; i++) {
 		if(textures->obj[i] != NULL) {
 			struct SDLGUI_Element *button = SDLGUI_Create_Texture(
 				(SDL_Rect){
-					.x=10 + (i % BUTTONS_PER_ROW) * (BUTTON_SIZE + 10),
-					.y=10*2 + BUTTON_SIZE + (i / BUTTONS_PER_ROW) * (BUTTON_SIZE + 10), 
-					.w=BUTTON_SIZE,
-					.h=BUTTON_SIZE
+					.x = BUTTON_MARGIN + (count % BUTTONS_PER_ROW) * (BUTTON_SIZE + BUTTON_MARGIN),
+					.y = (count / BUTTONS_PER_ROW) * (BUTTON_SIZE + BUTTON_MARGIN), 
+					.w = BUTTON_SIZE,
+					.h = BUTTON_SIZE
 				},
 				textures->obj[i]->textures[1][dir_up], ICON_SIZE, ICON_SIZE, editorMiniButtonParams
 			);
@@ -42,7 +45,9 @@ void reloadTextureButtons() {
 			button->clicked = texture_clicked;
 			button->destructor = destroyTextureButton;
 
-			SDLGUI_List_Add( buttons, button);
+			SDLGUI_AddTo_Panel( panel_buttons, button);
+
+			count++;
 		}
 	}
 }
@@ -65,6 +70,28 @@ void refresh_clicked(struct SDLGUI_Element *e) {
 
 		//TODO openTextureSchedulerDialog( &textureSchedulerCallback);
 	}
+	else {
+		clearTexturePaths(texturePaths);
+		FILE *fp = fopen(texturePaths->filePath, "r");
+
+		if(fp == NULL) {
+			log1("Reloading texture-schedule-specs file: %s\n", texturePaths->filePath);
+			SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING,
+				"File could not be loaded.\n"
+				"You may have moved it elsewhere or removed it\n"
+				" ... I mean it's your computer,\n"
+				"\n"
+				" How should I know?"
+			);
+			return;
+		}
+
+		loadTexturePaths(texturePaths, fp);
+
+		fclose(fp);
+
+		reloadTextureButtons();
+	}
 }
 
 struct SDLGUI_Element* brushOptionPanel_create_texture( struct SDLGUI_Element *parentPanel, SDLGUI_Params *panelParams ) {
@@ -86,8 +113,8 @@ struct SDLGUI_Element* brushOptionPanel_create_texture( struct SDLGUI_Element *p
 	button_reload->clicked = refresh_clicked;
 
 
-	struct SDLGUI_Element *panel_buttons = SDLGUI_Create_Panel(
-		(SDL_Rect){.x=0, .y=30, .w=parentPanel->rect.w, .h=170},
+	panel_buttons = SDLGUI_Create_Panel(
+		(SDL_Rect){.x=0, .y=BUTTON_SIZE + 20, .w=parentPanel->rect.w, .h=170},
 		(SDLGUI_Params){
 			.bgColor = COLOR_TRANSPARENT,
 			.isVisible = VISIBLE,
@@ -102,8 +129,6 @@ struct SDLGUI_Element* brushOptionPanel_create_texture( struct SDLGUI_Element *p
 	SDLGUI_AddTo_Panel( panel, button_reload);
 	SDLGUI_AddTo_Panel( panel, panel_buttons);
 
-
-	buttons = SDLGUI_Get_Panel_Elements( panel_buttons);
 
 	reloadTextureButtons();
 

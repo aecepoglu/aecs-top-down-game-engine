@@ -67,3 +67,7 @@ void SDLGUI_AddTo_Panel( struct SDLGUI_Element *panel, struct SDLGUI_Element *el
 	element->rect.x += panel->rect.x;
 	element->rect.y += panel->rect.y;
 }
+
+void SDLGUI_Clear_Panel( struct SDLGUI_Element *p) {
+	SDLGUI_List_Clear( p->data.elements, 1);
+}

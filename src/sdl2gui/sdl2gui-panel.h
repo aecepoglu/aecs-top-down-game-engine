@@ -12,4 +12,6 @@ void SDLGUI_AddTo_Panel( struct SDLGUI_Element *panel, struct SDLGUI_Element *el
 
 struct SDLGUI_List* SDLGUI_Get_Panel_Elements( struct SDLGUI_Element *element);
 
+void SDLGUI_Clear_Panel( struct SDLGUI_Element *panel);
+
 #endif /*SDLGUI_PANEL_H*/
