@@ -48,7 +48,7 @@ struct SDLGUI_Element* SDLGUI_Create_Textbox( SDL_Rect rect, SDLGUI_Params param
 	return e;
 }
 
-int SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, char *text) {
+int SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, const char *text) {
 	if( text && strlen(text) >= TEXTBOX_MAX_LENGTH) 
 		return 0; //TODO throw an error instead
 
@@ -74,14 +74,14 @@ int SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, char *text) {
 	SDL_Texture *texture_normal = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, data->textColor.r, data->textColor.g, data->textColor.b, &textWidth, &textHeight);
 	SDL_Texture *texture_focused = getTextTexture( guiCore.renderer, guiCore.font, data->text, data->fontWidth, data->fontHeight, (int[4]){0,0,0,0}, inverseColor.r, inverseColor.g, inverseColor.b, &textWidth, &textHeight);
 
-	textbox->textures.normal = createElementTexture( textbox->rect.w, textbox->rect.h, inverseColor, data->textColor, /*borderThickness*/1, texture_normal, textWidth, textHeight);
+	textbox->textures.normal = createElementTexture( textbox->rect.w, textbox->rect.h, inverseColor, data->textColor, /*borderThickness*/1, texture_normal, textWidth, textHeight, ALIGN_LEFT);
 	textbox->textures.hover = createElementTexture( textbox->rect.w, textbox->rect.h, (SDLGUI_Color) {
 			.r = 196 - data->textColor.r/2,
 			.g = 196 - data->textColor.g/2,
 			.b = 196 - data->textColor.b/2,
 			.a = 255
-		}, data->textColor, /*borderThickness*/1, texture_normal, textWidth, textHeight);
-	textbox->textures.focused = createElementTexture( textbox->rect.w, textbox->rect.h, data->textColor, inverseColor, /*borderThickness*/1, texture_focused, textWidth, textHeight);
+		}, data->textColor, /*borderThickness*/1, texture_normal, textWidth, textHeight, ALIGN_LEFT);
+	textbox->textures.focused = createElementTexture( textbox->rect.w, textbox->rect.h, data->textColor, inverseColor, /*borderThickness*/1, texture_focused, textWidth, textHeight, ALIGN_LEFT);
 	
 	SDL_DestroyTexture( texture_normal);
 	SDL_DestroyTexture( texture_focused);
@@ -114,7 +114,9 @@ void SDLGUI_ChangeText_Textbox( struct SDLGUI_Element *textbox, char c, int back
 			changed = 1;
 		}
 	}
-	else if ( (data->acceptedChars & TEXTBOX_INPUT_NUMERIC && c >= '0' && c <= '9') || (data->acceptedChars & TEXTBOX_INPUT_ALPHABET && c >= 'a' && c <= 'z') ){
+	else if ( (data->acceptedChars & TEXTBOX_INPUT_NUMERIC && c >= '0' && c <= '9') 
+			|| (data->acceptedChars & TEXTBOX_INPUT_ALPHABET && c >= 'a' && c <= 'z') 
+	) {
 		if( curLen < TEXTBOX_MAX_LENGTH-1) {
 			newText[ curLen] = c;
 			newText[ curLen + 1] = '\0';

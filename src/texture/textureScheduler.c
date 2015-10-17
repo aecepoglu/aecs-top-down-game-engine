@@ -7,8 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 
-const char *TEXTURE_SCHEDULE_FILENAME = "textures.yz.sch";
-
 char *getTextureSchedulePath( const char *file) {
 	char *dirPath = getDirPath( file);
 

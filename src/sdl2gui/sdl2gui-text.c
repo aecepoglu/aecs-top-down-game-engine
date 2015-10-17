@@ -11,7 +11,7 @@ struct SDLGUI_Element* SDLGUI_Create_Text( SDL_Rect rect, const char *text, SDLG
 		rect.w = textWidth;
 	if( rect.h == TEXT_SPAN_SIZE)
 		rect.h = textHeight;
-	
+
 	struct SDLGUI_Element *result = SDLGUI_Create_Texture( rect, textTexture, textWidth, textHeight, params);
 	
 	SDL_DestroyTexture( textTexture);

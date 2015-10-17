@@ -53,6 +53,8 @@ typedef struct {
 	int borderThickness;
 
 	int isHidden;
+
+	int horizontalAlignment;
 } SDLGUI_Params;
 
 
@@ -60,10 +62,12 @@ typedef struct {
 #define VISIBLE 1
 #define DEFAULT_VISIBLITY SDLGUI_VISIBLE
 
+#define ALIGN_CENTER 0
+#define ALIGN_LEFT 1
 
 #define SDLGUI_Destroy_Element( element) (element)->destructor( element)
 
-SDL_Texture *createElementTexture( int width, int height, SDLGUI_Color bgColor, SDLGUI_Color borderColor, int borderThickness, SDL_Texture *fgTexture, int fgWidth, int fgHeight);
+SDL_Texture *createElementTexture( int width, int height, SDLGUI_Color bgColor, SDLGUI_Color borderColor, int borderThickness, SDL_Texture *fgTexture, int fgWidth, int fgHeight, int horizontalAlignment);
 struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params);
 void SDLGUI_Texture_SetTextures( struct SDLGUI_Element *e, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params);
 

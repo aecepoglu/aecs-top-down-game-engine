@@ -2,6 +2,7 @@
 #include "brush.h"
 #include "../core/texture.h"
 #include "../levelEditor.h"
+#include "../../sdl2gui/widgets/filePicker.h"
 #include <stdio.h>
 
 #define BUTTONS_PER_ROW 4
@@ -52,7 +53,12 @@ void reloadTextureButtons() {
 	}
 }
 
-void textureSchedulerCallback(void* untypedData) {
+void filePicked(const char *path) {
+	texturePaths = readTextureSchedule(path);
+
+	if (texturePaths)
+		loadObjectTextures( guiCore.renderer, textures, texturePaths);
+
 	reloadTextureButtons();
 }
 
@@ -68,7 +74,7 @@ void refresh_clicked(struct SDLGUI_Element *e) {
 			" it'll load automatically )\n"
 		);
 
-		//TODO openTextureSchedulerDialog( &textureSchedulerCallback);
+		SDLGUI_OpenFilePicker("./", TEXTURE_SCHEDULE_FILENAME, &filePicked, NULL);
 	}
 	else {
 		clearTexturePaths(texturePaths);

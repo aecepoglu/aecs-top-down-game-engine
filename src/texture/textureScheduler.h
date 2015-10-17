@@ -10,6 +10,8 @@ struct TexturePaths {
 	char *filePath;
 };
 
+#define TEXTURE_SCHEDULE_FILENAME "textures.yz.sch"
+
 
 char *getTextureSchedulePath( const char *mapPath);
 

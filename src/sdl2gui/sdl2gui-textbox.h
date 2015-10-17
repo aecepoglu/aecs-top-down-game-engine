@@ -27,7 +27,7 @@ struct SDLGUI_Text_Data {
 
 struct SDLGUI_Element* SDLGUI_Create_Textbox( SDL_Rect rect, SDLGUI_Params params);
 
-int SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, char *text);
+int SDLGUI_SetText_Textbox( struct SDLGUI_Element *textbox, const char *text);
 
 //void SDLGUI_ClearText_Textbox( struct SDLGUI_Element *textbox);
 

@@ -5,7 +5,7 @@
 #include "../collection/stack.h"
 #include "templates.h"
 #include "../util/error.h"
-#include "mapCreator.h"
+#include "dialogs/mapCreator.h"
 #include "guiHelpers.h"
 #include "../texture/textureScheduler.h"
 

@@ -11,8 +11,8 @@ set(MY_BRUSH_SOURCES brushes move rotate terrain ai templates texture)
 set(MY_AI_SOURCES leftTurner hungryLeftTurner simpleFlower creeperPlant peekaboo weepingAngel door lineSensor switch escaper)
 set(MY_FOV_SOURCES fov-util fov-raycast fov-line fov-diamond)
 set(MY_PF_SOURCES roughAStar roughAStar_depthLimited)
-set(MY_SDLGUI_SOURCES sdl2gui sdl2gui-list sdl2gui-text sdl2gui-element sdl2gui-panel sdl2gui-textbox sdl2gui-check sdl2gui-virtual)
-set(MY_EDITOR_SOURCES level-editor templates mapCreator guiHelpers)
+set(MY_SDLGUI_SOURCES sdl2gui sdl2gui-list sdl2gui-text sdl2gui-element sdl2gui-panel sdl2gui-textbox sdl2gui-check sdl2gui-virtual widgets/filePicker widgets/dirUtils)
+set(MY_EDITOR_SOURCES level-editor templates guiHelpers dialogs/mapCreator)
 
 
 foreach(x ${MY_AI_SOURCES})
