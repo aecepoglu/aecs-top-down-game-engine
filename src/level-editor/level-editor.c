@@ -21,7 +21,6 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 #define GUI_TOPBAR_HEIGHT 32
 struct SDLGUI_Element *leftPanel;
 struct SDLGUI_Element *topBar;
-bool mouseDownInGui;
 bool isMessageBoxOn = false;
 struct TexturePaths *texturePaths = NULL;
 
@@ -81,7 +80,7 @@ bool editor_applyTemplate( unsigned int x, unsigned int y, int type) {
 		return false;
 }
 
-bool drawTerrain( unsigned int x, unsigned int y, int type){
+bool editor_drawTerrain( unsigned int x, unsigned int y, int type){
 	if( myMap->tiles[x][y] != type && myMap->objs[x][y]==NULL) {
 		myMap->tiles[x][y] = type;
 		return true;
@@ -178,7 +177,7 @@ bool editor_setTexture( unsigned int x, unsigned int y, int textureId){
 	return true;
 }
 
-bool drawAI( unsigned int x, unsigned int y, int type) {
+bool editor_drawAI( unsigned int x, unsigned int y, int type) {
 	//if there is an object at the given location, and it dsoen't have an AI
 	if( myMap->objs[x][y] != 0) {
 		if ( myMap->objs[x][y]->ai != NULL) {
@@ -218,7 +217,7 @@ bool editor_moveObject( unsigned int x, unsigned int y, int type) {
 	return false;
 }
 
-bool setDirection( unsigned int x, unsigned int y, int type) {
+bool editor_rotate( unsigned int x, unsigned int y, int type) {
 	if( brush.isRepeat ) {
 		enum direction newDir = vector_dirTan( y - selectedObjStuff.obj->pos.j, x - selectedObjStuff.obj->pos.i);
 		if( selectedObjStuff.obj->dir != newDir) {
@@ -462,24 +461,27 @@ void handleKey( SDL_KeyboardEvent *e) {
 /* The mouse button-event and motion-events are handled the same
  * I just need to extract the x,y from the event-data.
  */
-bool handleMouse( SDL_MouseButtonEvent *e, SDL_MouseMotionEvent *e2) {
+int handleMouseGeneric( int x, int y) {
+	x = x / TILELEN + viewPos.i;
+	y = y / TILELEN + viewPos.j;
 
-	unsigned int x,y;
-	if( e) {
-		x = (e->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
-		y = (e->y -  GUI_TOPBAR_HEIGHT) / TILELEN;
-	}
-	else {
-		if( ! e2->state) //if no buttons are pressed
-			return 0;
-		x = (e2->x - GUI_LEFTPANEL_WIDTH) / TILELEN;
-		y = (e2->y - GUI_TOPBAR_HEIGHT)/ TILELEN;
+	if ( brush.fun != NULL && x < myMap->width && y < myMap->height && brush.fun( x, y, brush.variant) ) {
+		drawBackground();
+		return 1;
 	}
 
-	x += viewPos.i;
-	y += viewPos.j;
+	return 0;
+}
+void handleMouseButton( SDL_MouseButtonEvent *e) {
+	handleMouseGeneric( e->x, e->y);
+}
 
-	return ( brush.fun != NULL && x < myMap->width && y < myMap->height && brush.fun( x, y, brush.variant) );
+int handleMouseMotion( SDL_MouseMotionEvent *e) {
+
+	if( ! e->state) //if no buttons are pressed
+		return 0;
+
+	return handleMouseGeneric(e->x, e->y);
 }
 
 void handleWindowEvent( SDL_WindowEvent *e) {
@@ -534,33 +536,15 @@ void run() {
 					handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if( SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e)) {
-					log2("mouse down - gui\n");
-					mouseDownInGui = true;
-				}
-				else {
-					log2("mouse down - editor\n");
-					mouseDownInGui = false;
-					if (handleMouse( (SDL_MouseButtonEvent*)&e, 0) ) {
-						drawBackground();
-						break;
-					}
-				}
-				continue;
+				SDLGUI_Handle_MouseDown( (SDL_MouseButtonEvent*)&e);
+				break;
 			case SDL_MOUSEBUTTONUP:
+				SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
 				brush.isRepeat = false;
-				if( mouseDownInGui) {
-					SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
-				}
 				break;
 			case SDL_MOUSEMOTION:
-				if (SDLGUI_Handle_MouseHover( (SDL_MouseMotionEvent*)&e)) {
+				if(SDLGUI_Handle_MouseHover( (SDL_MouseMotionEvent*)&e))
 					break;
-				}
-				else if( mouseDownInGui != true && handleMouse( 0, (SDL_MouseMotionEvent*)&e) ) {
-					drawBackground();
-					break;
-				}
 				else
 					continue;
 			case SDL_KEYUP:
@@ -652,14 +636,14 @@ void button_move_clicked( struct SDLGUI_Element *e) {
 }
 
 void button_rotate_clicked( struct SDLGUI_Element *e) {
-	brush.fun = setDirection;
+	brush.fun = editor_rotate;
 	brush.variant = 0;
 	hideAll();
 	brushOptionPanels.rotate->isVisible = true;
 }
 
 void button_terrain_clicked( struct SDLGUI_Element *e) {
-	brush.fun = drawTerrain;
+	brush.fun = editor_drawTerrain;
 	brush.variant = terrain_wall;
 	hideAll();
 	brushOptionPanels.terrain->isVisible = true;
@@ -672,7 +656,7 @@ void button_object_clicked( struct SDLGUI_Element *e) {
 }
 
 void button_ai_clicked( struct SDLGUI_Element *e) {
-	brush.fun = drawAI;
+	brush.fun = editor_drawAI;
 	brush.variant = ai_none;
 	hideAll();
 	brushOptionPanels.ai->isVisible = true;
@@ -721,7 +705,10 @@ void initGui() {
 	/* top bar */
 	topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=SDLGUI_SIZE_FILL, .h=GUI_TOPBAR_HEIGHT}, panelParams);
 
-	struct SDLGUI_Element *canvas = SDLGUI_Create_Virtual((SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=GUI_TOPBAR_HEIGHT, .w=0, .h=0}, &drawCanvas);
+	struct SDLGUI_Element *canvas = SDLGUI_Create_Virtual(
+		(SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=GUI_TOPBAR_HEIGHT, .w=SDLGUI_SIZE_FILL, .h=SDLGUI_SIZE_FILL},
+		&drawCanvas, &handleMouseButton, &handleMouseMotion
+	);
 
 	struct SDLGUI_List *list = SDLGUI_List_Create( 3);
 

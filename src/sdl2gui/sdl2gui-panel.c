@@ -34,7 +34,7 @@ struct SDLGUI_Element* SDLGUI_MouseHandler_Panel( struct SDLGUI_Element *panel, 
 }
 
 struct SDLGUI_Element* SDLGUI_Create_Panel( SDL_Rect rect, SDLGUI_Params params) {
-	struct SDLGUI_Element *panel = (struct SDLGUI_Element*)malloc( sizeof( struct SDLGUI_Element));
+	struct SDLGUI_Element *panel = SDLGUI_CreateElement();
 
 	if( rect.w == SDLGUI_SIZE_FILL || rect.h == SDLGUI_SIZE_FILL) {
 		int winWidth, winHeight;

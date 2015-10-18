@@ -17,7 +17,7 @@ void SDLGUI_Textbox_Clicked( struct SDLGUI_Element *elem) {
 
 struct SDLGUI_Element* SDLGUI_Create_Textbox( SDL_Rect rect, SDLGUI_Params params) {
 	struct SDLGUI_Text_Data *data = (struct SDLGUI_Text_Data*)malloc( sizeof( struct SDLGUI_Text_Data));
-	struct SDLGUI_Element *e = (struct SDLGUI_Element*)malloc( sizeof( struct SDLGUI_Element));
+	struct SDLGUI_Element *e = SDLGUI_CreateElement();
 
 	int height = rect.h == TEXT_SPAN_SIZE
 		? params.fontHeight*2

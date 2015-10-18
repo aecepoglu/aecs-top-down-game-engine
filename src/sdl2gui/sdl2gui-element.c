@@ -69,7 +69,7 @@ void SDLGUI_Texture_SetTextures( struct SDLGUI_Element *e, /*const*/SDL_Texture 
 
 //TODO the texture should be const
 struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params) {
-	struct SDLGUI_Element *e = (struct SDLGUI_Element*) malloc( sizeof( struct SDLGUI_Element));
+	struct SDLGUI_Element *e = SDLGUI_CreateElement();
 	e->rect = rect;
 	e->clicked = NULL;
 	e->destructor = SDLGUI_Destroy_Texture;
@@ -79,6 +79,15 @@ struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Textur
 	e->isVisible = !params.isHidden;
 
 	SDLGUI_Texture_SetTextures( e, texture, textureWidth, textureHeight, params);
+
+	return e;
+}
+
+struct SDLGUI_Element *SDLGUI_CreateElement() {
+	struct SDLGUI_Element *e = (struct SDLGUI_Element*)malloc(sizeof(struct SDLGUI_Element));
+
+	e->mouseDown = 0;
+	e->mouseMotion = 0;
 
 	return e;
 }

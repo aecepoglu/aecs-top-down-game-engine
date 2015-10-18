@@ -62,6 +62,11 @@ int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
 	struct SDLGUI_Element *mouseDownElement = SDLGUI_List_findItemAtPos( topLayer->list, e->x, e->y);
 	if( mouseDownElement != 0) {
 		guiCore.mouseDownElement = mouseDownElement;
+		if(mouseDownElement->mouseDown) {
+			e->x -= mouseDownElement->rect.x;
+			e->y -= mouseDownElement->rect.y;
+			mouseDownElement->mouseDown(e);
+		}
 		return 1;
 	}
 	else
@@ -69,22 +74,30 @@ int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e) {
 }
 
 int SDLGUI_Handle_MouseHover( SDL_MouseMotionEvent *e) {
-	if( ! e->state && topLayer != 0 && guiCore.messageBox == 0) {
+	if( topLayer != 0 && guiCore.messageBox == 0) {
 		struct SDLGUI_Element *hoverElement = SDLGUI_List_findItemAtPos( topLayer->list, e->x, e->y);
-		if( hoverElement != 0 && guiCore.mouseHoverElement != hoverElement) {
-			if( guiCore.mouseHoverElement != 0) {
-				guiCore.mouseHoverElement->textures.current = (guiCore.mouseHoverElement == guiCore.focusedElement)
-					? guiCore.mouseHoverElement->textures.focused
-					: guiCore.mouseHoverElement->textures.normal
-				;
+		if( hoverElement != 0 ) {
+			if (hoverElement->mouseMotion) {
+				e->x -= hoverElement->rect.x;
+				e->y -= hoverElement->rect.y;
+
+				return(hoverElement->mouseMotion(e));
 			}
+			else if( guiCore.mouseHoverElement != hoverElement) {
+				if( guiCore.mouseHoverElement != 0) {
+					guiCore.mouseHoverElement->textures.current = (guiCore.mouseHoverElement == guiCore.focusedElement)
+						? guiCore.mouseHoverElement->textures.focused
+						: guiCore.mouseHoverElement->textures.normal
+					;
+				}
 
-			guiCore.mouseHoverElement = hoverElement;
-			
-			if( hoverElement->textures.hover != 0 && hoverElement->clicked != 0)
-				hoverElement->textures.current = hoverElement->textures.hover;
+				guiCore.mouseHoverElement = hoverElement;
+				
+				if( hoverElement->textures.hover != 0 && hoverElement->clicked != 0)
+					hoverElement->textures.current = hoverElement->textures.hover;
 
-			return 1;
+				return 1;
+			}
 		}
 	}
 	return 0;
