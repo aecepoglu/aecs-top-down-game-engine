@@ -580,7 +580,7 @@ void run() {
 }
 
 /* Draws the map and objects viewed on screen */
-void drawObjects() {
+void drawObjects( SDL_Rect *r) {
 	unsigned i;
 	struct Vector screenPos;
 	struct object *obj;
@@ -600,7 +600,7 @@ void drawObjects() {
 					(obj->textureId < 0 || obj->textureId >= textures->objsCount || textures->obj[obj->textureId] == NULL)
 						? textures->unidentifiedObj
 						: textures->obj[obj->textureId]->textures[ obj->visualState][obj->dir],
-					screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN );
+					screenPos.i*TILELEN + r->x, screenPos.j*TILELEN + r->y, TILELEN, TILELEN );
 
 				if( obj == selectedObjStuff.obj) {
 					drawTexture( renderer, textures->highlitObjIndicator, screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN);
@@ -615,9 +615,9 @@ void drawObjects() {
 
 }
 
-void drawCanvas() {
-	drawTexture( renderer, bgroundTexture, GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, viewSize.i*TILELEN, viewSize.j*TILELEN);
-	drawObjects( );
+void drawCanvas( SDL_Rect *r) {
+	drawTexture( renderer, bgroundTexture, r->x, r->y, viewSize.i*TILELEN, viewSize.j*TILELEN);
+	drawObjects( r);
 }
 
 void draw() {
@@ -721,7 +721,7 @@ void initGui() {
 	/* top bar */
 	topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=SDLGUI_SIZE_FILL, .h=GUI_TOPBAR_HEIGHT}, panelParams);
 
-	struct SDLGUI_Element *canvas = SDLGUI_Create_Virtual(&drawCanvas);
+	struct SDLGUI_Element *canvas = SDLGUI_Create_Virtual((SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=GUI_TOPBAR_HEIGHT, .w=0, .h=0}, &drawCanvas);
 
 	struct SDLGUI_List *list = SDLGUI_List_Create( 3);
 
