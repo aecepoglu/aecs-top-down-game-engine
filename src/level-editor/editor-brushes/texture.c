@@ -22,6 +22,10 @@ void destroyTextureButton( struct SDLGUI_Element *e) {
 }
 
 void reloadTextureButtons() {
+	if (texturePaths) {
+		loadObjectTextures( guiCore.renderer, textures, texturePaths);
+	}
+
 	SDLGUI_Clear_Panel( panel_buttons);
 
 	int i;
@@ -55,9 +59,6 @@ void reloadTextureButtons() {
 
 void filePicked(const char *path) {
 	texturePaths = readTextureSchedule(path);
-
-	if (texturePaths)
-		loadObjectTextures( guiCore.renderer, textures, texturePaths);
 
 	reloadTextureButtons();
 }
@@ -95,6 +96,7 @@ void refresh_clicked(struct SDLGUI_Element *e) {
 		loadTexturePaths(texturePaths, fp);
 
 		fclose(fp);
+
 
 		reloadTextureButtons();
 	}

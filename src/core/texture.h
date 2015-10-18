@@ -44,6 +44,7 @@ struct GameTextures* loadOrdinaryTextures( SDL_Renderer *ren);
 void loadObjectTextures( SDL_Renderer *ren, struct GameTextures* textures,  const struct TexturePaths *texturePaths);
 
 void texture_freeTextureSheet( struct TextureSheet *sheet);
+void freeObjectTextures( struct GameTextures *textures);
 void freeTextures( struct GameTextures* textures);
 
 #endif //TEXTURE_H

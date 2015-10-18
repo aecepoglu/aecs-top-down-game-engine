@@ -177,17 +177,24 @@ void texture_freeTextureSheet( struct TextureSheet *sheet) {
 	free( sheet);
 }
 
+void freeObjectTextures( struct GameTextures *textures) {
+	int i;
+
+	printf("freeing textures\n");
+	for( i=0; i<textures->objsCount; i++)
+		if( textures->obj[i] != NULL)
+			texture_freeTextureSheet( textures->obj[i]);
+
+	free( textures->obj);
+	
+	textures->obj = NULL;
+	textures->objsCount = 0;
+}
+
 void freeTextures( struct GameTextures* textures) {
 	int i;
 
-	if( textures->obj) {
-		printf("freeing textures\n");
-		for( i=0; i<textures->objsCount; i++)
-			if( textures->obj[i] != NULL)
-				texture_freeTextureSheet( textures->obj[i]);
-
-		free( textures->obj);
-	}
+	freeObjectTextures(textures);
 
 	for( i=0; i<terrain_NUM_ITEMS; i++) {
 		SDL_DestroyTexture( textures->trn[ i]);
