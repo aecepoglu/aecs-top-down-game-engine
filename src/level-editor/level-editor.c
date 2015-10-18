@@ -68,8 +68,15 @@ bool editor_removeObject( unsigned int x, unsigned int y, int type) {
 }
 
 bool editor_applyTemplate( unsigned int x, unsigned int y, int type) {
-	if( myMap->objs[x][y] != 0)
-        return template_apply( myMap->objs[x][y], type);
+	if( myMap->objs[x][y] != 0
+	 && template_apply( myMap->objs[x][y], type)
+	) {
+		editor_selectObj( x, y, 0);
+
+		SHOW_TOOLTIP( x, y, "Updated");
+
+		return true;
+	}
 	else
 		return false;
 }
