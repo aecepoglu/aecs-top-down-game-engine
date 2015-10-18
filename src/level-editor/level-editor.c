@@ -145,10 +145,8 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 	if( myMap->tiles[x][y]==terrain_wall)
 		return false;
 
-	if( myMap->objs[x][y]!=NULL ) {
-		myMap->objs[x][y]->type = go_npc;
-		return true;
-	}
+	if( myMap->objs[x][y]!=NULL )
+		return false;
 
 	struct object *obj = createObject( go_npc, x, y, objectCounter++, -1);
 
