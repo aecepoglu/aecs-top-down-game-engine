@@ -2,16 +2,12 @@
 #include "sdl2gui.h"
 #include "sdl2gui-virtual.h"
 
-struct SDLGUI_Virtual_Data {
-	void (*drawCallback)();
-};
-
 void SDLGUI_Draw_Virtual(struct SDLGUI_Element *e) {
-	( (struct SDLGUI_Virtual_Data*)e->userData )->drawCallback(&e->rect);
+	e->data.virtualData->drawCallback(&e->rect);
 }
 
 void SDLGUI_Destroy_Virtual( struct SDLGUI_Element *e) {
-	free((struct SDLGUI_Virtual_Data*)e->userData);
+	free(e->data.virtualData);
 	free(e);
 };
 
@@ -41,7 +37,7 @@ struct SDLGUI_Element* SDLGUI_Create_Virtual(SDL_Rect rect, void (*drawCallback)
 	element->mouseDown = mouseDown;
 	element->mouseMotion = mouseMotion;
 	element->isVisible = 1;
-	element->userData = data;
+	element->data.virtualData = data;
 
 	return element;
 }

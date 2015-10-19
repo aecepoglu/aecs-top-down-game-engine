@@ -20,6 +20,7 @@ struct SDLGUI_Element {
 		struct SDLGUI_List *elements;
 		struct SDLGUI_Text_Data *textData;
 		struct SDLGUI_Checkbox_Data *check;
+		struct SDLGUI_Virtual_Data *virtualData;
 	} data;
 
 	struct {

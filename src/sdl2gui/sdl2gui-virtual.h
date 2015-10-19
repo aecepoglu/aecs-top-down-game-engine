@@ -3,6 +3,10 @@
 
 #include "sdl2gui-element.h"
 
+struct SDLGUI_Virtual_Data {
+	void (*drawCallback)();
+};
+
 struct SDLGUI_Element* SDLGUI_Create_Virtual(SDL_Rect rect, void (*drawCallback)(), SDLGUI_MouseDownFunction *mouseDown, SDLGUI_MouseMotionFunction  *mouseMotion );
 
 #endif /*SDLGUI_VIRTUAL_H*/
