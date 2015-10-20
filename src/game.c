@@ -380,7 +380,7 @@ void draw() {
 			drawTexture( renderer, textures->trn[ myMap->tiles[ vi][ vj]], i*TILELEN, j*TILELEN, TILELEN, TILELEN);
 			if( myMap->objs[ vi][ vj]) {
 				struct object *o = myMap->objs[ vi][ vj];
-				drawTexture( renderer, textures->obj[ o->type]->textures[ o->visualState][ o->dir], i*TILELEN, j*TILELEN, TILELEN, TILELEN);
+				drawTexture( renderer, textures->obj[ o->textureId]->textures[ o->visualState][ o->dir], i*TILELEN, j*TILELEN, TILELEN, TILELEN);
 			}
 		}
 	}
@@ -424,7 +424,7 @@ void draw() {
 	drawTexture( renderer, textures->inventory, xEnd - 7*TILELEN, 0, 7*TILELEN, TILELEN);
 	for( i=0; i<INVENTORY_SIZE; i++) {
 		if( inventory[i] != NULL)
-			drawTexture( renderer, textures->obj[ inventory[i]->type]->textures[ 1][0], xEnd - (7-i)*TILELEN, 0, TILELEN, TILELEN);
+			drawTexture( renderer, textures->obj[ inventory[i]->textureId]->textures[ 1][0], xEnd - (6-i)*TILELEN, 0, TILELEN, TILELEN);
 	}
 
 	/* the health bar */
