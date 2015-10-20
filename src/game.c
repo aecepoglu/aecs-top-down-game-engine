@@ -636,7 +636,8 @@ int main( int argc, char *args[]) {
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
 	free_fovBase( fovBase);
-	freeMap( myMap);
+	if(myMap)
+		freeMap( myMap);
     free( dirPath);
 	return 0;
 }
