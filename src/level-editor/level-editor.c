@@ -481,7 +481,7 @@ int handleMouseMotion( SDL_MouseMotionEvent *e) {
 }
 
 void handleResize(const SDL_Rect *r) {
-	resizeView( r->x, r->y, r->w, r->h );
+	resizeView( 0, 0, r->w, r->h);
 	drawBackground();
 }
 
@@ -904,14 +904,16 @@ int main( int argc, char *args[]) {
 	running = true;
 	run();
 
-    templates_save();
+	templates_save();
 
 	log0("Program over\nPeace\n");
 
 	SDLGUI_Destroy();
-	freeMap( myMap);
+	if (myMap)
+		freeMap( myMap);
 	freeTextures( textures);
-	destroyTextureSchedule( texturePaths);
+	if (texturePaths)
+		destroyTextureSchedule( texturePaths);
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
 	SDL_Quit();
