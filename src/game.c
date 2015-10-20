@@ -27,6 +27,8 @@ bool playerMoved = false;
 //FIXME The program will crash if the window is too small (test if this is still happening). Render window un-usable and show a notification message about it.
 
 #define PLAYER_FOV_TILES_LIM VIEW_BOX_LENGTH
+int viewRange;
+int vi_padding, vj_padding;
 enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
@@ -39,10 +41,15 @@ const Uint32 timerDelay = 100 /*miliseconds*/;
 #define CALL_FOV_FCN() currentFov( myMap, &player->pos, player->dir, viewRange, playerVisibleTiles, objsSeen, &objsSeenCount)
 #define PLAYER_DISTANCE( pos1) (abs( (pos1)->i - player->pos.i) + abs( (pos1)->j - player->pos.j))
 
-struct {
-	SDL_Rect container;
-	SDL_Rect fov;
-} guiMeasurements;
+
+void setViewRange( int value ) {
+	viewRange = value;
+}
+
+void setViewPaddings() {
+	vi_padding = viewSize.i/2 - VIEW_RANGE;
+	vj_padding = viewSize.j/2 - VIEW_RANGE;
+}
 
 
 Uint32 timerCallback( Uint32 interval, void *param) {
@@ -380,9 +387,6 @@ void draw() {
 
 	#endif
 
-	int vi_padding = viewSize.i/2 - VIEW_RANGE; //TODO can be defined elsewhere. They only change value when VIEW_RANGE changes or view is resized
-	int vj_padding = viewSize.j/2 - VIEW_RANGE; //TODO can be defined elsewhere. They only change value when VIEW_RANGE changes or view is resized
-
 	for( i=0, vi=vi_padding; i<PLAYER_FOV_TILES_LIM; i++, vi++ )
 		for( j=0, vj=vj_padding; j<PLAYER_FOV_TILES_LIM; j++, vj++) {
 			if( playerVisibleTiles[ i][ j] != terrain_dark) {
@@ -475,11 +479,20 @@ void update() {
 	playerMoved = false;
 }
 
+void recalculateViewSize() {
+	int w, h;
+	SDL_GetWindowSize( window, &w, &h);
+	resizeView(0, 0, w, h);
+	setViewPaddings();
+}
+
 int run() {
 	if( isPlayerPosSet != true) {
 		quit( "player position should have been set from the level script.");
 	}
 	CALL_FOV_FCN();
+	
+	recalculateViewSize();
 
 	SDL_Event e;
 	SDL_MouseMotionEvent motionEvent;
@@ -500,11 +513,7 @@ int run() {
 					case SDL_WINDOWEVENT_RESIZED:
 					    log1("Window %d resized to %dx%d\n", e.window.windowID, e.window.data1, e.window.data2);
 						resizeView( 0, 0, e.window.data1, e.window.data2);
-						
-						guiMeasurements.container.w = e.window.data1;
-						guiMeasurements.container.h = e.window.data2;
-						guiMeasurements.fov.x = (guiMeasurements.container.w - guiMeasurements.fov.w)/2;
-						guiMeasurements.fov.y = (guiMeasurements.container.h - guiMeasurements.fov.h)/2;
+						setViewPaddings();
 					    break;
 					case SDL_WINDOWEVENT_MINIMIZED:
 					    log1("Window %d minimized\n", e.window.windowID);
@@ -573,8 +582,8 @@ void setDefaults() {
 	log1("setting defaults\n");
 
 	isPlayerPosSet = false;
-	currentFov = fov_raycast;
-	viewRange = VIEW_RANGE_DEFAULT;
+	currentFov = fov_diamond;
+	setViewRange( VIEW_RANGE_DEFAULT );
 
 	timerPushEvent.user.code = CUSTOM_EVENT_UPDATE;
 
@@ -584,9 +593,6 @@ void setDefaults() {
 		playerVisibleTiles[i] = (enum terrainType*) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType));
 
 	init_fovBase( VIEW_RANGE);
-
-	guiMeasurements.fov = (SDL_Rect){.w = PLAYER_FOV_TILES_LIM * TILELEN, .h = PLAYER_FOV_TILES_LIM * TILELEN};
-	guiMeasurements.container = (SDL_Rect){.x = 0, .y=0};
 
 	inventory_reset( false);
 }

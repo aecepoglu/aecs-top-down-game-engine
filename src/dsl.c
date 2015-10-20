@@ -367,7 +367,7 @@ int dsl_setFovRange( lua_State *l) {
 	int range = lua_tointeger( l, 1);
 
 	if (range >= 0 && range <= VIEW_RANGE) {
-		viewRange = range;
+		setViewRange( range );
 	}
 
 	return 0;
