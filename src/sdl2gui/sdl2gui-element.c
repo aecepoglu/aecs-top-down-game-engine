@@ -69,13 +69,9 @@ void SDLGUI_Texture_SetTextures( struct SDLGUI_Element *e, /*const*/SDL_Texture 
 
 //TODO the texture should be const
 struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Texture *texture, int textureWidth, int textureHeight, SDLGUI_Params params) {
-	struct SDLGUI_Element *e = SDLGUI_CreateElement();
-	e->rect = rect;
-	e->clicked = NULL;
+	struct SDLGUI_Element *e = SDLGUI_CreateElement(rect);
 	e->destructor = SDLGUI_Destroy_Texture;
 	e->drawFun = SDLGUI_Draw_Texture;
-	e->mouseHandler = NULL;
-	e->textInputHandler = NULL;
 	e->isVisible = !params.isHidden;
 
 	SDLGUI_Texture_SetTextures( e, texture, textureWidth, textureHeight, params);
@@ -83,11 +79,34 @@ struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Textur
 	return e;
 }
 
-struct SDLGUI_Element *SDLGUI_CreateElement() {
+struct SDLGUI_Element *SDLGUI_CreateElement(SDL_Rect rect) {
 	struct SDLGUI_Element *e = (struct SDLGUI_Element*)malloc(sizeof(struct SDLGUI_Element));
 
+	e->sizeHints = SDLGUI_SIZEHINTS_FIXED;
+	if (rect.w == SDLGUI_SIZE_FILL || rect.h == SDLGUI_SIZE_FILL) {
+		int winWidth, winHeight;
+
+		SDL_GetWindowSize( guiCore.window, &winWidth, &winHeight);
+
+		if (rect.w == SDLGUI_SIZE_FILL) {
+			e->sizeHints = e->sizeHints | SDLGUI_SIZEHINTS_STRETCH_HORIZONTAL;
+			rect.w = winWidth - rect.x;
+		}
+		if (rect.h == SDLGUI_SIZE_FILL) {
+			e->sizeHints = e->sizeHints | SDLGUI_SIZEHINTS_STRETCH_VERTICAL;
+			rect.h = winHeight - rect.y;
+		}
+	}
+
+	e->rect = rect;
+
+	
+	e->clicked = 0;
 	e->mouseDown = 0;
 	e->mouseMotion = 0;
+	e->mouseHandler = 0;
+	e->resizeHandler = 0;
+	e->textInputHandler = 0;
 
 	return e;
 }

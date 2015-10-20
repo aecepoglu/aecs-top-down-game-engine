@@ -37,8 +37,10 @@ struct SDLGUI_Element {
 	SDLGUI_MouseDownFunction *mouseDown;
 	SDLGUI_MouseMotionFunction *mouseMotion;
 	void (*textInputHandler)( struct SDLGUI_Element *e, char c, int backspace);
+	void (*resizeHandler)(struct SDLGUI_Element *e, int width, int height);
 
-	int isVisible;
+	int isVisible:1;
+	int sizeHints:2;
 
     void *userData;
 };
@@ -50,16 +52,14 @@ typedef struct {
 typedef struct {
 	SDLGUI_Color bgColor;
 	SDLGUI_Color fgColor;
-	
-	int isVisible;
 
 	int fontWidth, fontHeight;
 
 	int borderThickness;
 
-	int isHidden;
+	int isHidden:1;
 
-	int horizontalAlignment;
+	int horizontalAlignment:1;
 } SDLGUI_Params;
 
 
@@ -72,6 +72,10 @@ typedef struct {
 
 #define SDLGUI_SIZE_FILL -1
 
+#define SDLGUI_SIZEHINTS_FIXED 0
+#define SDLGUI_SIZEHINTS_STRETCH_HORIZONTAL 1
+#define SDLGUI_SIZEHINTS_STRETCH_VERTICAL 2
+
 #define SDLGUI_Destroy_Element( element) (element)->destructor( element)
 
 SDL_Texture *createElementTexture( int width, int height, SDLGUI_Color bgColor, SDLGUI_Color borderColor, int borderThickness, SDL_Texture *fgTexture, int fgWidth, int fgHeight, int horizontalAlignment);
@@ -82,6 +86,6 @@ void SDLGUI_Draw_Texture( struct SDLGUI_Element *element);
 void SDLGUI_Destroy_Texture( struct SDLGUI_Element *element);
 
 
-struct SDLGUI_Element *SDLGUI_CreateElement();
+struct SDLGUI_Element *SDLGUI_CreateElement(SDL_Rect rect);
 
 #endif 

@@ -33,31 +33,29 @@ struct SDLGUI_Element* SDLGUI_MouseHandler_Panel( struct SDLGUI_Element *panel, 
 	return result != 0 ? result : panel;
 }
 
-struct SDLGUI_Element* SDLGUI_Create_Panel( SDL_Rect rect, SDLGUI_Params params) {
-	struct SDLGUI_Element *panel = SDLGUI_CreateElement();
-
-	if( rect.w == SDLGUI_SIZE_FILL || rect.h == SDLGUI_SIZE_FILL) {
-		int winWidth, winHeight;
-
-		SDL_GetWindowSize( guiCore.window, &winWidth, &winHeight);
-
-		if( rect.w == SDLGUI_SIZE_FILL)
-			rect.w = winWidth - rect.x;
-
-		if( rect.h == SDLGUI_SIZE_FILL)
-			rect.h = winHeight - rect.y;
+void SDLGUI_ResizePanel(struct SDLGUI_Element *panel, int width, int height) {
+	if (panel->sizeHints & SDLGUI_SIZEHINTS_STRETCH_HORIZONTAL) {
+		panel->rect.w = width - panel->rect.x;
 	}
-    
-    panel->textures.current = panel->textures.normal = createElementTexture( rect.w, rect.h, params.bgColor, params.fgColor, params.borderThickness, 0, 0, 0, 0);
+	else if (panel->sizeHints & SDLGUI_SIZEHINTS_STRETCH_VERTICAL) {
+		panel->rect.h = height - panel->rect.y;
+	}
+	else {
+		return;
+	}
+}
+
+struct SDLGUI_Element* SDLGUI_Create_Panel( SDL_Rect rect, SDLGUI_Params params) {
+	struct SDLGUI_Element *panel = SDLGUI_CreateElement(rect);
+
+    panel->textures.current = panel->textures.normal = createElementTexture( panel->rect.w, panel->rect.h, params.bgColor, params.fgColor, params.borderThickness, 0, 0, 0, 0);
 	panel->textures.hover = panel->textures.focused = NULL;
     panel->data.elements = SDLGUI_List_Create( 4);
-	panel->rect = rect;
-	panel->clicked = NULL;
 	panel->destructor = SDLGUI_Destroy_Panel;
 	panel->drawFun = SDLGUI_Draw_Panel;
 	panel->mouseHandler = SDLGUI_MouseHandler_Panel;
-	panel->textInputHandler = NULL;
 	panel->isVisible = !params.isHidden;
+	panel->resizeHandler = &SDLGUI_ResizePanel;
 
 	return panel;
 }

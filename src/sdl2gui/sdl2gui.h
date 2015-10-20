@@ -60,4 +60,6 @@ void SDLGUI_Show_Tooltip( int xPos, int yPos, const char *text);
 void SDLGUI_Layer_Add( struct SDLGUI_List *list);
 void SDLGUI_Layer_Remove();
 
+void SDLGUI_Resize(int x, int y);
+
 #endif /*SDL2GUI_H*/

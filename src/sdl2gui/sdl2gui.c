@@ -254,3 +254,16 @@ void SDLGUI_Layer_Remove() {
 
 	topLayer = prev;
 }
+
+void SDLGUI_Resize(int width, int height) {
+	int i;
+	struct SDLGUI_Element *elem;
+
+	for (i=0; i<topLayer->list->count ;i++) {
+		elem = topLayer->list->list[i];
+
+		if (elem->resizeHandler) {
+			elem->resizeHandler( elem, width, height );
+		}
+	}
+}

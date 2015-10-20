@@ -19,8 +19,6 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 /* GUI Elements */
 #define GUI_LEFTPANEL_WIDTH 192
 #define GUI_TOPBAR_HEIGHT 32
-struct SDLGUI_Element *leftPanel;
-struct SDLGUI_Element *topBar;
 bool isMessageBoxOn = false;
 struct TexturePaths *texturePaths = NULL;
 
@@ -45,9 +43,7 @@ struct {
 
 	struct SDLGUI_Element *panel;
 	struct object *obj;
-} selectedObjStuff = {
-	.obj = NULL,
-};
+} selectedObjStuff;
 
 #define SHOW_TOOLTIP( x, y, text) if(x>=viewPos.i && y>=viewPos.j && x<viewEnd.i && y<viewEnd.j) SDLGUI_Show_Tooltip( (x-viewPos.i)*TILELEN + GUI_LEFTPANEL_WIDTH, (y-viewPos.j)*TILELEN + GUI_TOPBAR_HEIGHT, text)
 
@@ -484,6 +480,11 @@ int handleMouseMotion( SDL_MouseMotionEvent *e) {
 	return handleMouseGeneric(e->x, e->y);
 }
 
+void handleResize(const SDL_Rect *r) {
+	resizeView( r->x, r->y, r->w, r->h );
+	drawBackground();
+}
+
 void handleWindowEvent( SDL_WindowEvent *e) {
 	switch( e->event) {
 		case SDL_WINDOWEVENT_SHOWN:
@@ -496,13 +497,10 @@ void handleWindowEvent( SDL_WindowEvent *e) {
 		    //log1("Window %d exposed\n", e->windowID);
 		    break;
 		case SDL_WINDOWEVENT_RESIZED:
-		    log1("Window %d resized to %dx%d\n",
-		            e->windowID, e->data1,
-		            e->data2);
-			resizeView( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, e->data1, e->data2);
-			leftPanel->rect.h = e->data2;
-			topBar->rect.w = e->data1 - GUI_LEFTPANEL_WIDTH;
-			//FIXME drawBackground();
+			log1("Window %d resized to %dx%d\n",
+				e->windowID, e->data1, e->data2);
+
+			SDLGUI_Resize(e->data1, e->data2);
 		    break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 		    log1("Window %d minimized\n", e->windowID);
@@ -700,14 +698,14 @@ void initGui() {
 		.borderThickness=1
 	};
 
-	leftPanel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH, .h=SDLGUI_SIZE_FILL}, panelParams);
+	struct SDLGUI_Element *leftPanel = SDLGUI_Create_Panel( (SDL_Rect){.x=0, .y=0, .w=GUI_LEFTPANEL_WIDTH, .h=SDLGUI_SIZE_FILL}, panelParams);
 
 	/* top bar */
-	topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=SDLGUI_SIZE_FILL, .h=GUI_TOPBAR_HEIGHT}, panelParams);
+	struct SDLGUI_Element *topBar = SDLGUI_Create_Panel( (SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=0, .w=SDLGUI_SIZE_FILL, .h=GUI_TOPBAR_HEIGHT}, panelParams);
 
 	struct SDLGUI_Element *canvas = SDLGUI_Create_Virtual(
 		(SDL_Rect){.x=GUI_LEFTPANEL_WIDTH, .y=GUI_TOPBAR_HEIGHT, .w=SDLGUI_SIZE_FILL, .h=SDLGUI_SIZE_FILL},
-		&drawCanvas, &handleMouseButton, &handleMouseMotion
+		&drawCanvas, &handleMouseButton, &handleMouseMotion, &handleResize
 	);
 
 	struct SDLGUI_List *list = SDLGUI_List_Create( 3);
