@@ -22,6 +22,45 @@ struct MyDirectory *currentDir;
 
 void openDir(const char *path);
 
+void minimizePath(char *path) {
+	int i = 0;
+	int slashCount = 0;
+
+	for (i=0; path[i] != '\0'; i++) {
+		if (path[i] == '/')
+			slashCount ++;
+	}
+
+	char **tokens = (char **)calloc(slashCount, sizeof(char*));
+
+	char *token = strtok(path, "/");
+	i = 0;
+	while (token) {
+		if (i == 0 || strcmp(token, ".") != 0) {
+			printf("%d <- %s\n", i, token);
+			tokens[i] = token;
+			i ++;
+		}
+		token = strtok(0, "/");
+	}
+
+	slashCount = i;
+
+	if (slashCount > 2
+		&& strcmp(tokens[slashCount - 1], "..") == 0
+		&& strcmp(tokens[slashCount - 2], "..") != 0
+	) {
+		slashCount -= 2;
+	}
+
+	sprintf(path, "%s", tokens[0]);
+	for (i=1; i<slashCount; i++) {
+		sprintf(path, "%s/%s", path, tokens[i]);
+	}
+	sprintf(path, "%s/", path);
+
+	free(tokens);
+}
 
 void destroyFilePicker() {
 	if(filePickerData.wantedFileName) {
@@ -49,7 +88,6 @@ void aFile_Clicked( struct SDLGUI_Element *e) {
 }
 
 void openDir(const char *path) {
-	printf("opening dir: %s\n", path);
 	currentDir = crossplatformDir(path, filePickerData.wantedFileName);
 
 	if(currentDir == 0) {
@@ -57,11 +95,7 @@ void openDir(const char *path) {
 		return;
 	}
 
-	printf("clearing panel\n");
-	
 	SDLGUI_Clear_Panel(panel_dir);
-
-	printf("cleared panel\n");
 
 	SDLGUI_Params textParams = {
 		.fontWidth = 6,
@@ -90,7 +124,11 @@ void openDir(const char *path) {
 		SDLGUI_AddTo_Panel( panel_dir, e);
 	}
 
-	SDLGUI_SetText_Textbox( textbox_dir, path);
+	sprintf(buf, "%s", path);
+
+	minimizePath(buf);
+
+	SDLGUI_SetText_Textbox( textbox_dir, buf);
 }
 
 void button_up_Clicked( struct SDLGUI_Element *e) {
