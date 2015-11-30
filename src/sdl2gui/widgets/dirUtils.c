@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+int compareMyFile(const void *a, const void *b) {
+	return strcmp( ((struct MyFile*)a)->name, ((struct MyFile*)b)->name );
+}
+
 struct MyDirectory *crossplatformDir(const char *path, const char *filename) {
 	DIR *dp;
 	struct dirent *ep;     
@@ -39,6 +43,8 @@ struct MyDirectory *crossplatformDir(const char *path, const char *filename) {
 		}
 
 		closedir(dp);
+
+		qsort(result->files, result->count, sizeof(struct MyFile), &compareMyFile);
 
 		return result;
 	}
