@@ -29,7 +29,6 @@ struct {
 			*id,
 			*health,
 			*maxHealth,
-			*healthGiven,
 			*attack,
 			*defence,
 			*ai,
@@ -100,9 +99,6 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 
 		sprintf(tmp, "%d", selectedObjStuff.obj->maxHealth);
 		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.maxHealth, tmp);
-
-		sprintf(tmp, "%d", selectedObjStuff.obj->healthGiven);
-		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.healthGiven, tmp);
 
 		sprintf(tmp, "%d", selectedObjStuff.obj->attack);
 		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.attack, tmp);
@@ -349,23 +345,6 @@ void textbox_maxHealth_changed( struct SDLGUI_Element *textbox, const char *text
 		}
 		else {
 			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "Max-Health should be <= 256");
-			isMessageBoxOn = true;
-		}
-	}
-	else {
-		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING, "No object selected");
-		isMessageBoxOn = true;
-	}
-}
-
-void textbox_healthGiven_changed( struct SDLGUI_Element *textbox, const char *text) {
-	if( selectedObjStuff.obj) {
-		int newValue = parseText( text);
-		if( newValue <= INT8_MAX && newValue >= INT8_MIN) {
-			selectedObjStuff.obj->healthGiven = newValue;
-		}
-		else {
-			SDLGUI_Show_Message( SDLGUI_MESSAGE_ERROR, "Health-Given must be >= -128 and <= 127");
 			isMessageBoxOn = true;
 		}
 	}
@@ -809,7 +788,6 @@ void initGui() {
 		{ "          id", 	&selectedObjStuff.textboxes.id			, 1, false,	textbox_id_changed 			, NULL 	},
 		{ "      health", 	&selectedObjStuff.textboxes.health		, 1, false,	textbox_health_changed 		, NULL 	},
 		{ "  max health", 	&selectedObjStuff.textboxes.maxHealth 	, 1, false,	textbox_maxHealth_changed 	, NULL 	},
-		{ "health given", 	&selectedObjStuff.textboxes.healthGiven	, 1, false,	textbox_healthGiven_changed , NULL 	},
 		{ "  is movable", 	&selectedObjStuff.checkboxes.movable	, 1, false,	NULL						, checkbox_movable_changed 	},
 		{ " is pickable", 	&selectedObjStuff.checkboxes.pickable	, 1, false,	NULL						, checkbox_pickable_changed },
 		{ "         ATK", 	&selectedObjStuff.textboxes.attack		, 1, false,	textbox_attack_changed 		, NULL 	},

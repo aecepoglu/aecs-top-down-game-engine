@@ -17,7 +17,6 @@ bool template_apply( struct object *to, int templateNo) {
 		to->type = from->obj->type;
 		to->health = from->obj->health;
 		to->maxHealth = from->obj->maxHealth;
-		to->healthGiven = from->obj->healthGiven;
 		to->isMovable = from->obj->isMovable;
 		to->isPickable = from->obj->isPickable;
 		to->attack = from->obj->attack;
@@ -50,7 +49,6 @@ struct ObjectTemplate* template_create( int templateIndex, const char *name, int
     template->obj->type = o->type;
     template->obj->health = o->health;
     template->obj->maxHealth = o->maxHealth;
-    template->obj->healthGiven = o->healthGiven;
     template->obj->isPickable = o->isPickable;
     template->obj->isMovable = o->isMovable;
     template->obj->attack = o->attack;
@@ -100,10 +98,6 @@ void parseTemplateLine( char *line, int lineNo) {
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "maxHealth");
 	obj.maxHealth = atoi( string);
-
-	string = strtok( NULL, delim);
-	CHECK_STRTOK_RESULT( string, lineNo, "healthGiven");
-	obj.healthGiven = atoi( string);
 
 	string = strtok( NULL, delim);
 	CHECK_STRTOK_RESULT( string, lineNo, "isMovable");
@@ -163,13 +157,12 @@ void templates_save() {
 		if( t == NULL)
 			continue;
 
-		fprintf( fp, "%s,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+		fprintf( fp, "%s,%d,%d,%d,%d,%d,%d,%d,%d\n",
 			t->name,
 			t->obj->type,
 			t->aiType,
 			t->obj->health,
 			t->obj->maxHealth,
-			t->obj->healthGiven,
 			t->obj->isMovable,
 			t->obj->isPickable,
 			t->obj->attack,

@@ -85,11 +85,9 @@ int luaStackDump(lua_State* l)
     return 0;
 }
 
-static int dsl_onInteract( lua_State *l) {
-	luaL_checkinteger( l, 1);
+int dsl_onInteract( lua_State *l) {
+	int objId = luaL_checkinteger( l, 1);
 	luaL_checktype( l, 2, LUA_TFUNCTION);
-	
-	int objId = lua_tointeger( l, 1);
 	
 	log1("Setting trigger for obj with id %d.\n", objId);
 	
@@ -107,32 +105,43 @@ static int dsl_onInteract( lua_State *l) {
 	return 0;
 }
 
+int dsl_onEaten( lua_State *l) {
+	int objId = luaL_checkinteger(l, 1);
+	luaL_checktype( l, 2, LUA_TFUNCTION);
+
+	log1("Setting onEat trigger for obj with id %d\n", objId);
+
+	int ref = luaL_ref(l, LUA_REGISTRYINDEX);
+
+	int i;
+	for (i=0; i<myMap->objListCount; i++) {
+		if (myMap->objList[i]->id == objId) {
+			myMap->objList[i]->callbacks.onEaten = ref;
+		}
+	}
+
+	return 0;
+}
+
 int dsl_startLevel( lua_State *l) {
-	luaL_checkstring( l, 1);
-	luaL_checkstring( l, 2);
-	luaL_checkinteger( l, 3);
-	
-	const char *mapPath = lua_tostring( l, 1);
-	const char *scriptPath = lua_tostring( l, 2);
-	int mapStartOption = lua_tointeger( l, 3);
+	const char *mapPath = luaL_checkstring( l, 1);
+	const char *scriptPath = luaL_checkstring( l, 2);
+	int mapStartOption = luaL_checkinteger( l, 3);
 	
 	lua_pushinteger( l, loadLevel( mapPath, scriptPath, mapStartOption, l) );
 	
 	return 1;
 }
 
-static int dsl_endLevel( lua_State *l) {
-	luaL_checkinteger( l, 1);
+int dsl_endLevel( lua_State *l) {
+	int levelEndValue = luaL_checkinteger( l, 1);
 
-	int levelEndValue = lua_tointeger( l, 1);
 	gameOver( levelEndValue);
 	return 0;
 }
 
 int dsl_setStartGate( lua_State *l) {
-	luaL_checkinteger( l, 1);
-
-	int gateId = lua_tointeger( l, 1);
+	int gateId = luaL_checkinteger( l, 1);
 	
 	struct object *o;
 	int i;
@@ -159,8 +168,7 @@ int dsl_setStartGate( lua_State *l) {
 }
 
 int dsl_useObject( lua_State *l) {
-	luaL_checkinteger( l, 1);
-	int usedObjId = lua_tointeger( l, 1);
+	int usedObjId = luaL_checkinteger( l, 1);
 
 	int i;
 	struct object *o;
@@ -175,7 +183,7 @@ int dsl_useObject( lua_State *l) {
 int dsl_writeConsole( lua_State *l) {
 	luaL_checkstring( l, 1);
 	const char *str = lua_tostring( l, 1);
-	
+
 	textConsole_add( str);
 	textConsole_write( renderer, textures->font, textConsole_texture);
 	PLAY_AUDIO_FX( AUDIO_CONSOLE, 0);
@@ -384,6 +392,7 @@ lua_State* initLua() {
 	luaL_setfuncs( L, (struct luaL_Reg[]) {
 		{"use", dsl_useObject},
 		{"onInteract", dsl_onInteract},
+		{"onEaten", dsl_onEaten},
 		{"startLevel", dsl_startLevel},
 		{"endLevel", dsl_endLevel},
 		{"setStartGate", dsl_setStartGate},

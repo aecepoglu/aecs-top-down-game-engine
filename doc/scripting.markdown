@@ -9,6 +9,7 @@ On top of lua, a set of functions are available to command the engine. These are
 
 * [use( object-id)](#use)
 * [onInteract( object-id, callback-function)](#onInteract)
+* [onEaten( object-id, callback-function)](#onEaten)
 * [startLevel( map-file-path, script-file-path, start-option): integer](#startLevel)
 * [endLevel( level-return-value)](#endLevel)
 * [setStartGate( object-id)](#setStartGate)
@@ -53,18 +54,28 @@ AIs with use functions are these:
 ## onInteract( object-id, callback-function) <a id="onInteract"></a>
 
 * object-id: integer: id object(s) whose interaction callbacks will be set
-* callback-function: function: the function which will be called on interaction. This function takes a boolean as a parameter, that has the value of whether the object was interacted with from the front side
+* callback-function: function: the function which will be called on interaction. This function takes ids of interacted and interacting object
 
 When object with given id is interacted with, the given callback function is called.
 
-    function callbackFunction( isInFront)
-        if isInFront
-            print("object interaction from the front")
-        else
-            print("object interaction, not from the front")
-        end
+    function callbackFunction( triggeredObjId, triggeringObjId)
+        print("object " .. triggeredObjId .. " is triggered by obj " .. triggeringObjId)
     end
-    lib.setTriger( 5, callbackFunction)
+    lib.onInteract( 5, callbackFunction)
+
+------------
+
+## onEaten( object-id, callback-function) <a id="onEaten"></a>
+
+* object-id: integer: id object(s) who are being watched for being eaten
+* callback-function: function: the function which will be called when an object is eaten. This function is passed the ids of eaten and eating objects
+
+When object with given id is interacted with, the given callback function is called.
+
+    function callbackFunction( eatenId, eatingObjId)
+        print("object " .. triggeredObjId .. " is eaten by obj " .. eatingObjId)
+    end
+    lib.onEaten( 5, callbackFunction)
 
 ------------
 
