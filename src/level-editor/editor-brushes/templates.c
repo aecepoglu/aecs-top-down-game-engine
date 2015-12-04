@@ -64,7 +64,7 @@ void addTemplate_clicked( struct SDLGUI_Element *e) {
 			};
 			createTemplateButton( i, template, &params);
 
-			repositionTemplateButtons( panel->data.elements, panel->rect.y);
+			repositionTemplateButtons( panel->data.panel.elements, panel->rect.y); //TODO this shouldnt be necessary
             brush.variant = i;
 			SHOW_DETAIL_PANEL();
 			break;
@@ -74,7 +74,7 @@ void addTemplate_clicked( struct SDLGUI_Element *e) {
 
 struct SDLGUI_Element* getSelectedBrushElement() {
 	struct SDLGUI_Element *panel = panels.list;
-	struct SDLGUI_List *elements = panel->data.elements;
+	struct SDLGUI_List *elements = panel->data.panel.elements;
 	int i;
 	for( i=2; i<elements->count; i++) {
 		struct SDLGUI_Element *e = elements->list[i];
@@ -88,7 +88,7 @@ struct SDLGUI_Element* getSelectedBrushElement() {
 
 void removeTemplate_clicked( struct SDLGUI_Element *from) {
 	struct SDLGUI_Element *panel = panels.list;
-	struct SDLGUI_List *elements = panel->data.elements;
+	struct SDLGUI_List *elements = panel->data.panel.elements;
 
     struct SDLGUI_Element *e = getSelectedBrushElement();
     if( e ) {
@@ -160,7 +160,7 @@ struct SDLGUI_Element* brushOptionPanel_create_templates( struct SDLGUI_Element 
 
 		createTemplateButton( i, t, buttonParams);
 	}
-	repositionTemplateButtons( panels.list->data.elements, panels.list->rect.y);
+	repositionTemplateButtons( panels.list->data.panel.elements, panels.list->rect.y);
 
 
 	/* Detail View Panel */

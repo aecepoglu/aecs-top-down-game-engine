@@ -118,6 +118,21 @@ void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e) {
 	}
 }
 
+int SDLGUI_Handle_Scroll (const SDL_MouseWheelEvent *e) {
+	if (guiCore.mouseHoverElement) {
+		struct SDLGUI_Element *scrollElement = guiCore.mouseHoverElement;
+
+		while (scrollElement != 0 && scrollElement->scrollHandler == 0) {
+			scrollElement = scrollElement->parent;
+		}
+
+		if (scrollElement) {
+			return scrollElement->scrollHandler(scrollElement, -10 * e->y);
+		}
+	}
+	return 0;
+}
+
 int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e) {
 	if( guiCore.focusedElement && guiCore.focusedElement->textInputHandler) {
 		SDL_Keycode sym = e->keysym.sym;
@@ -244,6 +259,11 @@ void SDLGUI_Layer_Add( struct SDLGUI_List *list) {
 	layer->list = list;
 
 	topLayer = layer;
+
+	int i;
+	for (i=0; i<list->count; i++) {
+		list->list[i]->parent = 0;
+	}
 }
 
 void SDLGUI_Layer_Remove() {

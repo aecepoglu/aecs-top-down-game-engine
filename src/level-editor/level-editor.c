@@ -519,6 +519,11 @@ void run() {
 				SDLGUI_Handle_MouseUp( (SDL_MouseButtonEvent*)&e);
 				brush.isRepeat = false;
 				break;
+			case SDL_MOUSEWHEEL:
+				if (SDLGUI_Handle_Scroll( (SDL_MouseWheelEvent*)&e))
+					break;
+				else
+					continue;
 			case SDL_MOUSEMOTION:
 				if(SDLGUI_Handle_MouseHover( (SDL_MouseMotionEvent*)&e))
 					break;

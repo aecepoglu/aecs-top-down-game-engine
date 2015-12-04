@@ -47,6 +47,7 @@ void SDLGUI_Destroy();
 int SDLGUI_Handle_MouseDown( SDL_MouseButtonEvent *e);
 void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e);
 int SDLGUI_Handle_MouseHover( SDL_MouseMotionEvent *e);
+int SDLGUI_Handle_Scroll (const SDL_MouseWheelEvent *e);
 int SDLGUI_Handle_TextInput( SDL_KeyboardEvent *e);
 
 
