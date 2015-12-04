@@ -19,7 +19,6 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 	obj->ai = 0;
 	obj->health = 3;
 	obj->maxHealth = 3;
-	obj->healthGiven = 1;
 	obj->isMovable = true;
 	obj->isPickable = true;
 	obj->attack = 1;
@@ -28,7 +27,8 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 	obj->timerCounter= 0;
 	obj->isDeleted=false;
 	obj->visualState = 1;
-    obj->callbacks.onInteract = LUA_NOREF;
+	obj->callbacks.onInteract = LUA_NOREF;
+	obj->callbacks.onEaten = LUA_NOREF;
 
 	return obj;
 }
@@ -39,11 +39,10 @@ void writeObject( FILE *fp, struct object *obj) {
 	fwrite( &obj->dir,  sizeof(enum direction), 1, fp);
 	enum AIType tmp = obj->ai == 0 ? ai_none : obj->ai->type;
 	fwrite( &tmp, 		sizeof(enum AIType),     1, fp);
-    fwrite( &obj->id, sizeof(int), 1, fp);
+	fwrite( &obj->id, sizeof(int), 1, fp);
 
 	fwrite( &obj->health,		sizeof(uint8_t), 	1, fp);
 	fwrite( &obj->maxHealth,	sizeof(uint8_t), 	1, fp);
-	fwrite( &obj->healthGiven,	sizeof(int8_t), 	1, fp);
 	fwrite( &obj->isMovable, 	sizeof(bool),		1, fp);
 	fwrite( &obj->isPickable, 	sizeof(bool),		1, fp);
 	fwrite( &obj->attack, 		sizeof(uint8_t), 	1, fp);
@@ -59,11 +58,10 @@ struct object* readObject( FILE *fp) {
 	fread( &type,      sizeof(enum AIType),    1, fp);
 	obj->ai = type != 0 ? AI_CREATE( type) : 0;
 
-    fread( &obj->id, sizeof( int), 1, fp);
+	fread( &obj->id, sizeof( int), 1, fp);
 
 	fread( &obj->health,		sizeof(uint8_t),	1, fp);
 	fread( &obj->maxHealth,		sizeof(uint8_t),	1, fp);
-	fread( &obj->healthGiven,	sizeof(int8_t),		1, fp);
 	fread( &obj->isMovable,		sizeof(bool),		1, fp);
 	fread( &obj->isPickable,	sizeof(bool),		1, fp);
 	fread( &obj->attack,		sizeof(uint8_t),	1, fp);
@@ -73,7 +71,8 @@ struct object* readObject( FILE *fp) {
 	obj->timerCounter= 0;
 	obj->visualState = 1;
 	obj->isDeleted=false;
-    obj->callbacks.onInteract = LUA_NOREF;
+	obj->callbacks.onInteract = LUA_NOREF;
+	obj->callbacks.onEaten = LUA_NOREF;
 
 	return obj;
 }
@@ -82,18 +81,23 @@ struct object* readObject( FILE *fp) {
 	Some functions objects use to interract with each other
 */
 
+bool triggerObjectCallback( lua_State *lua, int luaRef, const struct object *triggeredObj, const struct object *triggeringObj ) {
+	lua_rawgeti(lua, LUA_REGISTRYINDEX, luaRef);
+
+	lua_pushinteger(lua, triggeredObj->id);
+	lua_pushinteger(lua, triggeringObj ? triggeringObj->id : -1);
+
+	if( lua_pcall( lua, 2, 0, 0) != 0) {
+		fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));
+		return false;
+	}
+	else
+		return true;
+}
 
 bool objectInteract( struct object *obj, struct object *obj2, lua_State *lua) {
 	if( obj2->callbacks.onInteract != LUA_NOREF) {
-		lua_rawgeti( lua, LUA_REGISTRYINDEX, obj2->callbacks.onInteract);
-
-		lua_pushboolean( lua, obj == NULL ? true : obj->dir == DIR_REVERSE(obj2->dir));
-
-		if( lua_pcall( lua, 1, 0, 0) != 0) {
-			fprintf( stderr, "Failed to call the callback\n%s\n", lua_tostring( lua, -1));
-			return false;
-		}
-		return true;
+		return triggerObjectCallback(lua, obj2->callbacks.onInteract, obj2, obj);
 	}
 	else
 		return false;
@@ -106,7 +110,7 @@ bool objectHit( struct object *obj1, struct object *obj2) {
 		obj2->health = dmg > obj2->health
 			? 0
 			: obj2->health - dmg;
-		printf("obj health down to %d\n", obj2->health);
+		log1("obj health down to %d\n", obj2->health);
 
 		if( obj2->health == 0) {
 			if( obj2->ai) {
@@ -123,18 +127,17 @@ bool objectHit( struct object *obj1, struct object *obj2) {
 	}
 }
 
-bool objectSwallow( struct object *obj1, struct object *obj2) {
+bool objectSwallow( struct object *obj1, struct object *obj2, lua_State *lua) {
 	if( obj2->health == 0) {
-		obj1->health += obj2->maxHealth;
-		int value = obj1->health + obj2->healthGiven;
-		if( value > obj1->maxHealth)
-			value = obj1->maxHealth;
-		else if (value <= 0) {
-			value = 0;
+		if (obj2->callbacks.onEaten != LUA_NOREF) {
+			triggerObjectCallback(lua, obj2->callbacks.onEaten, obj2, obj1);
+		}
+
+		if (obj1->health < 0) {
 			AI_DESTROY( obj1->ai);
 			obj1->ai = NULL;
 		}
-		obj1->health = value;
+
 		obj2->isDeleted = true;
 		
 		return true;

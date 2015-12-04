@@ -33,7 +33,6 @@ struct object {
 
 	uint8_t health;
 	uint8_t maxHealth;
-	int8_t healthGiven; /* health given upon getting eaten */
 	bool isMovable;
 	bool isPickable;
 	uint8_t attack;
@@ -41,6 +40,7 @@ struct object {
 
 	struct {
 		int onInteract;
+		int onEaten;
 	} callbacks;
 };
 
@@ -53,7 +53,7 @@ struct object* readObject( FILE *fp);
 void writeObject( FILE *fp, struct object *obj);
 
 bool objectInteract( struct object *obj1, struct object *obj2, lua_State *lua);
-bool objectSwallow( struct object *obj1, struct object *obj2);
+bool objectSwallow( struct object *obj1, struct object *obj2, lua_State *lua);
 bool objectHit( struct object *obj1, struct object *obj2);
 
 void objectFree( struct object *obj);

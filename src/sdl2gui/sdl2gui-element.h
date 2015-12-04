@@ -15,9 +15,14 @@ typedef int (SDLGUI_MouseMotionFunction)(SDL_MouseMotionEvent *event);
 
 struct SDLGUI_Element {
 	SDL_Rect rect;
+	struct SDLGUI_Element *parent;
 
 	union {
-		struct SDLGUI_List *elements;
+		struct {
+			struct SDLGUI_List *elements;
+			int scrollY;
+			int contentHeight;
+		} panel;
 		struct SDLGUI_Text_Data *textData;
 		struct SDLGUI_Checkbox_Data *check;
 		struct SDLGUI_Virtual_Data *virtualData;
@@ -38,6 +43,7 @@ struct SDLGUI_Element {
 	SDLGUI_MouseMotionFunction *mouseMotion;
 	void (*textInputHandler)( struct SDLGUI_Element *e, char c, int backspace);
 	void (*resizeHandler)(struct SDLGUI_Element *e, int width, int height);
+	int (*scrollHandler)(struct SDLGUI_Element *e, int verticalScroll);
 
 	int isVisible:1;
 	int sizeHints:2;

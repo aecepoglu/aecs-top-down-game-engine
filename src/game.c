@@ -301,7 +301,7 @@ bool eat( struct Map *map, struct object *obj) {
 	vectorAdd(  &newPos, &obj->pos, &dirVectors[ obj->dir ]);
 	struct object *otherObj = map->objs[newPos.i][newPos.j];
 	if( otherObj != 0 && otherObj->health == 0) {
-		objectSwallow( obj, otherObj);
+		objectSwallow( obj, otherObj, lua);
 		map->objs[ newPos.i ][ newPos.j ] = NULL;
 		PLAY_AUDIO_FX( AUDIO_EAT, PLAYER_DISTANCE( &newPos));
 		return true;
@@ -311,7 +311,7 @@ bool eat( struct Map *map, struct object *obj) {
 	return false;
 }
 
-void movePlayer( bool (moveFunction)(struct Map*, struct object*) ) {
+void movePlayer( moveFun *moveFunction ) {
 	if( ! playerMoved) {
 		playerMoved = true;
 		moveFunction( myMap, player);

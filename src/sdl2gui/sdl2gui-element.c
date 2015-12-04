@@ -73,6 +73,7 @@ struct SDLGUI_Element *SDLGUI_Create_Texture( SDL_Rect rect, /*const*/SDL_Textur
 	e->destructor = SDLGUI_Destroy_Texture;
 	e->drawFun = SDLGUI_Draw_Texture;
 	e->isVisible = !params.isHidden;
+	e->scrollHandler = 0;
 
 	SDLGUI_Texture_SetTextures( e, texture, textureWidth, textureHeight, params);
 
@@ -100,13 +101,13 @@ struct SDLGUI_Element *SDLGUI_CreateElement(SDL_Rect rect) {
 
 	e->rect = rect;
 
-	
 	e->clicked = 0;
 	e->mouseDown = 0;
 	e->mouseMotion = 0;
 	e->mouseHandler = 0;
 	e->resizeHandler = 0;
 	e->textInputHandler = 0;
+	e->scrollHandler = 0;
 
 	return e;
 }
