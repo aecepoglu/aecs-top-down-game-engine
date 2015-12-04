@@ -373,6 +373,31 @@ int dsl_setFovRange( lua_State *l) {
 	return 0;
 }
 
+int dsl_bindKey(lua_State *l) {
+	luaL_checkinteger(l, 1);
+	luaL_checkinteger(l, 2);
+
+	int key = lua_tointeger(l, 1);
+	int action = lua_tointeger(l, 2);
+
+	moveFun *fun;
+
+	switch (action) {
+		case 0:
+			fun = pickUp;
+			break;
+		default:
+			fun = NULL;
+			break;
+	};
+
+	if (key >= 0 && key < KEY_LOOKUP_SIZE) {
+		keyLookup[key] = fun;
+	}
+
+	return 0;
+}
+
 lua_State* initLua() {
 	lua_State * L;
 	
@@ -403,6 +428,7 @@ lua_State* initLua() {
 		{"objAtPos", dsl_getObjAtPos},
 		{"setFov", dsl_setFov},
 		{"setFovRange", dsl_setFovRange},
+		{"bindKey", dsl_bindKey},
 		{"printStack", luaStackDump},
 		{NULL, NULL}
 	}, 0);

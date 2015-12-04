@@ -51,18 +51,33 @@ SDL_Texture** loadTextureSheet( SDL_Renderer *ren, SDL_Surface *sheet, int inNum
 
 /* takes a 1d list of textures, and returns a 2d array of textures
 */
-SDL_Texture*** loadTexturesIntoTable( SDL_Texture **list, int listLen, int outNumRows, int outNumCols) {
+SDL_Texture*** loadTexturesIntoTable( SDL_Renderer *ren, SDL_Texture **list, int listLen, int outNumRows, int outNumCols) {
 	assert( (outNumRows * outNumCols) % listLen == 0);
-	int rowJumpLen = listLen / outNumRows;
+	int factor = listLen / outNumRows;
+
+	Uint32 textureFormat;
+	int textureWidth, textureHeight;
+
+	SDL_QueryTexture( list[0], &textureFormat, NULL, &textureWidth, &textureHeight );
+
+
 
 	SDL_Texture ***table = (SDL_Texture***)calloc( outNumRows, sizeof( SDL_Texture**));
 	int row, col;
 	for( row=0; row<outNumRows; row++) {
 		table[ row] = (SDL_Texture**)calloc( outNumCols, sizeof( SDL_Texture*));
 		for( col=0; col<outNumCols; col++) {
-			table[ row][ col] = list[ row*rowJumpLen + col%rowJumpLen];
+			SDL_Texture *rotatedTexture = SDL_CreateTexture(ren, textureFormat, SDL_TEXTUREACCESS_TARGET, textureWidth, textureHeight);
+			SDL_SetTextureBlendMode(rotatedTexture, SDL_BLENDMODE_BLEND);
+			SDL_SetRenderTarget(ren, rotatedTexture);
+
+			SDL_RenderCopyEx( ren, list[row * factor + col % factor], NULL, NULL, ((col - col%factor)* 90), NULL, SDL_FLIP_NONE );
+			
+			table[ row][ col] = rotatedTexture;
 		}
 	}
+
+	SDL_SetRenderTarget(ren, NULL);
 
 	return table;
 }
@@ -82,9 +97,10 @@ struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const char *path) {
 	SDL_Texture **texturesList = loadTextureSheet( ren, img, numStates, numRotations, SPRITE_TILE_LEN, SPRITE_TILE_LEN);
 
 	result->numStates = numStates;
-	result->textures = loadTexturesIntoTable( texturesList, numStates*numRotations, numStates, 4);
+	result->textures = loadTexturesIntoTable( ren, texturesList, numStates*numRotations, numStates, 4);
 
 	free( texturesList);
+	//FIXME free every item in texturesList
 	SDL_FreeSurface( img);
 
 	return result;

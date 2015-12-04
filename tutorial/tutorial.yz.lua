@@ -1,3 +1,5 @@
+lib.bindKey(19, 0);
+
 -- SCENE 1
 lib.cutClear( 0,0,0)
 lib.cutWrite( 10, 10, "Welcome to YZ-01\n\n"
@@ -16,7 +18,6 @@ lib.cutClear( 0,0,0)
 lib.cutWrite( 10, 10, "Use mouse to look around\n\n"
 
     .. "    Press WASD to move,\n"
-	.. "        or ,AOE for Dvorak users\n\n"
 
     .. "Click once to interact with objects\n\n\n"
 
@@ -33,7 +34,7 @@ lib.startLevel( "2.yz.map", "level1.yz.lua", 0)
 lib.startLevel( "3.yz.map", "3.yz.lua", 0)
 
 lib.cutClear(0,0,0)
-lib.cutWrite( 10,200, "Press 'F' or 'U' to pick up an item");
+lib.cutWrite( 10,200, "Press 'F' to pick up an item");
 lib.cutRender()
 lib.cutReadKey()
 

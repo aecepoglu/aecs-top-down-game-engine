@@ -35,14 +35,15 @@ struct Map {
 	unsigned int objListCount;
 	unsigned int objListSize;
 };
+
 /*
  objs:    /-----------/
          /     /     /
         /     /     /
-	   /-----------/
-	  /     /     /
-	 /     /   ------> object
-	/-----/-----/
+       /-----------/
+      /     /     /
+     /     /   ------> object
+    /-----/-----/
 */
 
 

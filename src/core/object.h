@@ -21,7 +21,7 @@ enum objType {
 
 /*struct AI defined in ai.h*/
 struct object {
-    unsigned int id;
+	unsigned int id;
 	struct Vector pos;
 	enum objType type;
 	int textureId;
@@ -39,7 +39,7 @@ struct object {
 	uint8_t attack;
 	uint8_t defence;
 
-    struct {
+	struct {
 		int onInteract;
 	} callbacks;
 };

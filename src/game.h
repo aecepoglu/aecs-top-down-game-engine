@@ -4,6 +4,7 @@
 
 #include "basic.h"
 #include "fov/fov.h"
+#include "move.h"
 
 /* when a level is read, player position needs to be set from within the level script.
 	until then, this variable stays false */
@@ -12,6 +13,9 @@ struct object *player;
 
 char *dirPath;
 fovFun *currentFov;
+
+#define KEY_LOOKUP_SIZE 283
+moveFun *keyLookup[KEY_LOOKUP_SIZE];
 
 void setViewRange(int value);
 

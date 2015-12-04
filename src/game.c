@@ -83,6 +83,42 @@ void gameOver( int levelEndValue) {
 	SDL_PushEvent( &event);
 }
 
+bool kick( struct Map *map, struct object *obj) {
+	struct Vector *initPos = GET_PF_POS( map->pfBase[ obj->pos.i ][ obj->pos.j ]->neighbours[ obj->dir ] );
+
+	if (initPos != NULL) {
+		struct object *objHit = map->objs[initPos->i][initPos->j];
+
+		if (objHit && objHit->isMovable) {
+			struct Vector curPos;
+			struct Vector prevPos;
+			struct Vector *dirVector = &dirVectors[obj->dir];
+
+			vectorClone(&curPos, initPos);
+
+			do {
+				vectorClone(&prevPos, &curPos);
+				vectorAdd(&curPos, &curPos, dirVector);
+			}
+			while (map->tiles[curPos.i][curPos.j] == terrain_gnd &&
+				map->objs[curPos.i][curPos.j] == NULL);
+
+			if (vectorEquals(&prevPos, &curPos) != true) {
+				map->objs[objHit->pos.i][objHit->pos.j] = NULL;
+				map->objs[prevPos.i][prevPos.j] = objHit;
+
+				vectorClone( &(objHit->pos), &prevPos );
+
+				return true;
+				PLAY_AUDIO_FX(AUDIO_HIT, 1);
+			}
+		}
+	}
+
+	PLAY_AUDIO_FX( AUDIO_NO_INTERACT, 0);
+	return false;
+}
+
 /* Uses the object in-front of player */
 bool interact( struct Map *map, struct object *obj) {
 	struct BasePfNode *nextNode = map->pfBase[ obj->pos.i][ obj->pos.j]->neighbours[ obj->dir];
@@ -315,49 +351,45 @@ void movePlayerPos( enum direction dir, bool shift) {
 
 
 void handleKey( SDL_KeyboardEvent *e) {
-	switch (e->keysym.sym) {
-		case SDLK_q:
-            quit("pressed 'q'. Quitting");
+	switch (e->keysym.scancode) {
+		case 42:
+			quit("pressed 'backspace'. Quitting");
 			break;
-		case SDLK_COMMA:
-		case SDLK_w:
+		case 26:
 			movePlayerPos( dir_up, e->keysym.mod & KMOD_LSHIFT);
 			break;
-		case SDLK_o:
-		case SDLK_s:
+		case 22:
 			movePlayerPos( dir_down, e->keysym.mod & KMOD_LSHIFT);
 			break;
-		case SDLK_a:
+		case 4:
 			movePlayerPos( dir_left, e->keysym.mod & KMOD_LSHIFT);
 			break;
-		case SDLK_e:
-		case SDLK_d:
+		case 7:
 			movePlayerPos( dir_right, e->keysym.mod & KMOD_LSHIFT);
 			break;
-        case SDLK_u:
-        case SDLK_f:
-			movePlayer( ( e->keysym.mod & KMOD_LSHIFT) ? eat : pickUp );
-            break;
-		case SDLK_1:
+		case 30:
 			dropItem( myMap, player, 0);
 			break;
-		case SDLK_2:
+		case 31:
 			dropItem( myMap, player, 1);
 			break;
-		case SDLK_3:
+		case 32:
 			dropItem( myMap, player, 2);
 			break;
-		case SDLK_4:
+		case 33:
 			dropItem( myMap, player, 3);
 			break;
-		case SDLK_5:
+		case 34:
 			dropItem( myMap, player, 4);
 			break;
-		case SDLK_6:
+		case 35:
 			dropItem( myMap, player, 5);
 			break;
 		default:
-			log0("Unhandled key\n");
+			if (keyLookup[e->keysym.scancode]) {
+				//movePlayer(keyLookup[e->keysym.scancode][e->keysym.mod & KMOD_LSHIFT]);
+				movePlayer(keyLookup[e->keysym.scancode]);
+			}
 			break;
 	};
 }
@@ -595,13 +627,20 @@ void setDefaults() {
 	init_fovBase( VIEW_RANGE);
 
 	inventory_reset( false);
+
+	for (i=0; i<KEY_LOOKUP_SIZE; i++) {
+		keyLookup[i] = NULL;
+	}
+	keyLookup[ 6 /*C*/] = kick;
+	keyLookup[ 9 /*F*/] = pickUp;
+	keyLookup[10 /*G*/] = eat;
 }
 
 int main( int argc, char *args[]) {
 	
 	if( argc != 2) {
 		fprintf( stderr, "Usage: %s map-file (without .yz.* extensions)", args[0]);
-        return 1;
+		return 1;
 	}
 
 	dirPath = getDirPath( args[1]);
@@ -629,9 +668,9 @@ int main( int argc, char *args[]) {
 	cutscene_init();
 	textConsole_init( renderer);
     
-    if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {
-        fprintf(stderr, "Error loading script '%s'\n%s\n", args[1], lua_tostring(lua, -1));
-        return 0;
+	if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {
+		fprintf(stderr, "Error loading script '%s'\n%s\n", args[1], lua_tostring(lua, -1));
+		return 0;
 	}
 	
 	log0("Program over\nDeallocating because I'm just OCD like that\n");
@@ -644,6 +683,6 @@ int main( int argc, char *args[]) {
 	free_fovBase( fovBase);
 	if(myMap)
 		freeMap( myMap);
-    free( dirPath);
+	free( dirPath);
 	return 0;
 }
