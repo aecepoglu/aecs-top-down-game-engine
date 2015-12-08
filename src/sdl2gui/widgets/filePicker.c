@@ -37,7 +37,6 @@ void minimizePath(char *path) {
 	i = 0;
 	while (token) {
 		if (i == 0 || strcmp(token, ".") != 0) {
-			printf("%d <- %s\n", i, token);
 			tokens[i] = token;
 			i ++;
 		}
@@ -75,7 +74,6 @@ void destroyFilePicker() {
 void aFile_Clicked( struct SDLGUI_Element *e) {
 	struct MyFile *f = (struct MyFile*)e->userData;
 
-	printf("clicked on file: %s. isDir: %d\n", f->name, f->isDir);
 	if(f->isDir) {
 		char buf[255];
 

@@ -7,7 +7,7 @@
 #include "../util/error.h"
 #include "dialogs/mapCreator.h"
 #include "guiHelpers.h"
-#include "../texture/textureScheduler.h"
+#include "../texture/spriteSpecs.h"
 
 bool running;
 unsigned int objectCounter = 1;
@@ -20,7 +20,7 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 #define GUI_LEFTPANEL_WIDTH 192
 #define GUI_TOPBAR_HEIGHT 32
 bool isMessageBoxOn = false;
-struct TexturePaths *texturePaths = NULL;
+struct SpriteSpecs *spriteSpecs = NULL;
 
 
 struct {
@@ -842,16 +842,16 @@ void initGui() {
 }
 
 void mapLoaded() {
-	if(texturePaths == NULL) {
-		char *schedulePath = getTextureSchedulePath( myMap->filePath);
-		texturePaths = readTextureSchedule( schedulePath);
+	if(spriteSpecs == NULL) {
+		char *schedulePath = calculateSpriteSpecsFilePath( myMap->filePath);
+		spriteSpecs = readSpriteSpecsFile (schedulePath);
 		free( schedulePath);
 
 		drawBackground();
 		draw();
 
-		if(texturePaths) {
-			loadObjectTextures( renderer, textures, texturePaths);
+		if(spriteSpecs) {
+			loadObjectTextures( renderer, textures, spriteSpecs);
 		}
 
 		reloadTextureButtons();
@@ -895,8 +895,8 @@ int main( int argc, char *args[]) {
 	if (myMap)
 		freeMap( myMap);
 	freeTextures( textures);
-	if (texturePaths)
-		destroyTextureSchedule( texturePaths);
+	if (spriteSpecs)
+		destroySpriteSpecs (spriteSpecs);
 	SDL_DestroyRenderer( renderer);
 	SDL_DestroyWindow( window);
 	SDL_Quit();

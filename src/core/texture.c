@@ -157,7 +157,7 @@ struct GameTextures* loadOrdinaryTextures( SDL_Renderer *ren) {
 	return result;
 }
 
-void loadObjectTextures( SDL_Renderer *ren, struct GameTextures *textures, const struct TexturePaths *texturePaths) {
+void loadObjectTextures( SDL_Renderer *ren, struct GameTextures *textures, const struct SpriteSpecs *texturePaths) {
 	log1("Loading obj textures\n");
 
 	textures->obj = calloc( texturePaths->size, sizeof(struct TextureSheet*));

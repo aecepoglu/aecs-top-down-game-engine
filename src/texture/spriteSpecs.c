@@ -1,4 +1,4 @@
-#include "textureScheduler.h"
+#include "spriteSpecs.h"
 #include "../basic.h"
 #include "../util/util.h"
 #include "../util/log.h"
@@ -7,25 +7,26 @@
 #include <stdio.h>
 #include <string.h>
 
-char *getTextureSchedulePath( const char *file) {
+
+char *calculateSpriteSpecsFilePath( const char *file) {
 	char *dirPath = getDirPath( file);
 
-	char *result = combineFilePaths( dirPath, TEXTURE_SCHEDULE_FILENAME);
+	char *result = combineFilePaths( dirPath, SPRITE_SPECS_FILENAME);
 
 	free( dirPath);
 
 	return result;
 }
 
-void unsetTexturePaths(struct TexturePaths *texturePaths, int from, int to) {
+void unsetSpriteSpecs(struct SpriteSpecs *spriteSpecs, int from, int to) {
 	int i;
 
 	for( i=from; i<to; i++) {
-		texturePaths->array[from] = NULL;
+		spriteSpecs->array[from] = NULL;
 	}
 }
 
-void clearTexturePaths( struct TexturePaths *t) {
+void clearSpriteSpecs( struct SpriteSpecs *t) {
 	int i;
 	for (i=0; i<t->size; i++) {
 		if (t->array[i] != NULL) {
@@ -37,7 +38,7 @@ void clearTexturePaths( struct TexturePaths *t) {
 	t->size = 0;
 }
 
-void loadTexturePaths( struct TexturePaths *t, FILE *fp) {
+void loadSpriteSpecs( struct SpriteSpecs *t, FILE *fp) {
 	char *dirPath = getDirPath( t->filePath);
 
 	char buf[BUFSIZ];
@@ -47,7 +48,7 @@ void loadTexturePaths( struct TexturePaths *t, FILE *fp) {
 	
 	t->size = 64;
 	t->array = (char**)calloc(t->size, sizeof(char*));
-	unsetTexturePaths( t, 0, 64);
+	unsetSpriteSpecs( t, 0, 64);
 	
 	/* read textures first.
 		this section is terminated by an empty line
@@ -71,7 +72,7 @@ void loadTexturePaths( struct TexturePaths *t, FILE *fp) {
 				if( t->size < textureId) {
 					t->size += 64;
 					t->array = realloc( t->array, t->size * sizeof(char*));
-					unsetTexturePaths( t, t->size - 64, t->size);
+					unsetSpriteSpecs( t, t->size - 64, t->size);
 				}
 
 				t->array[textureId] = filePath;
@@ -93,7 +94,7 @@ void loadTexturePaths( struct TexturePaths *t, FILE *fp) {
 
 	free( dirPath);
 
-	log1("Texture Paths:\n");
+	log1("Sprite Specs:\n");
 	for(i=0; i<t->size; i++) {
 		if(t->array[i] != NULL) {
 			log1("%d: %s\n", i, t->array[i]);
@@ -101,7 +102,7 @@ void loadTexturePaths( struct TexturePaths *t, FILE *fp) {
 	}
 }
 
-struct TexturePaths *readTextureSchedule( const char *path) {
+struct SpriteSpecs *readSpriteSpecsFile( const char *path) {
 	log1("loading texture-spec file \"%s\"\n", path);
 	FILE *fp = fopen( path, "r");
 	if( fp == 0) {
@@ -110,18 +111,18 @@ struct TexturePaths *readTextureSchedule( const char *path) {
 	}
 
 
-	struct TexturePaths *texturePaths = (struct TexturePaths*)malloc(sizeof(struct TexturePaths));
+	struct SpriteSpecs *spriteSpecs = (struct SpriteSpecs*)malloc(sizeof(struct SpriteSpecs));
 
-	texturePaths->filePath = strdup(path);
+	spriteSpecs->filePath = strdup(path);
 
-	loadTexturePaths( texturePaths, fp);
+	loadSpriteSpecs( spriteSpecs, fp);
 
 	fclose( fp);
 
-	return texturePaths;
+	return spriteSpecs;
 }
 
-void destroyTextureSchedule( struct TexturePaths *t) {
+void destroySpriteSpecs( struct SpriteSpecs *t) {
 	int i;
 
 	for( i=0; i<t->size; i++)
@@ -133,7 +134,7 @@ void destroyTextureSchedule( struct TexturePaths *t) {
 	free(t);
 }
 
-bool validateTexturePaths(const struct TexturePaths *t) {
+bool validateSpriteSpecs (const struct SpriteSpecs *t) {
 	if(t->size < 1) {
 		fprintf(stderr, "The texture-spec file is empty\n");
 		return false;

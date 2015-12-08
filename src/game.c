@@ -11,7 +11,7 @@
 #include "core/audio.h"
 #include "customEventTypes.h"
 #include "cutscene.h"
-#include "texture/textureScheduler.h"
+#include "texture/spriteSpecs.h"
 #include "util/util.h"
 
 SDL_Event timerPushEvent = {
@@ -32,7 +32,7 @@ int vi_padding, vj_padding;
 enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
-struct TexturePaths *texturePaths;
+struct SpriteSpecs *spriteSpecs;
 
 
 const Uint32 timerDelay = 100 /*miliseconds*/;
@@ -645,15 +645,15 @@ int main( int argc, char *args[]) {
 
 	dirPath = getDirPath( args[1]);
 
-	char *schedulePath = getTextureSchedulePath( args[1]);
-	texturePaths = readTextureSchedule( schedulePath);
-	if(texturePaths == NULL) {
-		fprintf(stderr, "Texture-Specification-File at '%s' couldn't be loaded\n", schedulePath);
+	char *spriteSpecsPath = calculateSpriteSpecsFilePath( args[1] );
+	spriteSpecs = readSpriteSpecsFile( spriteSpecsPath );
+	if (spriteSpecs == NULL) {
+		fprintf(stderr, "Texture-Specification-File at '%s' couldn't be loaded\n", spriteSpecsPath);
 		return 1;
 	}
-	free( schedulePath);
+	free( spriteSpecsPath);
 
-	if(validateTexturePaths(texturePaths) != true) {
+	if(validateSpriteSpecs(spriteSpecs) != true) {
 		fprintf(stderr, "Ending program because of errors in texture-scheduler specification\n");
 		return 1;
 	}
@@ -663,11 +663,11 @@ int main( int argc, char *args[]) {
 	
 	init( 0, 0, 1280, 960);
 	textures = loadOrdinaryTextures( renderer);
-	loadObjectTextures( renderer, textures, texturePaths);
+	loadObjectTextures( renderer, textures, spriteSpecs);
 	audio_init();
 	cutscene_init();
 	textConsole_init( renderer);
-    
+
 	if (luaL_loadfile(lua, args[1]) || lua_pcall( lua, 0, 0, 0)) {
 		fprintf(stderr, "Error loading script '%s'\n%s\n", args[1], lua_tostring(lua, -1));
 		return 0;

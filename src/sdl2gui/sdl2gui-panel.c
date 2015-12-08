@@ -34,6 +34,8 @@ void SDLGUI_Draw_Panel( struct SDLGUI_Element *element) {
 		int scrollerHeight = element->rect.h * scrollRatio;
 		int scrollerPosY = element->data.panel.scrollY * scrollRatio;
 
+		SDL_SetRenderDrawColor( guiCore.renderer, 0, 0, 0, 255);
+
 		SDL_RenderFillRect(guiCore.renderer, &(SDL_Rect){
 			.x = element->rect.x + element->rect.w - 2 - SCROLLER_WIDTH,
 			.y = scrollerPosY + element->rect.y,
@@ -135,4 +137,7 @@ void SDLGUI_AddTo_Panel( struct SDLGUI_Element *panel, struct SDLGUI_Element *el
 
 void SDLGUI_Clear_Panel( struct SDLGUI_Element *p) {
 	SDLGUI_List_Clear( p->data.panel.elements, 1);
+
+	p->data.panel.contentHeight = 0;
+	p->data.panel.scrollY = 0;
 }

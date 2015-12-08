@@ -6,7 +6,7 @@
 #define TEXTURE_H
 
 #include <SDL.h>
-#include "../texture/textureScheduler.h"
+#include "../texture/spriteSpecs.h"
 
 struct TextureSheet {
 	SDL_Texture ***textures;
@@ -41,7 +41,7 @@ void drawTexture( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int 
 /* Loads all the textures
 */
 struct GameTextures* loadOrdinaryTextures( SDL_Renderer *ren);
-void loadObjectTextures( SDL_Renderer *ren, struct GameTextures* textures,  const struct TexturePaths *texturePaths);
+void loadObjectTextures( SDL_Renderer *ren, struct GameTextures* textures,  const struct SpriteSpecs *texturePaths);
 
 void texture_freeTextureSheet( struct TextureSheet *sheet);
 void freeObjectTextures( struct GameTextures *textures);

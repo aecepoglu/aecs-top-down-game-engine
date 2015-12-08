@@ -22,8 +22,8 @@ void destroyTextureButton( struct SDLGUI_Element *e) {
 }
 
 void reloadTextureButtons() {
-	if (texturePaths) {
-		loadObjectTextures( guiCore.renderer, textures, texturePaths);
+	if (spriteSpecs) {
+		loadObjectTextures( guiCore.renderer, textures, spriteSpecs);
 	}
 
 	SDLGUI_Clear_Panel( panel_buttons);
@@ -32,6 +32,7 @@ void reloadTextureButtons() {
 	int count = 0;
 	for (i=0; i<textures->objsCount; i++) {
 		if(textures->obj[i] != NULL) {
+			printf("obj %d exists\n", i);
 			struct SDLGUI_Element *button = SDLGUI_Create_Texture(
 				(SDL_Rect){
 					.x = BUTTON_MARGIN + (count % BUTTONS_PER_ROW) * (BUTTON_SIZE + BUTTON_MARGIN),
@@ -58,13 +59,13 @@ void reloadTextureButtons() {
 }
 
 void filePicked(const char *path) {
-	texturePaths = readTextureSchedule(path);
+	spriteSpecs = readSpriteSpecsFile(path);
 
 	reloadTextureButtons();
 }
 
 void refresh_clicked(struct SDLGUI_Element *e) {
-	if (texturePaths == NULL) {
+	if (spriteSpecs == NULL) {
 		SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING,
 			"Textures-Specification file haven't been loaded.\n"
 			"\n"
@@ -75,14 +76,14 @@ void refresh_clicked(struct SDLGUI_Element *e) {
 			" it'll load automatically )\n"
 		);
 
-		SDLGUI_OpenFilePicker("./", TEXTURE_SCHEDULE_FILENAME, &filePicked, NULL);
+		SDLGUI_OpenFilePicker("./", SPRITE_SPECS_FILENAME, &filePicked, NULL);
 	}
 	else {
-		clearTexturePaths(texturePaths);
-		FILE *fp = fopen(texturePaths->filePath, "r");
+		clearSpriteSpecs(spriteSpecs);
+		FILE *fp = fopen(spriteSpecs->filePath, "r");
 
 		if(fp == NULL) {
-			log1("Reloading texture-schedule-specs file: %s\n", texturePaths->filePath);
+			log1("Reloading texture-schedule-specs file: %s\n", spriteSpecs->filePath);
 			SDLGUI_Show_Message( SDLGUI_MESSAGE_WARNING,
 				"File could not be loaded.\n"
 				"You may have moved it elsewhere or removed it\n"
@@ -93,7 +94,7 @@ void refresh_clicked(struct SDLGUI_Element *e) {
 			return;
 		}
 
-		loadTexturePaths(texturePaths, fp);
+		loadSpriteSpecs(spriteSpecs, fp);
 
 		fclose(fp);
 
@@ -122,7 +123,7 @@ struct SDLGUI_Element* brushOptionPanel_create_texture( struct SDLGUI_Element *p
 
 
 	panel_buttons = SDLGUI_Create_Panel(
-		(SDL_Rect){.x=0, .y=BUTTON_SIZE + 20, .w=parentPanel->rect.w, .h=170},
+		(SDL_Rect){.x=0, .y=BUTTON_SIZE + 20, .w=parentPanel->rect.w, .h=200 - (BUTTON_SIZE + 20)},
 		(SDLGUI_Params){
 			.bgColor = COLOR_TRANSPARENT,
 		}
