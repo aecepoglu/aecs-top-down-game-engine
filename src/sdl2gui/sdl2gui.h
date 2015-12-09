@@ -62,5 +62,6 @@ void SDLGUI_Layer_Add( struct SDLGUI_List *list);
 void SDLGUI_Layer_Remove();
 
 void SDLGUI_Resize(int x, int y);
+void SDLGUI_Refresh();
 
 #endif /*SDL2GUI_H*/

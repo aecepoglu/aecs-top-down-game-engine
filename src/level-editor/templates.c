@@ -61,14 +61,9 @@ void parseTemplateLine( char *line, int lineNo) {
 	char *string;
 	const char *delim = DELIMETER;
 
-	struct ObjectTemplate *template = (struct ObjectTemplate*)malloc(sizeof(struct ObjectTemplate));
-	template->obj = (struct object*)malloc(sizeof(struct object));
-
     struct object obj;
     char *templateName;
     int aiType;
-
-	template->obj->id = 0;
 
 	if(line[0] == ',') {
 		templateName = "";

@@ -27,10 +27,12 @@ void editor_createMap_clicked( struct SDLGUI_Element *from) {
 		
 		drawBackground();
 		draw();
+		
+		void (*callback)() = from->userData;
 
 		SDLGUI_Layer_Remove();
+		SDLGUI_Refresh();
 
-		void (*callback)() = from->userData;
 		callback();
 	}
 }
