@@ -48,7 +48,7 @@ struct SDLGUI_Element {
 	int isVisible:1;
 	int sizeHints:2;
 
-    void *userData;
+	void *userData;
 };
 
 typedef struct {

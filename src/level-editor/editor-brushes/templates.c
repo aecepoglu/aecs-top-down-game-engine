@@ -27,9 +27,17 @@ void template_clicked( struct SDLGUI_Element *e) {
 	brush.variant = *((int*)(e->userData));
 }
 
+void destroyTemplateButton( struct SDLGUI_Element *e) {
+	int *variantPtr = (int*)e->userData;
+
+	free(variantPtr);
+	SDLGUI_Destroy_Texture(e);
+}
+
 void createTemplateButton( int templateIndex, const struct ObjectTemplate *t, SDLGUI_Params *buttonParams) {
 	struct SDLGUI_Element *button = SDLGUI_Create_Text( (SDL_Rect){.x= 10, .w=panels.list->rect.w - 2*10, .h=20}, t->name, *buttonParams);
 	button->clicked = template_clicked;
+	button->destructor = destroyTemplateButton;
 
 	int *variantPtr = (int*)malloc(sizeof(int));
 	*variantPtr = templateIndex;

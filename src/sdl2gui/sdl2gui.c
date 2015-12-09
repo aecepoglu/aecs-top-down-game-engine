@@ -108,9 +108,11 @@ void SDLGUI_Handle_MouseUp( SDL_MouseButtonEvent *e) {
 		guiCore.focusedElement->textures.current = guiCore.focusedElement->textures.normal;
 	}
 	if( guiCore.mouseDownElement && guiCore.mouseDownElement->clicked != 0) {
-		guiCore.mouseDownElement->clicked( guiCore.mouseDownElement);
 		guiCore.focusedElement = guiCore.mouseDownElement;
 		guiCore.focusedElement->textures.current = guiCore.focusedElement->textures.focused;
+
+		/* the click event handler could decide to destroy its element. So it is best we call it last */
+		guiCore.mouseDownElement->clicked( guiCore.mouseDownElement);
 		guiCore.mouseDownElement = 0;
 	}
 	else {
@@ -286,4 +288,10 @@ void SDLGUI_Resize(int width, int height) {
 			elem->resizeHandler( elem, width, height );
 		}
 	}
+}
+
+void SDLGUI_Refresh() {
+	guiCore.mouseHoverElement = 0;
+	guiCore.mouseDownElement = 0;
+	guiCore.focusedElement = 0;
 }

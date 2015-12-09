@@ -151,6 +151,8 @@ struct Map* createNewMap( unsigned int width, unsigned int height) {
 		}
 	}
 
+	m->pfBase = createPfBase( m->tiles, m->width, m->height);
+
 	log1( "createMap() over\n");
 	return m;
 }
