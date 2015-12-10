@@ -275,6 +275,8 @@ void SDLGUI_Layer_Remove() {
 	free(topLayer);
 
 	topLayer = prev;
+
+	SDLGUI_Refresh();
 }
 
 void SDLGUI_Resize(int width, int height) {

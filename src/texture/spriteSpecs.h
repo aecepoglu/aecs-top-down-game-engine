@@ -4,8 +4,16 @@
 #include <stdio.h>
 #include "../basic.h"
 
-struct SpriteSpecs {
-	char **array;
+struct SpriteSpec {
+	int id;
+	char *path;
+
+	int width;
+	int height;
+};
+
+struct SpriteSpecsList {
+	struct SpriteSpec **array;
 	int size;
 
 	char *filePath;
@@ -16,13 +24,13 @@ struct SpriteSpecs {
 
 char* calculateSpriteSpecsFilePath( const char *mapPath);
 
-struct SpriteSpecs* readSpriteSpecsFile( const char *path);
+struct SpriteSpecsList* readSpriteSpecsFile( const char *path);
 
-void destroySpriteSpecs( struct SpriteSpecs *SpriteSpecs);
+void destroySpriteSpecs( struct SpriteSpecsList *SpriteSpecs);
 
-void clearSpriteSpecs(struct SpriteSpecs *s);
-void loadSpriteSpecs(struct SpriteSpecs *s, FILE *fp);
+void clearSpriteSpecs(struct SpriteSpecsList *s);
+void loadSpriteSpecs(struct SpriteSpecsList *s, FILE *fp);
 
-bool validateSpriteSpecs(const struct SpriteSpecs *t);
+bool validateSpriteSpecs(const struct SpriteSpecsList *t);
 
 #endif /*SPRITE_SPECS_H*/

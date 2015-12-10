@@ -31,7 +31,6 @@ void editor_createMap_clicked( struct SDLGUI_Element *from) {
 		void (*callback)() = from->userData;
 
 		SDLGUI_Layer_Remove();
-		SDLGUI_Refresh();
 
 		callback();
 	}

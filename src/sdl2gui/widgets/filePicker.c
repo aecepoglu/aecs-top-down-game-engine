@@ -52,11 +52,16 @@ void minimizePath(char *path) {
 		slashCount -= 2;
 	}
 
-	sprintf(path, "%s", tokens[0]);
+	char tmpPath[256];
+
+	strcpy(tmpPath, tokens[0]);
 	for (i=1; i<slashCount; i++) {
-		sprintf(path, "%s/%s", path, tokens[i]);
+		strcat(tmpPath, "/");
+		strcat(tmpPath, tokens[i]);
 	}
-	sprintf(path, "%s/", path);
+	strcat(tmpPath, "/");
+
+	strcpy(path, tmpPath);
 
 	free(tokens);
 }
@@ -82,6 +87,7 @@ void aFile_Clicked( struct SDLGUI_Element *e) {
 		destroyDirectory(currentDir);
 
 		openDir(buf);
+		SDLGUI_Refresh();
 	}
 }
 

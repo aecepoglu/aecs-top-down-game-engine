@@ -82,19 +82,19 @@ SDL_Texture*** loadTexturesIntoTable( SDL_Renderer *ren, SDL_Texture **list, int
 	return table;
 }
 
-struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const char *path) {
-    log1( "\tLoading sheet %s\n", path);
-	SDL_Surface *img = IMG_Load( path);
+struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const struct SpriteSpec *spec) {
+	log1("\tLoading sheet %s\n", spec->path);
+	SDL_Surface *img = IMG_Load(spec->path);
 	assert( img != NULL);
 
-	int numRotations = img->w / SPRITE_TILE_LEN;
-	int numStates = img->h / SPRITE_TILE_LEN;
+	int numRotations = img->w / spec->width;
+	int numStates = img->h / spec->height;
 	assert(numStates >= 2);
 	log1( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 
 	struct TextureSheet *result = (struct TextureSheet*)malloc( sizeof( struct TextureSheet));
 
-	SDL_Texture **texturesList = loadTextureSheet( ren, img, numStates, numRotations, SPRITE_TILE_LEN, SPRITE_TILE_LEN);
+	SDL_Texture **texturesList = loadTextureSheet( ren, img, numStates, numRotations, spec->width, spec->height);
 
 	result->numStates = numStates;
 	result->textures = loadTexturesIntoTable( ren, texturesList, numStates*numRotations, numStates, 4);
@@ -157,19 +157,19 @@ struct GameTextures* loadOrdinaryTextures( SDL_Renderer *ren) {
 	return result;
 }
 
-void loadObjectTextures( SDL_Renderer *ren, struct GameTextures *textures, const struct SpriteSpecs *texturePaths) {
+void loadObjectTextures( SDL_Renderer *ren, struct GameTextures *textures, const struct SpriteSpecsList *specsList) {
 	log1("Loading obj textures\n");
 
-	textures->obj = calloc( texturePaths->size, sizeof(struct TextureSheet*));
+	textures->obj = calloc(specsList->size, sizeof(struct TextureSheet*));
 
 	int i;
-	for( i=0; i<texturePaths->size; i++)
-		if( texturePaths->array[i] != NULL)
-			textures->obj[i] = loadObjTextures( ren, texturePaths->array[i]);
+	for( i=0; i<specsList->size; i++)
+		if(specsList->array[i] != NULL)
+			textures->obj[i] = loadObjTextures(ren, specsList->array[i]);
 		else
 			textures->obj[i] = NULL;
 	
-	textures->objsCount = texturePaths->size;
+	textures->objsCount = specsList->size;
 }
 
 void texture_freeTextureSheet( struct TextureSheet *sheet) {

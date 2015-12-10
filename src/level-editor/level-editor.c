@@ -20,7 +20,7 @@ bool turnRight( struct Map *map, struct object* obj) { return false; }
 #define GUI_LEFTPANEL_WIDTH 192
 #define GUI_TOPBAR_HEIGHT 32
 bool isMessageBoxOn = false;
-struct SpriteSpecs *spriteSpecs = NULL;
+struct SpriteSpecsList *spriteSpecs = NULL;
 
 
 struct {

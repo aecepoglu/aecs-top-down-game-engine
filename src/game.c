@@ -32,7 +32,7 @@ int vi_padding, vj_padding;
 enum terrainType **playerVisibleTiles;
 struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
 int objsSeenCount;
-struct SpriteSpecs *spriteSpecs;
+struct SpriteSpecsList *spriteSpecs;
 
 
 const Uint32 timerDelay = 100 /*miliseconds*/;

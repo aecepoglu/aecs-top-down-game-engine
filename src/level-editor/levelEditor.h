@@ -5,7 +5,7 @@
 #include "../core/engine.h"
 
 
-extern struct SpriteSpecs *spriteSpecs;
+extern struct SpriteSpecsList *spriteSpecs;
 
 
 void buttonQuit_clicked( struct SDLGUI_Element *from);
