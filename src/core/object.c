@@ -24,6 +24,9 @@ struct object* createObject( enum objType type, unsigned int x, unsigned int y, 
 	obj->attack = 1;
 	obj->defence = 1;
 
+	obj->width = 1;
+	obj->height = 1;
+
 	obj->timerCounter= 0;
 	obj->isDeleted=false;
 	obj->visualState = 1;
@@ -47,18 +50,20 @@ void writeObject( FILE *fp, struct object *obj) {
 	fwrite( &obj->isPickable, 	sizeof(bool),		1, fp);
 	fwrite( &obj->attack, 		sizeof(uint8_t), 	1, fp);
 	fwrite( &obj->defence, 		sizeof(uint8_t), 	1, fp);
+
+	fwrite (&obj->width,            sizeof(int),            1, fp);
+	fwrite (&obj->height,           sizeof(int),            1, fp);
 }
 
 struct object* readObject( FILE *fp) {
 	struct object *obj = (struct object*)malloc(sizeof(struct object));
 	readToVector( fp, &obj->pos);
-	fread( &obj->textureId, sizeof(int),   1, fp);
-	fread( &obj->dir,  sizeof(enum direction), 1, fp);
+	fread( &obj->textureId,         sizeof(int),            1, fp);
+	fread( &obj->dir,               sizeof(enum direction), 1, fp);
 	enum AIType type;
-	fread( &type,      sizeof(enum AIType),    1, fp);
-	obj->ai = type != 0 ? AI_CREATE( type) : 0;
+	fread( &type,                   sizeof(enum AIType),    1, fp);
 
-	fread( &obj->id, sizeof( int), 1, fp);
+	fread( &obj->id,                sizeof( int),           1, fp);
 
 	fread( &obj->health,		sizeof(uint8_t),	1, fp);
 	fread( &obj->maxHealth,		sizeof(uint8_t),	1, fp);
@@ -66,6 +71,19 @@ struct object* readObject( FILE *fp) {
 	fread( &obj->isPickable,	sizeof(bool),		1, fp);
 	fread( &obj->attack,		sizeof(uint8_t),	1, fp);
 	fread( &obj->defence,		sizeof(uint8_t),	1, fp);
+
+	fread(&obj->width,              sizeof(int),            1, fp);
+	fread(&obj->height,             sizeof(int),            1, fp);
+
+	if (obj->width > 1 || obj->height > 1) {
+		obj->isMovable = false;
+		obj->isPickable = false;
+		obj->ai = NULL;
+	}
+	else {
+		obj->ai = type != 0 ? AI_CREATE( type) : 0;
+	}
+
 
 	obj->type = go_npc;
 	obj->timerCounter= 0;

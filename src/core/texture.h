@@ -11,6 +11,9 @@
 struct TextureSheet {
 	SDL_Texture ***textures;
 	int numStates;
+
+	int spriteWidth;
+	int spriteHeight;
 };
 
 struct GameTextures {

@@ -97,6 +97,8 @@ struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const struct SpriteSpec
 	SDL_Texture **texturesList = loadTextureSheet( ren, img, numStates, numRotations, spec->width, spec->height);
 
 	result->numStates = numStates;
+	result->spriteWidth = spec->width;
+	result->spriteHeight = spec->height;
 	result->textures = loadTexturesIntoTable( ren, texturesList, numStates*numRotations, numStates, 4);
 
 	free( texturesList);

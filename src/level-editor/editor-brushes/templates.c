@@ -49,7 +49,7 @@ void createTemplateButton( int templateIndex, const struct ObjectTemplate *t, SD
 
 
 void addTemplate_clicked( struct SDLGUI_Element *e) {
-    brush.fun = editor_selectObj;
+	brush.fun = editor_move;
 	if( *selectedObjectPtr == NULL)
 		return;
 	struct SDLGUI_Element *panel = panels.list;

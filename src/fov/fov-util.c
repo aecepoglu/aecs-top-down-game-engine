@@ -74,7 +74,24 @@ void free_fovBase( struct FOVBase **fovBase) {
 	}
 }
 
-void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tiles, int range, struct ViewObject *objsSeen, int *objsSeenCount) {
+void setFovViewObject(struct ViewObject *vo, struct object *obj, bool isFullySeen, int seenPosX, int seenPosY, int worldX, int worldY, struct TextureSheet **sprites) {
+	vo->obj = obj;
+	vo->isFullySeen = isFullySeen;
+	vo->pos.i = seenPosX;
+	vo->pos.j = seenPosY;
+
+	float unitWidth =
+		(float)sprites[obj->textureId]->spriteWidth / (float)obj->width;
+	float unitHeight =
+		(float)sprites[obj->textureId]->spriteHeight / (float)obj->height;
+
+	vo->srcRect.w = unitWidth;
+	vo->srcRect.h = unitHeight;
+	vo->srcRect.x = (worldX - obj->pos.i) * unitWidth;
+	vo->srcRect.y = (worldY - obj->pos.j) * unitHeight;
+}
+
+void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tiles, int range, struct ViewObject *objsSeen, int *objsSeenCount, struct TextureSheet **sprites) {
 	*objsSeenCount = 0;
 
 	int i,j;
@@ -93,12 +110,11 @@ void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tile
 					&& mapPos.i<map->width && mapPos.j<map->height 
 					&& map->objs[ mapPos.i][ mapPos.j] != NULL)
 				{
-					struct ViewObject *vo = &objsSeen[ *objsSeenCount];
-
-					vo->obj =  map->objs[ mapPos.i][ mapPos.j];
-					vo->isFullySeen = base->lowerLimVisible && base->upperLimVisible;
-					vo->pos.i = i;
-					vo->pos.j = j;
+					setFovViewObject( &objsSeen[ *objsSeenCount],
+						map->objs[ mapPos.i ][ mapPos.j ],
+						base->lowerLimVisible && base->upperLimVisible,
+						i, j, mapPos.i, mapPos.j, sprites
+					);
 
 					*objsSeenCount = *objsSeenCount +1;
 				}

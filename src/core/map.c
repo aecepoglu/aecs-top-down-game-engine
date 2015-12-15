@@ -56,13 +56,17 @@ struct Map* readMapFile( const char *path) {
 	log1("reading objects-list. count %d size %d\n", m->objListCount, m->objListSize);
 	
 	//read the objList
+	int i, j;
 	for( x=0; x< m->objListCount; x++) {
 		struct object *obj = readObject( fp);
 
 		m->objList[x] = obj;
 
 		//setup pointers from the map->objs to objList items
-		m->objs[ obj->pos.i][ obj->pos.j] = obj;
+		for (i = obj->pos.i; i < obj->pos.i + obj->width; i ++)
+			for (j = obj->pos.j; j < obj->pos.j + obj->height; j ++)
+				m->objs[i][j] = obj;
+
 	}
 	log1( "width %d\nheight %d\n", m->width, m->height);
 	

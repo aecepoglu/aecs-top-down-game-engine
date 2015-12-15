@@ -2,12 +2,11 @@
 #include "../util/log.h"
 #include "../definitions.h"
 
-void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount) {
+void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct TextureSheet **sprites, struct ViewObject *objsSeen, int *objsSeenCount) {
 	log2("fov_diamond\n");
 	int i,j;
 	int mapX, mapY;
 	int distance;
-	struct ViewObject *vo;
 
 	*objsSeenCount=0;
 	bool tileSeen = false;
@@ -22,13 +21,13 @@ void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int 
 				tileSeen = true;
 
 				if( map->objs[ mapX][ mapY] != NULL) {
-					vo = &(objsSeen[*objsSeenCount]);
-					*objsSeenCount = *objsSeenCount + 1;
+					setFovViewObject(
+						&(objsSeen[*objsSeenCount]),
+						map->objs[mapX][mapY],
+						true, i, j, mapX, mapY, sprites
+					);
 
-					vo->obj = map->objs[ mapX][ mapY];
-					vo->isFullySeen = true;
-					vo->pos.i = i;
-					vo->pos.j = j;
+					*objsSeenCount = *objsSeenCount + 1;
 				}
 			}
 			else {

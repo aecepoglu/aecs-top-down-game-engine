@@ -38,6 +38,9 @@ struct object {
 	uint8_t attack;
 	uint8_t defence;
 
+	unsigned int width;
+	unsigned int height;
+
 	struct {
 		int onInteract;
 		int onEaten;

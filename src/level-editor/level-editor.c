@@ -46,52 +46,49 @@ struct {
 
 #define SHOW_TOOLTIP( x, y, text) if(x>=viewPos.i && y>=viewPos.j && x<viewEnd.i && y<viewEnd.j) SDLGUI_Show_Tooltip( (x-viewPos.i)*TILELEN + GUI_LEFTPANEL_WIDTH, (y-viewPos.j)*TILELEN + GUI_TOPBAR_HEIGHT, text)
 
-
-/* ---------------------------
-	Brush Functions
+/* --------------------------
+	Helper Functions
 */
 
-bool editor_removeObject( unsigned int x, unsigned int y, int type) {
-	if( myMap->objs[x][y] != 0) {
-		myMap->objs[x][y]->isDeleted = true;
-		myMap->objs[x][y] = NULL;
-		return true;
+bool checkMapIfClear (unsigned int x0, unsigned int y0, unsigned int w, unsigned int h, const struct object *ignoredObj) {
+	int x,y;
+	for (x = x0; x < MIN(myMap->width, x0 + w); x++) {
+		for (y = y0; y < MIN(myMap->height, y0+h); y++) {
+			if (myMap->tiles[x][y] == terrain_wall ||
+			    (myMap->objs[x][y] != NULL && myMap->objs[x][y] != ignoredObj)) {
+			    	printf("unclear at %d,%d\n", x, y);
+
+			    	return false;
+			}
+		}
 	}
-	else
-		return false;
+	return true;
 }
 
-bool editor_applyTemplate( unsigned int x, unsigned int y, int type) {
-	if( myMap->objs[x][y] != 0
-	 && template_apply( myMap->objs[x][y], type)
-	) {
-		editor_selectObj( x, y, 0);
+void unsetObjectMap(struct Map *map, const struct object *obj) {
+	int i, j;
 
-		SHOW_TOOLTIP( x, y, "Updated");
-
-		return true;
-	}
-	else
-		return false;
+	for (i=obj->pos.i; i < obj->pos.i + obj->width; i++)
+		for (j=obj->pos.j; j < obj->pos.j + obj->height; j ++)
+			map->objs[i][j] = NULL;
 }
 
-bool editor_drawTerrain( unsigned int x, unsigned int y, int type){
-	if( myMap->tiles[x][y] != type && myMap->objs[x][y]==NULL) {
-		myMap->tiles[x][y] = type;
-		return true;
-	}
-	else
-		return false;
+void setObjectMap(struct Map *map, struct object *obj) {
+	int i, j;
+
+	for (i=obj->pos.i; i < obj->pos.i + obj->width; i++)
+		for (j=obj->pos.j; j < obj->pos.j + obj->height; j ++)
+			map->objs[i][j] = obj;
 }
 
-bool editor_selectObj( unsigned int x, unsigned int y, int type) {
+bool editor_selectObj (unsigned int x, unsigned int y) {
 	selectedObjStuff.obj = myMap->objs[x][y];
 
 	char tmp[4];
 	if( selectedObjStuff.obj != NULL) {
 		selectedObjStuff.panel->isVisible = true;
 
-    	sprintf(tmp, "%d", selectedObjStuff.obj->id);
+		sprintf(tmp, "%d", selectedObjStuff.obj->id);
 		SDLGUI_SetText_Textbox( selectedObjStuff.textboxes.id, tmp);
 
 		sprintf(tmp, "%d", selectedObjStuff.obj->health);
@@ -138,6 +135,45 @@ bool editor_selectObj( unsigned int x, unsigned int y, int type) {
 	return true;
 }
 
+
+
+/* ---------------------------
+	Brush Functions
+*/
+
+bool editor_removeObject( unsigned int x, unsigned int y, int type) {
+	if( myMap->objs[x][y] != 0) {
+		myMap->objs[x][y]->isDeleted = true;
+		myMap->objs[x][y] = NULL;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool editor_applyTemplate( unsigned int x, unsigned int y, int type) {
+	if( myMap->objs[x][y] != 0
+	 && template_apply( myMap->objs[x][y], type)
+	) {
+		editor_selectObj(x, y);
+
+		SHOW_TOOLTIP( x, y, "Updated");
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool editor_drawTerrain( unsigned int x, unsigned int y, int type){
+	if( myMap->tiles[x][y] != type && myMap->objs[x][y]==NULL) {
+		myMap->tiles[x][y] = type;
+		return true;
+	}
+	else
+		return false;
+}
+
 bool editor_createObj( unsigned int x, unsigned int y, int type){
 	//add objects only if there is no object there
 	if( myMap->tiles[x][y]==terrain_wall)
@@ -150,7 +186,7 @@ bool editor_createObj( unsigned int x, unsigned int y, int type){
 
 
 	addObject( obj, myMap, x, y);
-	editor_selectObj( x, y, type);
+	editor_selectObj(x, y);
 
 	char tooltipText[8];
 	sprintf( tooltipText, "#%d", obj->id);
@@ -180,7 +216,7 @@ bool editor_drawAI( unsigned int x, unsigned int y, int type) {
 			ai->type = type;
 			myMap->objs[x][y]->ai = ai;
 		}
-		editor_selectObj( x, y, 0);
+		editor_selectObj(x, y);
 		SHOW_TOOLTIP( x, y, "AI put");
 		return true;
 	}
@@ -188,20 +224,28 @@ bool editor_drawAI( unsigned int x, unsigned int y, int type) {
 	return false;
 }
 
-bool editor_moveObject( unsigned int x, unsigned int y, int type) {
+bool editor_move( unsigned int x, unsigned int y, int type) {
 	if( brush.isRepeat ) {
 		int oldX = selectedObjStuff.obj->pos.i;
 		int oldY = selectedObjStuff.obj->pos.j;
-		if( (x != oldX || y != oldY) && myMap->objs[x][y] == NULL && myMap->tiles[x][y] != terrain_wall) {
-			myMap->objs[oldX][oldY] = NULL;
-			myMap->objs[x][y] = selectedObjStuff.obj;
+		if ((x != oldX || y != oldY) &&
+		    checkMapIfClear(x, y,
+		                    selectedObjStuff.obj->width,
+		                    selectedObjStuff.obj->height,
+				    selectedObjStuff.obj)) {
+
+			unsetObjectMap(myMap, selectedObjStuff.obj);
+
 			selectedObjStuff.obj->pos.i = x;
 			selectedObjStuff.obj->pos.j = y;
+
+			setObjectMap(myMap, selectedObjStuff.obj);
+
 			return true;
 		}
 	}
 	else {
-		selectedObjStuff.obj = myMap->objs[x][y];
+		editor_selectObj(x, y);
 
 		if( selectedObjStuff.obj != NULL)
 			brush.isRepeat = true;
@@ -212,8 +256,34 @@ bool editor_moveObject( unsigned int x, unsigned int y, int type) {
 bool editor_rotate( unsigned int x, unsigned int y, int type) {
 	if( brush.isRepeat ) {
 		enum direction newDir = vector_dirTan( y - selectedObjStuff.obj->pos.j, x - selectedObjStuff.obj->pos.i);
-		if( selectedObjStuff.obj->dir != newDir) {
+
+		int newWidth, newHeight;
+
+		if ((newDir - selectedObjStuff.obj->dir + 4) %2 != 0) {
+			newWidth = selectedObjStuff.obj->height;
+			newHeight = selectedObjStuff.obj->width;
+		}
+		else {
+			newWidth = selectedObjStuff.obj->width;
+			newHeight = selectedObjStuff.obj->height;
+		}
+
+		if ((x != selectedObjStuff.obj->pos.i || y != selectedObjStuff.obj->pos.j) &&
+		    selectedObjStuff.obj->dir != newDir && 
+		    checkMapIfClear(selectedObjStuff.obj->pos.i,
+		                    selectedObjStuff.obj->pos.j,
+				    newWidth, newHeight,
+				    selectedObjStuff.obj)) {
+
 			selectedObjStuff.obj->dir = newDir;
+
+			unsetObjectMap(myMap, selectedObjStuff.obj);
+
+			selectedObjStuff.obj->width = newWidth;
+			selectedObjStuff.obj->height = newHeight;
+
+			setObjectMap(myMap, selectedObjStuff.obj);
+
 			return true;
 		}
 	}
@@ -221,6 +291,40 @@ bool editor_rotate( unsigned int x, unsigned int y, int type) {
 		selectedObjStuff.obj = myMap->objs[x][y];
 
 		if( selectedObjStuff.obj != NULL) {
+			brush.isRepeat = true;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool editor_resize( unsigned int x, unsigned int y, int type) {
+	if (brush.isRepeat) {
+		int width = x - selectedObjStuff.obj->pos.i + 1;
+		int height = y - selectedObjStuff.obj->pos.j + 1;
+
+		if ((width != selectedObjStuff.obj->width ||
+		     height != selectedObjStuff.obj->height) && 
+		    width > 0 && height > 0 &&
+		    checkMapIfClear(selectedObjStuff.obj->pos.i,
+		                    selectedObjStuff.obj->pos.j,
+				    width, height,
+				    selectedObjStuff.obj)) {
+
+			unsetObjectMap(myMap, selectedObjStuff.obj);
+
+			selectedObjStuff.obj->width = width;
+			selectedObjStuff.obj->height = height;
+
+			setObjectMap(myMap, selectedObjStuff.obj);
+
+			return true;
+		}
+	}
+	else {
+		selectedObjStuff.obj = myMap->objs[x][y];
+
+		if (selectedObjStuff.obj != NULL) {
 			brush.isRepeat = true;
 			return true;
 		}
@@ -566,10 +670,13 @@ void drawObjects( SDL_Rect *r) {
 					(obj->textureId < 0 || obj->textureId >= textures->objsCount || textures->obj[obj->textureId] == NULL)
 						? textures->unidentifiedObj
 						: textures->obj[obj->textureId]->textures[ obj->visualState][obj->dir],
-					screenPos.i*TILELEN + r->x, screenPos.j*TILELEN + r->y, TILELEN, TILELEN );
+					screenPos.i*TILELEN + r->x, screenPos.j*TILELEN + r->y,
+					TILELEN * obj->width, TILELEN * obj->height );
 
 				if( obj == selectedObjStuff.obj) {
-					drawTexture( renderer, textures->highlitObjIndicator, screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT, TILELEN, TILELEN);
+					drawTexture (renderer, textures->highlitObjIndicator,
+					             screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT,
+						     TILELEN * selectedObjStuff.obj->width, TILELEN * selectedObjStuff.obj->height);
 				}
 			}
 		}
@@ -605,13 +712,8 @@ void hideAll() {
 	brushOptionPanels.texture->isVisible = false;
 }
 
-void button_select_clicked( struct SDLGUI_Element *e) {
-	brush.fun = editor_selectObj;
-	hideAll();
-}
-
 void button_move_clicked( struct SDLGUI_Element *e) {
-	brush.fun = editor_moveObject;
+	brush.fun = editor_move;
 	brush.variant = 0;
 	hideAll();
 	brushOptionPanels.move->isVisible = true;
@@ -622,6 +724,11 @@ void button_rotate_clicked( struct SDLGUI_Element *e) {
 	brush.variant = 0;
 	hideAll();
 	brushOptionPanels.rotate->isVisible = true;
+}
+
+void button_resize_clicked( struct SDLGUI_Element *e) {
+	brush.fun = editor_resize;
+	hideAll();
 }
 
 void button_terrain_clicked( struct SDLGUI_Element *e) {
@@ -650,10 +757,10 @@ void button_remove_clicked( struct SDLGUI_Element *e) {
 }
 
 void button_template_clicked( struct SDLGUI_Element *e) {
-    brush.fun = editor_selectObj;
-    brush.variant = 0;
-    hideAll();
-    brushOptionPanels.templates->isVisible = true;
+	brush.fun = editor_move;
+	brush.variant = 0;
+	hideAll();
+	brushOptionPanels.templates->isVisible = true;
 }
 
 void button_texture_clicked( struct SDLGUI_Element *e) {
@@ -728,15 +835,15 @@ void initGui() {
 		SDLGUI_Clicked *onClick;
 	};
 	struct buttonTemplate buttonTemplates[] = {
-		{"res/editor/select.png", 	button_select_clicked},
-		{"res/editor/move.png", 	button_move_clicked},
-		{"res/editor/rotate.png", 	button_rotate_clicked},
-		{"res/editor/terrain.png",	button_terrain_clicked},
-		{"res/editor/object.png", 	button_object_clicked},
-		{"res/editor/ai.png", 		button_ai_clicked},
-		{"res/editor/delete.png", 	button_remove_clicked},
-		{"res/editor/template.png", button_template_clicked},
-		{"res/editor/object.png", 	button_texture_clicked},
+		{"res/editor/move.png",         button_move_clicked},
+		{"res/editor/rotate.png",       button_rotate_clicked},
+		{"res/editor/resize.png",       button_resize_clicked},
+		{"res/editor/terrain.png",      button_terrain_clicked},
+		{"res/editor/object.png",       button_object_clicked},
+		{"res/editor/ai.png",           button_ai_clicked},
+		{"res/editor/delete.png",       button_remove_clicked},
+		{"res/editor/template.png",     button_template_clicked},
+		{"res/editor/object.png",       button_texture_clicked},
 	};
 
 	struct SDLGUI_Element *buttonsContainer = SDLGUI_Create_Panel( (SDL_Rect){.x=10, .y=100, .w=GUI_LEFTPANEL_WIDTH-2*10, .h= buttonLeftMargin + ((sizeof(buttonTemplates) / sizeof(struct buttonTemplate) - 1) / buttonsPerRow + 1) * buttonSizeWithMargins}, panelParams);
@@ -861,12 +968,12 @@ void mapLoaded() {
 int main( int argc, char *args[]) {
 	//Default values
 	myMap = 0;
-	brush.fun = editor_selectObj;
+	brush.fun = editor_move;
 	brush.isRepeat =  false;
-    templates_load();
+	templates_load();
 
 	init( GUI_LEFTPANEL_WIDTH, GUI_TOPBAR_HEIGHT, 1280, 960);
-    log0("loading textures\n");
+	log0("loading textures\n");
 	textures = loadOrdinaryTextures( renderer);
 	SDLGUI_Init( window, renderer, textures->font);
 	initGui();

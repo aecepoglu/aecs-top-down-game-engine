@@ -2,7 +2,8 @@
 #include "../util/log.h"
 #include "../definitions.h"
 
-void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount) {
+//FIXME use setFovViewObject(...) in here
+void fov_line(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct TextureSheet **sprites, struct ViewObject *objsSeen, int *objsSeenCount) {
 	log2("fov_line\n");
 	int i,j;
 	for( i=0; i<VIEW_BOX_LENGTH; i++) {

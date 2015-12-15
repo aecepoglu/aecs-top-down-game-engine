@@ -38,7 +38,7 @@ struct SpriteSpecsList *spriteSpecs;
 const Uint32 timerDelay = 100 /*miliseconds*/;
 
 
-#define CALL_FOV_FCN() currentFov( myMap, &player->pos, player->dir, viewRange, playerVisibleTiles, objsSeen, &objsSeenCount)
+#define CALL_FOV_FCN() currentFov( myMap, &player->pos, player->dir, viewRange, playerVisibleTiles, textures->obj, objsSeen, &objsSeenCount)
 #define PLAYER_DISTANCE( pos1) (abs( (pos1)->i - player->pos.i) + abs( (pos1)->j - player->pos.j))
 
 
@@ -430,17 +430,21 @@ void draw() {
 			}
 		}
 				
+	SDL_Rect destRect = (SDL_Rect){ .w = TILELEN, .h = TILELEN };
 	struct ViewObject *vo;
 	for( i=0; i<objsSeenCount; i++) {
 		vo = &objsSeen[ i];
 
 		#ifndef GOD_VISION
-		drawTexture( renderer, 
-			vo->isFullySeen
-				? textures->obj[ vo->obj->textureId ]->textures[ vo->obj->visualState][ vo->obj->dir]
-				: textures->unidentifiedObj, 
-			(vi_padding + vo->pos.i)*TILELEN, (vj_padding + vo->pos.j)*TILELEN, TILELEN, TILELEN
-		);
+
+		destRect.x = (vi_padding + vo->pos.i)*TILELEN;
+		destRect.y = (vj_padding + vo->pos.j)*TILELEN;
+
+		SDL_RenderCopy(renderer, 
+		               vo->isFullySeen
+		                ? textures->obj[ vo->obj->textureId ]->textures[ vo->obj->visualState][ vo->obj->dir]
+		                : textures->unidentifiedObj, 
+		               &vo->srcRect, &destRect);
 		#endif
 		
 		if( vo->obj->ai)
@@ -506,7 +510,7 @@ void update() {
 		free( newObjList);
 	}
 
-	getFovObjects( myMap, &player->pos, playerVisibleTiles, VIEW_RANGE, objsSeen, &objsSeenCount);
+	getFovObjects( myMap, &player->pos, playerVisibleTiles, VIEW_RANGE, objsSeen, &objsSeenCount, textures->obj);
 
 	playerMoved = false;
 }
@@ -623,7 +627,7 @@ void setDefaults() {
 	int i;
 	for( i=0; i< PLAYER_FOV_TILES_LIM; i++)
 		playerVisibleTiles[i] = (enum terrainType*) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType));
-
+	
 	init_fovBase( VIEW_RANGE);
 
 	inventory_reset( false);

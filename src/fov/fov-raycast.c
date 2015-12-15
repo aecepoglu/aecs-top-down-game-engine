@@ -25,7 +25,7 @@ void fov_castLight( struct FOVBase *from, struct FOVBase *to) {
 		: to->maxLit[1];
 }
 
-void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, int range, enum terrainType **tiles, struct ViewObject *objsSeen, int *objsSeenCount) {
+void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, int range, enum terrainType **tiles, struct TextureSheet **sprites, struct ViewObject *objsSeen, int *objsSeenCount) {
 	log2("fov_raycast from pos (%d,%d) with dir %d\n", pos->i, pos->j, objDir);
 
 	int i,j,dir;
@@ -68,10 +68,11 @@ void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, in
 		tiles[ tilePos.i][ tilePos.j] = map->tiles[ mapPos.i][ mapPos.j];
 
 		if( map->objs[ mapPos.i][ mapPos.j] != NULL) {
-			struct ViewObject *vo = &objsSeen[ *objsSeenCount];
-			vo->isFullySeen = node->lowerLimVisible && node->upperLimVisible;
-			vo->obj = map->objs[ mapPos.i][ mapPos.j];
-			vectorClone( &vo->pos, &tilePos);
+			setFovViewObject( &objsSeen[ *objsSeenCount],
+				map->objs[ mapPos.i][ mapPos.j],
+				node->lowerLimVisible && node->upperLimVisible,
+				tilePos.i, tilePos.j, mapPos.i, mapPos.j, sprites
+			);
 			*objsSeenCount = *objsSeenCount + 1;
 		}
 

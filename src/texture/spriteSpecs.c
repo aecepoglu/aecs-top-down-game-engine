@@ -6,8 +6,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
-#define DELIMETER " ;:\t\n"
+#define DELIMETER " ;:\t"
 
 char *calculateSpriteSpecsFilePath( const char *file) {
 	char *dirPath = getDirPath( file);
@@ -49,6 +50,9 @@ void loadSpriteSpecs( struct SpriteSpecsList *t, FILE *fp) {
 	unsetSpriteSpecs( t, 0, 64);
 	
 	while (fgets(buf, BUFSIZ, fp)) {
+		if (buf[strlen(buf) - 1] == '\n')
+			buf[strlen(buf) - 1] = '\0';
+
 		struct SpriteSpec *sprite = (struct SpriteSpec*)malloc(sizeof(struct SpriteSpec));
 
 		string = strtok(buf, DELIMETER);
@@ -70,6 +74,8 @@ void loadSpriteSpecs( struct SpriteSpecsList *t, FILE *fp) {
 			sprite->width = 16;
 			sprite->height = 16;
 		}
+
+		assert(sprite->width == sprite->height);
 
 		if (sprite->id >= t->size) {
 			t->size += 64;
