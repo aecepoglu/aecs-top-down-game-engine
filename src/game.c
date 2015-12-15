@@ -432,17 +432,20 @@ void draw() {
 				
 	SDL_Rect destRect = (SDL_Rect){ .w = TILELEN, .h = TILELEN };
 	struct ViewObject *vo;
+	struct TextureSheet *ts;
 	for( i=0; i<objsSeenCount; i++) {
 		vo = &objsSeen[ i];
+		ts = textures->obj[vo->obj->textureId];
 
 		#ifndef GOD_VISION
 
 		destRect.x = (vi_padding + vo->pos.i)*TILELEN;
-		destRect.y = (vj_padding + vo->pos.j)*TILELEN;
+		destRect.y = (vj_padding + vo->pos.j - ts->tallness + 1)*TILELEN;
+		destRect.h = TILELEN * ts->tallness;
 
 		SDL_RenderCopy(renderer, 
 		               vo->isFullySeen
-		                ? textures->obj[ vo->obj->textureId ]->textures[ vo->obj->visualState][ vo->obj->dir]
+		                ? ts->textures[ vo->obj->visualState][ vo->obj->dir]
 		                : textures->unidentifiedObj, 
 		               &vo->srcRect, &destRect);
 		#endif

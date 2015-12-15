@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 #define DELIMETER " ;:\t"
 
@@ -69,13 +68,21 @@ void loadSpriteSpecs( struct SpriteSpecsList *t, FILE *fp) {
 
 			string = strtok(NULL, DELIMETER);
 			sprite->height = atoi(string);
+
+			string = strtok(NULL, DELIMETER);
+
+			if (string) {
+				sprite->tallness = atoi(string);
+			}
+			else {
+				sprite->tallness = 1;
+			}
 		}
 		else {
 			sprite->width = 16;
 			sprite->height = 16;
+			sprite->tallness = 1;
 		}
-
-		assert(sprite->width == sprite->height);
 
 		if (sprite->id >= t->size) {
 			t->size += 64;

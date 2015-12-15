@@ -10,6 +10,7 @@ struct SpriteSpec {
 
 	int width;
 	int height;
+	int tallness;
 };
 
 struct SpriteSpecsList {

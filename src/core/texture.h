@@ -14,6 +14,7 @@ struct TextureSheet {
 
 	int spriteWidth;
 	int spriteHeight;
+	int tallness;
 };
 
 struct GameTextures {
