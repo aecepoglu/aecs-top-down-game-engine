@@ -11,6 +11,7 @@
 
 bool running;
 unsigned int objectCounter = 1;
+unsigned int removedObjectCounter = 0;
 
 bool moveForward( struct Map *map, struct object* obj) { return false; }
 bool turnLeft( struct Map *map, struct object *obj) { return false; }
@@ -143,8 +144,32 @@ bool editor_selectObj (unsigned int x, unsigned int y) {
 
 bool editor_removeObject( unsigned int x, unsigned int y, int type) {
 	if( myMap->objs[x][y] != 0) {
+		if (selectedObjStuff.obj == myMap->objs[x][y])
+			selectedObjStuff.obj = NULL;
+
 		myMap->objs[x][y]->isDeleted = true;
-		myMap->objs[x][y] = NULL;
+		unsetObjectMap(myMap, myMap->objs[x][y]);
+
+		removedObjectCounter ++;
+		
+		if (removedObjectCounter > 8 &&
+		    removedObjectCounter * 4 >= myMap->objListSize) {
+
+			int indexToPut = 0;
+			int i;
+			for (i = 0; i < myMap->objListCount; i++) {
+				if (myMap->objList[i]->isDeleted != true) {
+					myMap->objList[indexToPut] = myMap->objList[i];
+					indexToPut ++;
+				}
+				else {
+					objectFree(myMap->objList[i]);
+				}
+			}
+
+			myMap->objListCount -= removedObjectCounter;
+			removedObjectCounter = 0;
+		}
 		return true;
 	}
 	else
@@ -651,41 +676,47 @@ void run() {
 
 /* Draws the map and objects viewed on screen */
 void drawObjects( SDL_Rect *r) {
-	unsigned i;
-	struct Vector screenPos;
 	struct object *obj;
 
-	struct object **newObjList = (struct object**)calloc( myMap->objListSize, sizeof( struct object*));
-	int newCount = 0;
+	int mapX, mapY;
+	for (mapX = viewPos.i; mapX < viewPos.i + MIN(viewSize.i, myMap->width); mapX ++) {
+		for (mapY = viewPos.j; mapY < viewPos.j + MIN(viewSize.j, myMap->height); mapY ++) {
+			if (myMap->objs[mapX][mapY]) {
+				obj = myMap->objs[mapX][mapY];
 
-	for( i=0; i<myMap->objListCount; i++) {
-		obj = myMap->objList[i];
-		if( ! obj->isDeleted) {
-			newObjList[ newCount] = obj;
-			newCount ++;
+				struct TextureSheet *sheet = (obj->textureId < 0 || obj->textureId >= textures->objsCount) ? NULL : textures->obj[obj->textureId];
+				int tallness = sheet ? sheet->tallness : 1;
 
-			vectorSub( &screenPos, &myMap->objList[i]->pos, &viewPos );
-			if( screenPos.i>=0 && screenPos.j>=0 && screenPos.i<viewSize.i && screenPos.j<viewSize.j ) {
-				drawTexture( renderer,
-					(obj->textureId < 0 || obj->textureId >= textures->objsCount || textures->obj[obj->textureId] == NULL)
-						? textures->unidentifiedObj
-						: textures->obj[obj->textureId]->textures[ obj->visualState][obj->dir],
-					screenPos.i*TILELEN + r->x, screenPos.j*TILELEN + r->y,
-					TILELEN * obj->width, TILELEN * obj->height );
-
-				if( obj == selectedObjStuff.obj) {
-					drawTexture (renderer, textures->highlitObjIndicator,
-					             screenPos.i*TILELEN + GUI_LEFTPANEL_WIDTH, screenPos.j*TILELEN + GUI_TOPBAR_HEIGHT,
-						     TILELEN * selectedObjStuff.obj->width, TILELEN * selectedObjStuff.obj->height);
-				}
+				float unitWidth =
+					(sheet ? (float)sheet->spriteWidth : 16) / obj->width;
+				float unitHeight =
+					(sheet ? (float)sheet->spriteHeight : 16) / obj->height;
+				
+				SDL_RenderCopy(
+					renderer,
+					sheet ? sheet->textures[obj->visualState][obj->dir] : textures->unidentifiedObj,
+					&(SDL_Rect) {
+						.x = (mapX - obj->pos.i) * unitWidth,
+						.y = (mapY - obj->pos.j) * unitHeight,
+						.w = unitWidth,
+						.h = unitHeight
+					},
+					&(SDL_Rect) {
+						.x = (mapX - viewPos.i)*TILELEN + r->x,
+						.y = (mapY - viewPos.j - tallness + 1)*TILELEN + r->y,
+				        	.w = TILELEN,
+						.h = TILELEN * tallness
+					}
+				);
 			}
 		}
 	}
 
-	free( myMap->objList);
-	myMap->objList = newObjList;
-	myMap->objListCount = newCount;
-
+	if (selectedObjStuff.obj) {
+		drawTexture (renderer, textures->highlitObjIndicator,
+		             (selectedObjStuff.obj->pos.i - viewPos.i)*TILELEN + r->x, (selectedObjStuff.obj->pos.j - viewPos.j)*TILELEN + r->y,
+			     TILELEN * selectedObjStuff.obj->width, TILELEN * selectedObjStuff.obj->height);
+	}
 }
 
 void drawCanvas( SDL_Rect *r) {
