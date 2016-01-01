@@ -355,9 +355,6 @@ int dsl_setFov( lua_State *l) {
 	int fovOption = lua_tointeger( l, 1);
 
 	switch (fovOption) {
-		case 0:
-			currentFov = fov_line;
-			break;
 		case 1:
 			currentFov = fov_raycast;
 			break;

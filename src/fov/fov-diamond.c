@@ -2,13 +2,12 @@
 #include "../util/log.h"
 #include "../definitions.h"
 
-void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct TextureSheet **sprites, struct ViewObject *objsSeen, int *objsSeenCount) {
+void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int range, struct ViewObject **tiles, struct TextureSheet **sprites) {
 	log2("fov_diamond\n");
 	int i,j;
 	int mapX, mapY;
 	int distance;
 
-	*objsSeenCount=0;
 	bool tileSeen = false;
 	for( i=0; i<VIEW_BOX_LENGTH; i++) {
 		for( j=0; j<VIEW_BOX_LENGTH; j++) {
@@ -17,21 +16,19 @@ void fov_diamond(  struct Map *map, struct Vector *pos, enum direction dir, int 
 			mapY = j + pos->j - VIEW_RANGE;
 
 			if( distance <= range && mapX >= 0 && mapY >= 0 && mapX < map->width && mapY < map->height) {
-				tiles[i][j] = map->tiles[mapX][mapY];
+				tiles[i][j].terrain = map->tiles[mapX][mapY];
 				tileSeen = true;
 
 				if( map->objs[ mapX][ mapY] != NULL) {
 					setFovViewObject(
-						&(objsSeen[*objsSeenCount]),
+						&tiles[i][j],
 						map->objs[mapX][mapY],
-						true, i, j, mapX, mapY, sprites
+						true, mapX, mapY, sprites
 					);
-
-					*objsSeenCount = *objsSeenCount + 1;
 				}
 			}
 			else {
-				tiles[i][j] = terrain_dark;
+				tiles[i][j].terrain = terrain_dark;
 				tileSeen = false;
 			}
 

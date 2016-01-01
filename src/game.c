@@ -27,18 +27,19 @@ bool playerMoved = false;
 //FIXME The program will crash if the window is too small (test if this is still happening). Render window un-usable and show a notification message about it.
 
 #define PLAYER_FOV_TILES_LIM VIEW_BOX_LENGTH
+bool makeTransparentForGround = false;
 int viewRange;
 int vi_padding, vj_padding;
-enum terrainType **playerVisibleTiles;
-struct ViewObject objsSeen[ VIEW_BOX_PERIMETER];
-int objsSeenCount;
+struct ViewObject **playerVisibleTiles;
 struct SpriteSpecsList *spriteSpecs;
+struct Vector mouseTile;
+struct object *highlitObject;
 
 
 const Uint32 timerDelay = 100 /*miliseconds*/;
 
 
-#define CALL_FOV_FCN() currentFov( myMap, &player->pos, player->dir, viewRange, playerVisibleTiles, textures->obj, objsSeen, &objsSeenCount)
+#define CALL_FOV_FCN() clearFovObjects(playerVisibleTiles, VIEW_RANGE); currentFov(myMap, &player->pos, player->dir, viewRange, playerVisibleTiles, textures->obj)
 #define PLAYER_DISTANCE( pos1) (abs( (pos1)->i - player->pos.i) + abs( (pos1)->j - player->pos.j))
 
 
@@ -396,64 +397,68 @@ void handleKey( SDL_KeyboardEvent *e) {
 
 void draw() {
 	log3("draw here\n");
-	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255);
 	SDL_RenderClear( renderer);
 
 	int i, j; //index of tile in map
 	int vi, vj; //where to draw tile in view
 	
-	#ifdef GOD_VISION //TODO try to optimize the calculations in here
+	struct ViewObject *vo, vo2;
+	struct object *obj;
 
-	vi = MAX(player->pos.i-viewSize.i/2, 0);
-	int vjStart = MAX(player->pos.j-viewSize.j/2, 0);
-
-	for( i=vi - player->pos.i + viewSize.i/2; vi<=MIN(myMap->width-1,player->pos.i+viewSize.i/2); i++, vi++) {
-		for( vj=vjStart, j=vj - player->pos.j + viewSize.j/2; vj<=MIN(myMap->height-1,player->pos.j+viewSize.j/2); j++, vj++) {
-			drawTexture( renderer, textures->trn[ myMap->tiles[ vi][ vj]], i*TILELEN, j*TILELEN, TILELEN, TILELEN);
-			if( myMap->objs[ vi][ vj]) {
-				struct object *o = myMap->objs[ vi][ vj];
-				drawTexture( renderer, textures->obj[ o->textureId]->textures[ o->visualState][ o->dir], i*TILELEN, j*TILELEN, TILELEN, TILELEN);
-			}
-		}
-	}
-
-	#endif
-
-	for( i=0, vi=vi_padding; i<PLAYER_FOV_TILES_LIM; i++, vi++ )
-		for( j=0, vj=vj_padding; j<PLAYER_FOV_TILES_LIM; j++, vj++) {
-			if( playerVisibleTiles[ i][ j] != terrain_dark) {
-				#ifdef GOD_VISION
-				drawTexture( renderer, textures->highlitObjIndicator, vi*TILELEN, vj*TILELEN, TILELEN, TILELEN);
-				#else
-				drawTexture( renderer, textures->trn[ playerVisibleTiles[ i][ j]], vi*TILELEN, vj*TILELEN, TILELEN, TILELEN);
-				#endif
-			}
-		}
-				
-	SDL_Rect destRect = (SDL_Rect){ .w = TILELEN, .h = TILELEN };
-	struct ViewObject *vo;
 	struct TextureSheet *ts;
-	for( i=0; i<objsSeenCount; i++) {
-		vo = &objsSeen[ i];
-		ts = textures->obj[vo->obj->textureId];
+	SDL_Rect destRect = (SDL_Rect){.w = TILELEN};
 
-		#ifndef GOD_VISION
+	for (i=0, vi=vi_padding; i < PLAYER_FOV_TILES_LIM; i++, vi++ ) {
+		for (j=0, vj=vj_padding; j < PLAYER_FOV_TILES_LIM; j++, vj++) {
 
-		destRect.x = (vi_padding + vo->pos.i)*TILELEN;
-		destRect.y = (vj_padding + vo->pos.j - ts->tallness + 1)*TILELEN;
-		destRect.h = TILELEN * ts->tallness;
+			vo = &playerVisibleTiles[i][j];
 
-		SDL_RenderCopy(renderer, 
-		               vo->isFullySeen
-		                ? ts->textures[ vo->obj->visualState][ vo->obj->dir]
-		                : textures->unidentifiedObj, 
-		               &vo->srcRect, &destRect);
-		#endif
-		
-		if( vo->obj->ai)
-			AI_SEEN( vo->obj->ai);
+			if (vo->terrain != terrain_dark) {
+
+				/* draw terrain */
+				drawTexture( renderer, textures->trn[ vo->terrain ], vi*TILELEN, vj*TILELEN, TILELEN, TILELEN );
+
+				/* draw object */
+				if (vo->obj) {
+					obj = vo->obj;
+					ts = textures->obj[obj->textureId];
+
+					destRect.x = vi * TILELEN;
+					destRect.y = (vj - ts->tallness) * TILELEN;
+					destRect.h = (ts->tallness + 1)* TILELEN;
+
+					int textureAlphaMod = 255;
+
+					if (obj != highlitObject) {
+						int dy;
+						for (dy = 1; dy <= ts->tallness; dy ++) {
+							vo2 = playerVisibleTiles[i][j - dy];
+
+							if ((vo2.obj == NULL && makeTransparentForGround) || 
+							    ( playerVisibleTiles[i][j - dy].obj &&
+							      textures->obj[ playerVisibleTiles[i][j - dy].obj->textureId ]->tallness <= (ts->tallness - dy)
+							    )) {
+
+								textureAlphaMod /= 2;
+							}
+						}
+					}
+
+					SDL_SetTextureAlphaMod(ts->textures[obj->visualState][obj->dir], textureAlphaMod);
+
+					SDL_RenderCopy(renderer, 
+					               vo->isFullySeen
+					                ? ts->textures[ obj->visualState ][ obj->dir ]
+					                : textures->unidentifiedObj, 
+					               &vo->srcRect, &destRect);
+
+					if (obj->ai)
+						AI_SEEN(obj->ai);
+				}
+			}
+		}
 	}
-
+		
 	int xStart = (windowW - CONSOLE_WIDTH) /2;
 	int xEnd = (windowW + CONSOLE_WIDTH) /2;
 
@@ -513,7 +518,8 @@ void update() {
 		free( newObjList);
 	}
 
-	getFovObjects( myMap, &player->pos, playerVisibleTiles, VIEW_RANGE, objsSeen, &objsSeenCount, textures->obj);
+	clearFovObjects( playerVisibleTiles, VIEW_RANGE );
+	getFovObjects( myMap, &player->pos, playerVisibleTiles, VIEW_RANGE, textures->obj);
 
 	playerMoved = false;
 }
@@ -534,7 +540,6 @@ int run() {
 	recalculateViewSize();
 
 	SDL_Event e;
-	SDL_MouseMotionEvent motionEvent;
 	while( true) {
 		SDL_WaitEvent( &e);
 		switch (e.type) {
@@ -588,16 +593,26 @@ int run() {
 				handleKey( (SDL_KeyboardEvent*)&e);
 				break;
 			case SDL_MOUSEMOTION: 
-			if( playerMoved != true) {
-				motionEvent = e.motion;
-				enum direction newDir = vector_dirTan( motionEvent.y/TILELEN - viewSize.j/2, motionEvent.x/TILELEN - viewSize.i/2);
-				if( player->dir == newDir)
-					continue;
-				player->dir = newDir;
-				playerMoved = true;
-				CALL_FOV_FCN();
-				break;
-			}
+				if( playerMoved != true) {
+					mouseTile.i = e.motion.x / TILELEN - vi_padding;
+					mouseTile.j = e.motion.y / TILELEN - vj_padding;
+
+					if (mouseTile.i >= 0 &&
+					    mouseTile.j >= 0 &&
+					    mouseTile.i < VIEW_BOX_LENGTH &&
+					    mouseTile.j < VIEW_BOX_LENGTH) {
+
+						highlitObject = playerVisibleTiles[ mouseTile.i ][ mouseTile.j ].obj;
+					}
+
+					enum direction newDir = vector_dirTan( mouseTile.j - VIEW_RANGE, mouseTile.i - VIEW_RANGE);
+					if( player->dir == newDir)
+						continue;
+					player->dir = newDir;
+					playerMoved = true;
+					CALL_FOV_FCN();
+					break;
+				}
 			case SDL_MOUSEBUTTONDOWN:
 				if( e.button.state == SDL_PRESSED) {
 					if( e.button.button == SDL_BUTTON_LEFT) {
@@ -621,15 +636,27 @@ void setDefaults() {
 	log1("setting defaults\n");
 
 	isPlayerPosSet = false;
-	currentFov = fov_diamond;
+	currentFov = fov_raycast;
 	setViewRange( VIEW_RANGE_DEFAULT );
 
 	timerPushEvent.user.code = CUSTOM_EVENT_UPDATE;
 
-	playerVisibleTiles = (enum terrainType**) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType*));
-	int i;
-	for( i=0; i< PLAYER_FOV_TILES_LIM; i++)
-		playerVisibleTiles[i] = (enum terrainType*) calloc( PLAYER_FOV_TILES_LIM, sizeof( enum terrainType));
+	playerVisibleTiles = (struct ViewObject**) calloc( PLAYER_FOV_TILES_LIM, sizeof(struct ViewObject*));
+	int i, j;
+	for (i=0; i< PLAYER_FOV_TILES_LIM; i++) {
+		playerVisibleTiles[i] = (struct ViewObject*) calloc( PLAYER_FOV_TILES_LIM, sizeof(struct ViewObject));
+
+		for (j = 0; j < PLAYER_FOV_TILES_LIM; j ++) {
+			struct ViewObject *vo = &playerVisibleTiles[i][j];
+
+			vo->obj = NULL;
+			vo->pos.i = i;
+			vo->pos.j = j;
+			vo->terrain = terrain_dark;
+			vo->srcRect.w = TILELEN;
+			vo->isFullySeen = false;
+		}
+	}
 	
 	init_fovBase( VIEW_RANGE);
 

@@ -62,7 +62,8 @@ SDL_Texture*** loadTexturesIntoTable( SDL_Renderer *ren, SDL_Texture **list, int
 
 
 
-	SDL_Texture ***table = (SDL_Texture***)calloc( outNumRows, sizeof( SDL_Texture**));
+	SDL_Texture ***table = (SDL_Texture***)calloc( outNumRows == 1 ? 2 : outNumRows, sizeof( SDL_Texture**));
+
 	int row, col;
 	for( row=0; row<outNumRows; row++) {
 		table[ row] = (SDL_Texture**)calloc( outNumCols, sizeof( SDL_Texture*));
@@ -78,6 +79,10 @@ SDL_Texture*** loadTexturesIntoTable( SDL_Renderer *ren, SDL_Texture **list, int
 	}
 
 	SDL_SetRenderTarget(ren, NULL);
+	
+	if (outNumRows == 1) {
+		table[1] = table[0];
+	}
 
 	return table;
 }
@@ -89,7 +94,6 @@ struct TextureSheet* loadObjTextures( SDL_Renderer *ren, const struct SpriteSpec
 
 	int numRotations = img->w / spec->width;
 	int numStates = img->h / spec->height;
-	assert(numStates >= 2);
 	log1( "\t\tWidth: %d, Height: %d. Num-states: %d, Num-rotations:%d\n", img->w, img->h, numStates, numRotations);
 
 	struct TextureSheet *result = (struct TextureSheet*)malloc( sizeof( struct TextureSheet));

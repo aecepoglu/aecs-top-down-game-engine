@@ -75,13 +75,13 @@ void loadSpriteSpecs( struct SpriteSpecsList *t, FILE *fp) {
 				sprite->tallness = atoi(string);
 			}
 			else {
-				sprite->tallness = 1;
+				sprite->tallness = 0;
 			}
 		}
 		else {
 			sprite->width = 16;
 			sprite->height = 16;
-			sprite->tallness = 1;
+			sprite->tallness = 0;
 		}
 
 		if (sprite->id >= t->size) {

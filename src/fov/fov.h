@@ -20,6 +20,7 @@ struct FOVBase {
 struct ViewObject {
 	struct object *obj;
 	struct Vector pos;
+	enum terrainType terrain;
 	SDL_Rect srcRect;
 	bool isFullySeen;
 };
@@ -29,8 +30,9 @@ struct FOVBase **fovBase;
 float fmodf_simple( float angle, float mod);
 struct FOVBase** init_fovBase( int range);
 void free_fovBase( struct FOVBase **fovBase);
-void getFovObjects( struct Map *map, struct Vector *pos, enum terrainType **tiles, int tilesLen, struct ViewObject *objsSeen, int *objsSeenCount, struct TextureSheet **objSprites);
-void setFovViewObject( struct ViewObject *result, struct object *objSeen, bool isFullySeen, int seenPosX, int seenPosY, int worldX, int worldY, struct TextureSheet **objSprites );
+void getFovObjects( struct Map *map, struct Vector *pos, struct ViewObject **tiles, int tilesLen, struct TextureSheet **objSprites);
+void setFovViewObject( struct ViewObject *result, struct object *objSeen, bool isFullySeen, int worldX, int worldY, struct TextureSheet **objSprites );
+void clearFovObjects (struct ViewObject **tiles, int range);
 
 
 /*
@@ -38,7 +40,7 @@ void setFovViewObject( struct ViewObject *result, struct object *objSeen, bool i
 	=============
 */
 
-typedef void (fovFun)( struct Map *map, struct Vector *pos, enum direction dir, int range, enum terrainType **tiles, struct TextureSheet **sprites, struct ViewObject *objsSeen, int *objsSeenCount);
+typedef void (fovFun)( struct Map *map, struct Vector *pos, enum direction dir, int range, struct ViewObject **tiles, struct TextureSheet **sprites );
 
 /* FOV covered by a single ray going towards the $dir direction
 */

@@ -142,6 +142,23 @@ bool editor_selectObj (unsigned int x, unsigned int y) {
 	Brush Functions
 */
 
+void removeDeletedObjects() {
+	int indexToPut = 0;
+	int i;
+	for (i = 0; i < myMap->objListCount; i++) {
+		if (myMap->objList[i]->isDeleted != true) {
+			myMap->objList[indexToPut] = myMap->objList[i];
+			indexToPut ++;
+		}
+		else {
+			objectFree(myMap->objList[i]);
+		}
+	}
+
+	myMap->objListCount -= removedObjectCounter;
+	removedObjectCounter = 0;
+}
+
 bool editor_removeObject( unsigned int x, unsigned int y, int type) {
 	if( myMap->objs[x][y] != 0) {
 		if (selectedObjStuff.obj == myMap->objs[x][y])
@@ -155,20 +172,7 @@ bool editor_removeObject( unsigned int x, unsigned int y, int type) {
 		if (removedObjectCounter > 8 &&
 		    removedObjectCounter * 4 >= myMap->objListSize) {
 
-			int indexToPut = 0;
-			int i;
-			for (i = 0; i < myMap->objListCount; i++) {
-				if (myMap->objList[i]->isDeleted != true) {
-					myMap->objList[indexToPut] = myMap->objList[i];
-					indexToPut ++;
-				}
-				else {
-					objectFree(myMap->objList[i]);
-				}
-			}
-
-			myMap->objListCount -= removedObjectCounter;
-			removedObjectCounter = 0;
+			removeDeletedObjects();
 		}
 		return true;
 	}
@@ -422,6 +426,8 @@ void buttonQuit_clicked( struct SDLGUI_Element *from) {
 }
 
 void buttonSave_clicked( struct SDLGUI_Element *from) {
+	removeDeletedObjects();
+
 	enum SDLGUI_Message_Type msgType;
 	char *msgText;
 	if( saveMap( myMap) != true) {
@@ -690,8 +696,10 @@ void drawObjects( SDL_Rect *r) {
 				float unitWidth =
 					(sheet ? (float)sheet->spriteWidth : 16) / obj->width;
 				float unitHeight =
-					(sheet ? (float)sheet->spriteHeight : 16) / obj->height;
-				
+					(sheet ? (float)sheet->spriteHeight : 16) / (obj->height + tallness);
+				int seenSpriteHeight =
+					(mapY == (obj->pos.j + obj->height - 1)) ? (tallness + 1) : 1;
+
 				SDL_RenderCopy(
 					renderer,
 					sheet ? sheet->textures[obj->visualState][obj->dir] : textures->unidentifiedObj,
@@ -699,13 +707,13 @@ void drawObjects( SDL_Rect *r) {
 						.x = (mapX - obj->pos.i) * unitWidth,
 						.y = (mapY - obj->pos.j) * unitHeight,
 						.w = unitWidth,
-						.h = unitHeight
+						.h = seenSpriteHeight * unitHeight
 					},
 					&(SDL_Rect) {
 						.x = (mapX - viewPos.i)*TILELEN + r->x,
-						.y = (mapY - viewPos.j - tallness + 1)*TILELEN + r->y,
-				        	.w = TILELEN,
-						.h = TILELEN * tallness
+						.y = (mapY - viewPos.j - tallness)*TILELEN + r->y,
+						.w = TILELEN,
+						.h = TILELEN * seenSpriteHeight
 					}
 				);
 			}

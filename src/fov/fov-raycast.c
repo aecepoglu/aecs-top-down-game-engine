@@ -25,7 +25,7 @@ void fov_castLight( struct FOVBase *from, struct FOVBase *to) {
 		: to->maxLit[1];
 }
 
-void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, int range, enum terrainType **tiles, struct TextureSheet **sprites, struct ViewObject *objsSeen, int *objsSeenCount) {
+void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, int range, struct ViewObject **tiles, struct TextureSheet **sprites) {
 	log2("fov_raycast from pos (%d,%d) with dir %d\n", pos->i, pos->j, objDir);
 
 	int i,j,dir;
@@ -33,7 +33,7 @@ void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, in
 	// clear
 	for( i=0; i<VIEW_BOX_LENGTH; i++)
 		for( j=0; j<VIEW_BOX_LENGTH; j++) {
-			tiles[i][j] = terrain_dark;
+			tiles[i][j].terrain = terrain_dark;
 			fovBase[i][j].lowerLimVisible = false;
 			fovBase[i][j].upperLimVisible = false;
 		}
@@ -51,7 +51,6 @@ void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, in
 
 	queueHead = 0;
 	queueTail = 0;
-	*objsSeenCount = 0;
 
 	node->lowerLimVisible= true;
 	node->upperLimVisible= true;
@@ -65,15 +64,14 @@ void fov_raycast( struct Map *map, struct Vector *pos, enum direction objDir, in
 
 		vectorAdd( &mapPos, pos, &node->pos);
 		vectorAdd( &tilePos, &centerPos, &node->pos);
-		tiles[ tilePos.i][ tilePos.j] = map->tiles[ mapPos.i][ mapPos.j];
+		tiles[ tilePos.i][ tilePos.j].terrain = map->tiles[ mapPos.i][ mapPos.j];
 
 		if( map->objs[ mapPos.i][ mapPos.j] != NULL) {
-			setFovViewObject( &objsSeen[ *objsSeenCount],
-				map->objs[ mapPos.i][ mapPos.j],
-				node->lowerLimVisible && node->upperLimVisible,
-				tilePos.i, tilePos.j, mapPos.i, mapPos.j, sprites
+			setFovViewObject( &tiles[ tilePos.i ][ tilePos.j ],
+			                  map->objs[ mapPos.i][ mapPos.j],
+			                  node->lowerLimVisible && node->upperLimVisible,
+			                  mapPos.i, mapPos.j, sprites
 			);
-			*objsSeenCount = *objsSeenCount + 1;
 		}
 
 		if( map->tiles[ mapPos.i][ mapPos.j] != terrain_wall) {
