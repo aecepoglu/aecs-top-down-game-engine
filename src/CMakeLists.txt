@@ -50,7 +50,7 @@ foreach(x ${MY_EDITOR_SOURCES})
 endforeach(x ${MY_EDITOR_SOURCES})
 set(MY_EDITOR_SOURCES ${_tmp})
 
-set(MY_SOURCE_FILES core/engine.c core/texture.c core/map.c core/object.c vector.c collection/linkedList.c text.c textConsole.c inventory.c cutscene.c ai/ai.c util/util.c texture/spriteSpecs.c)
+set(MY_SOURCE_FILES core/engine.c core/texture.c core/map.c core/object.c vector.c collection/linkedList.c text.c textConsole.c inventory.c cutscene.c ai/ai.c util/util.c texture/spriteSpecs.c jsmn/jsmn.c)
 
 
 
